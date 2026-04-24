@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { Printer } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { StatusDot } from "@/components/StatusDot";
@@ -9,7 +10,9 @@ import {
   statusColor,
   statusLabel,
   workOrders,
+  getBacklog,
 } from "@/data/cmms";
+import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 import { SeverityBadge, formatTs } from "./Index";
 
 const MachineDetail = () => {
@@ -38,6 +41,7 @@ const MachineDetail = () => {
   const machineAlerts = alerts.filter((a) => a.machineId === machine.id);
   const machineWO = workOrders.filter((w) => w.machineId === machine.id);
   const machinePM = pmTasks.filter((p) => p.machineId === machine.id);
+  const machineBacklog = getBacklog(machine.id);
 
   return (
     <AppLayout pageTitle={machine.id} breadcrumb={machine.sector.toUpperCase()}>
@@ -150,9 +154,59 @@ const MachineDetail = () => {
           </Panel>
         </div>
 
+        {/* Backlog for this machine */}
+        <div>
+          <SectionHeading>
+            Backlog · {machineBacklog.length} {machineBacklog.length === 1 ? "item" : "items"}
+          </SectionHeading>
+          <Panel className="overflow-x-auto" topAccent={machineBacklog.length > 0 ? "warn" : "default"}>
+            {machineBacklog.length === 0 ? (
+              <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
+                NO BACKLOG — UP TO DATE
+              </div>
+            ) : (
+              <table className="w-full text-left min-w-[640px]">
+                <thead>
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                    <th className="p-3 w-24">ID</th>
+                    <th className="p-3">Title</th>
+                    <th className="p-3 w-24">Priority</th>
+                    <th className="p-3 w-32">Due</th>
+                    <th className="p-3 w-16">Print</th>
+                  </tr>
+                </thead>
+                <tbody className="font-mono-data text-xs">
+                  {machineBacklog.map((w) => {
+                    const isOverdue = new Date(w.dueAt).getTime() < Date.now();
+                    return (
+                      <tr key={w.id} className="border-b border-border last:border-b-0">
+                        <td className="p-3 font-bold">{w.id}</td>
+                        <td className="p-3">{w.title}</td>
+                        <td className="p-3 uppercase">{w.priority}</td>
+                        <td className={`p-3 ${isOverdue ? "text-led-crit" : "text-muted-foreground"}`}>
+                          {new Date(w.dueAt).toISOString().slice(5, 16).replace("T", " ")}
+                        </td>
+                        <td className="p-3">
+                          <button
+                            onClick={() => printSingleWorkOrder(w)}
+                            className="text-muted-foreground hover:text-foreground"
+                            aria-label={`Print ${w.id}`}
+                          >
+                            <Printer className="size-4" />
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+        </div>
+
         {/* Work orders */}
         <div>
-          <SectionHeading>Open Work Orders</SectionHeading>
+          <SectionHeading>Work Orders</SectionHeading>
           <Panel className="overflow-x-auto">
             {machineWO.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
@@ -167,6 +221,7 @@ const MachineDetail = () => {
                     <th className="p-3 w-28">Priority</th>
                     <th className="p-3 w-28">Status</th>
                     <th className="p-3 w-32">Assignee</th>
+                    <th className="p-3 w-16">Print</th>
                   </tr>
                 </thead>
                 <tbody className="font-mono-data text-xs">
@@ -177,6 +232,15 @@ const MachineDetail = () => {
                       <td className="p-3 uppercase">{w.priority}</td>
                       <td className="p-3 uppercase text-muted-foreground">{w.status.replace("_", " ")}</td>
                       <td className="p-3 text-muted-foreground">{w.assignee}</td>
+                      <td className="p-3">
+                        <button
+                          onClick={() => printSingleWorkOrder(w)}
+                          className="text-muted-foreground hover:text-foreground"
+                          aria-label={`Print ${w.id}`}
+                        >
+                          <Printer className="size-4" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>

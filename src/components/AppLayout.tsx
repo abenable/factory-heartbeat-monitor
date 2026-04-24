@@ -8,9 +8,11 @@ import {
   CalendarClock,
   BarChart3,
   Menu,
+  Inbox,
 } from "lucide-react";
-import { alerts, workOrders } from "@/data/cmms";
+import { alerts, workOrders, getBacklog } from "@/data/cmms";
 import { StatusDot } from "@/components/StatusDot";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useLocation } from "react-router-dom";
 
@@ -19,6 +21,7 @@ const nav = [
   { to: "/machines", label: "Machines", icon: Cpu },
   { to: "/alerts", label: "Alerts", icon: AlertTriangle },
   { to: "/work-orders", label: "Work Orders", icon: ClipboardList },
+  { to: "/backlog", label: "Backlog", icon: Inbox },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
   { to: "/reports", label: "Reports", icon: BarChart3 },
 ];
@@ -32,6 +35,7 @@ interface AppLayoutProps {
 export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const openAlerts = alerts.filter((a) => !a.acknowledged).length;
   const openWO = workOrders.filter((w) => w.status !== "done").length;
+  const backlogCount = getBacklog().length;
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
@@ -43,6 +47,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const counts: Record<string, number | undefined> = {
     "/alerts": openAlerts,
     "/work-orders": openWO,
+    "/backlog": backlogCount,
   };
 
   const sidebarContent = (
@@ -143,6 +148,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
             </div>
             <div className="hidden md:block h-4 w-px bg-border" />
             <LiveClock />
+            <ThemeToggle />
           </div>
         </header>
 

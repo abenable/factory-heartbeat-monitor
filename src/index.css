@@ -2,96 +2,111 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Stealth Control Console — CMMS design system. All colors HSL. */
+/* Industrial CMMS — light + dark. All colors HSL.
+   Light = factory floor (teal primary + amber accent).
+   Dark  = stealth control console. */
 
 @layer base {
   :root {
-    /* Surfaces */
-    --background: 220 33% 2%;
-    --foreground: 213 27% 90%;
+    /* === LIGHT (default) — industrial teal + amber === */
+    --background: 210 20% 98%;
+    --foreground: 220 25% 12%;
 
-    --panel: 220 22% 5%;
-    --panel-elevated: 222 18% 8%;
+    --panel: 0 0% 100%;
+    --panel-elevated: 210 20% 96%;
 
-    --card: 220 22% 5%;
-    --card-foreground: 213 27% 90%;
+    --card: 0 0% 100%;
+    --card-foreground: 220 25% 12%;
 
-    --popover: 222 18% 8%;
-    --popover-foreground: 213 27% 90%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 25% 12%;
 
-    --primary: 213 27% 90%;
-    --primary-foreground: 220 33% 2%;
+    /* Teal primary */
+    --primary: 174 62% 38%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 18% 12%;
-    --secondary-foreground: 213 27% 90%;
+    --secondary: 210 16% 92%;
+    --secondary-foreground: 220 25% 18%;
 
-    --muted: 222 18% 10%;
-    --muted-foreground: 215 14% 60%;
+    --muted: 210 16% 94%;
+    --muted-foreground: 215 12% 42%;
 
-    --accent: 222 18% 14%;
-    --accent-foreground: 213 27% 90%;
+    /* Amber accent */
+    --accent: 38 95% 52%;
+    --accent-foreground: 220 25% 12%;
 
-    --destructive: 348 100% 50%;
-    --destructive-foreground: 213 27% 95%;
+    --destructive: 0 75% 48%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 220 22% 14%;
-    --input: 220 22% 14%;
-    --ring: 220 18% 30%;
+    --border: 215 18% 86%;
+    --input: 215 18% 86%;
+    --ring: 174 62% 38%;
 
-    /* Status LEDs */
-    --led-ok: 156 100% 49%;
-    --led-warn: 28 100% 50%;
-    --led-crit: 348 100% 50%;
-    --led-info: 215 14% 60%;
+    /* Status LEDs (kept readable on light) */
+    --led-ok: 152 70% 36%;
+    --led-warn: 32 95% 48%;
+    --led-crit: 0 78% 48%;
+    --led-info: 215 18% 45%;
 
-    --radius: 0.125rem;
+    --radius: 0.375rem;
 
-    /* Sidebar (matches stealth panel) */
-    --sidebar-background: 220 22% 4%;
-    --sidebar-foreground: 215 14% 60%;
-    --sidebar-primary: 213 27% 90%;
-    --sidebar-primary-foreground: 220 33% 2%;
-    --sidebar-accent: 222 18% 8%;
-    --sidebar-accent-foreground: 213 27% 90%;
-    --sidebar-border: 220 22% 12%;
-    --sidebar-ring: 220 18% 30%;
+    /* Sidebar */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 215 14% 35%;
+    --sidebar-primary: 174 62% 38%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 16% 94%;
+    --sidebar-accent-foreground: 220 25% 12%;
+    --sidebar-border: 215 18% 88%;
+    --sidebar-ring: 174 62% 38%;
   }
 
   .dark {
-    /* Single dark theme — same as :root */
-    --background: 220 33% 2%;
-    --foreground: 213 27% 90%;
-    --panel: 220 22% 5%;
-    --panel-elevated: 222 18% 8%;
-    --card: 220 22% 5%;
-    --card-foreground: 213 27% 90%;
-    --popover: 222 18% 8%;
-    --popover-foreground: 213 27% 90%;
-    --primary: 213 27% 90%;
-    --primary-foreground: 220 33% 2%;
-    --secondary: 222 18% 12%;
-    --secondary-foreground: 213 27% 90%;
-    --muted: 222 18% 10%;
-    --muted-foreground: 215 14% 60%;
-    --accent: 222 18% 14%;
-    --accent-foreground: 213 27% 90%;
-    --destructive: 348 100% 50%;
+    /* === DARK — stealth console === */
+    --background: 220 33% 4%;
+    --foreground: 213 27% 92%;
+
+    --panel: 220 22% 7%;
+    --panel-elevated: 222 18% 10%;
+
+    --card: 220 22% 7%;
+    --card-foreground: 213 27% 92%;
+
+    --popover: 222 18% 10%;
+    --popover-foreground: 213 27% 92%;
+
+    --primary: 174 65% 48%;
+    --primary-foreground: 220 33% 4%;
+
+    --secondary: 222 18% 14%;
+    --secondary-foreground: 213 27% 92%;
+
+    --muted: 222 18% 12%;
+    --muted-foreground: 215 14% 62%;
+
+    --accent: 38 95% 56%;
+    --accent-foreground: 220 33% 4%;
+
+    --destructive: 348 100% 56%;
     --destructive-foreground: 213 27% 95%;
-    --border: 220 22% 14%;
-    --input: 220 22% 14%;
-    --ring: 220 18% 30%;
+
+    --border: 220 22% 16%;
+    --input: 220 22% 16%;
+    --ring: 174 65% 48%;
+
     --led-ok: 156 100% 49%;
-    --led-warn: 28 100% 50%;
-    --led-crit: 348 100% 50%;
-    --led-info: 215 14% 60%;
-    --sidebar-background: 220 22% 4%;
-    --sidebar-foreground: 215 14% 60%;
-    --sidebar-primary: 213 27% 90%;
-    --sidebar-primary-foreground: 220 33% 2%;
-    --sidebar-accent: 222 18% 8%;
-    --sidebar-accent-foreground: 213 27% 90%;
-    --sidebar-border: 220 22% 12%;
-    --sidebar-ring: 220 18% 30%;
+    --led-warn: 28 100% 55%;
+    --led-crit: 348 100% 58%;
+    --led-info: 215 14% 65%;
+
+    --sidebar-background: 220 22% 5%;
+    --sidebar-foreground: 215 14% 65%;
+    --sidebar-primary: 174 65% 48%;
+    --sidebar-primary-foreground: 220 33% 4%;
+    --sidebar-accent: 222 18% 10%;
+    --sidebar-accent-foreground: 213 27% 92%;
+    --sidebar-border: 220 22% 14%;
+    --sidebar-ring: 174 65% 48%;
   }
 }
 
@@ -107,7 +122,7 @@
   }
 
   ::selection {
-    background: hsl(var(--ring));
+    background: hsl(var(--primary) / 0.3);
     color: hsl(var(--foreground));
   }
 }
@@ -119,13 +134,13 @@
   }
 
   .led-glow-ok {
-    box-shadow: 0 0 10px 1px hsl(var(--led-ok) / 0.5);
+    box-shadow: 0 0 10px 1px hsl(var(--led-ok) / 0.45);
   }
   .led-glow-warn {
     box-shadow: 0 0 10px 1px hsl(var(--led-warn) / 0.5);
   }
   .led-glow-crit {
-    box-shadow: 0 0 10px 1px hsl(var(--led-crit) / 0.6);
+    box-shadow: 0 0 10px 1px hsl(var(--led-crit) / 0.55);
   }
 
   .text-led-ok { color: hsl(var(--led-ok)); }
@@ -139,4 +154,23 @@
 
   .bg-panel { background-color: hsl(var(--panel)); }
   .bg-panel-elevated { background-color: hsl(var(--panel-elevated)); }
+}
+
+/* === Print styles ===
+   Anything wrapped in .print-only is hidden on screen and shown on print.
+   When .printing class is on <html>, hide app chrome and show only the printable region. */
+@media screen {
+  .print-only { display: none !important; }
+}
+
+@media print {
+  @page { margin: 1.5cm; }
+  html, body { background: #fff !important; color: #000 !important; }
+  .no-print, aside, header { display: none !important; }
+  main { padding: 0 !important; overflow: visible !important; }
+  .print-only { display: block !important; }
+  .print-block { break-inside: avoid; }
+  table { width: 100% !important; border-collapse: collapse; }
+  th, td { border: 1px solid #999 !important; padding: 6px 8px !important; color: #000 !important; }
+  thead { background: #eee !important; }
 }

@@ -364,3 +364,23 @@ export function statusLabel(status: MachineStatus): string {
     maintenance: "MAINT",
   }[status];
 }
+
+/**
+ * Backlog = work orders that are not done AND are either past their due date
+ * OR have been open for more than 3 days. Used for fleet + per-machine views.
+ */
+export function isBacklog(wo: WorkOrder, now: Date = new Date()): boolean {
+  if (wo.status === "done") return false;
+  const due = new Date(wo.dueAt);
+  if (due.getTime() < now.getTime()) return true;
+  const created = new Date(wo.createdAt);
+  const ageDays = (now.getTime() - created.getTime()) / 86_400_000;
+  return ageDays > 3;
+}
+
+export function getBacklog(machineId?: string, now: Date = new Date()): WorkOrder[] {
+  return workOrders.filter(
+    (w) => isBacklog(w, now) && (!machineId || w.machineId === machineId),
+  );
+}
+
