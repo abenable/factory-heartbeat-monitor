@@ -8,14 +8,15 @@ import {
   statusColor,
   statusLabel,
   workOrders,
+  getBacklog,
 } from "@/data/cmms";
 
 const Dashboard = () => {
   const running = machines.filter((m) => m.status === "running").length;
-  const down = machines.filter((m) => m.status === "down").length;
   const fleetUptime =
     machines.reduce((s, m) => s + m.uptime, 0) / machines.length;
   const openWO = workOrders.filter((w) => w.status !== "done").length;
+  const backlog = getBacklog().length;
   const critical = alerts.filter((a) => a.severity === "crit" && !a.acknowledged)
     .length;
   const recentAlerts = alerts.slice(0, 5);
@@ -27,10 +28,16 @@ const Dashboard = () => {
     >
       <div className="flex flex-col gap-8">
         {/* KPI row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <Kpi label="Fleet Uptime (30d)" value={`${fleetUptime.toFixed(2)}`} unit="%" />
           <Kpi label="Active Machines" value={`${running}`} unit={`/ ${machines.length}`} />
           <Kpi label="Open Work Orders" value={`${openWO}`} unit="OPEN" />
+          <Kpi
+            label="Backlog"
+            value={String(backlog).padStart(2, "0")}
+            unit={backlog > 0 ? "OVERDUE/AGING" : "CLEAR"}
+            tone={backlog > 0 ? "warn" : "ok"}
+          />
           <Kpi
             label="Critical Anomalies"
             value={String(critical).padStart(2, "0")}
@@ -163,11 +170,15 @@ function Kpi({
   label: string;
   value: string;
   unit?: string;
-  tone?: "default" | "crit" | "ok";
+  tone?: "default" | "crit" | "ok" | "warn";
 }) {
-  const accent = tone === "crit" ? "crit" : tone === "ok" ? "ok" : "default";
+  const accent = tone === "default" ? "default" : tone;
   const valueClass =
-    tone === "crit" ? "text-led-crit" : "text-foreground";
+    tone === "crit"
+      ? "text-led-crit"
+      : tone === "warn"
+      ? "text-led-warn"
+      : "text-foreground";
   return (
     <Panel topAccent={accent} className="p-5 h-32 flex flex-col justify-between">
       <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
