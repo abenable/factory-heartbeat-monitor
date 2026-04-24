@@ -1,12 +1,16 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Printer } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
+import { Button } from "@/components/ui/button";
 import {
   workOrders as initial,
   WorkOrderStatus,
   WorkOrderPriority,
+  getMachine,
 } from "@/data/cmms";
+import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 
 const statusFilters: { key: WorkOrderStatus | "all"; label: string }[] = [
   { key: "all", label: "All" },
@@ -36,30 +40,38 @@ const WorkOrders = () => {
   const blocked = initial.filter((w) => w.status === "blocked").length;
   const done = initial.filter((w) => w.status === "done").length;
 
+  const printFiltered = () => window.print();
+
   return (
     <AppLayout pageTitle="Work Orders" breadcrumb="MAINTENANCE QUEUE">
       <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 no-print">
           <Stat label="Open" value={open} />
           <Stat label="In Progress" value={inProgress} />
           <Stat label="Blocked" value={blocked} tone="warn" />
           <Stat label="Completed" value={done} tone="ok" />
         </div>
 
-        <div className="flex flex-wrap gap-1">
-          {statusFilters.map((f) => (
-            <button
-              key={f.key}
-              onClick={() => setFilter(f.key)}
-              className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border transition-colors ${
-                filter === f.key
-                  ? "border-foreground bg-panel-elevated text-foreground"
-                  : "border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {f.label}
-            </button>
-          ))}
+        <div className="flex flex-wrap items-center justify-between gap-3 no-print">
+          <div className="flex flex-wrap gap-1">
+            {statusFilters.map((f) => (
+              <button
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border transition-colors ${
+                  filter === f.key
+                    ? "border-foreground bg-panel-elevated text-foreground"
+                    : "border-border text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+          <Button variant="outline" size="sm" onClick={printFiltered}>
+            <Printer className="size-4" />
+            Print Filtered ({list.length})
+          </Button>
         </div>
 
         <SectionHeading>{list.length} Work Orders</SectionHeading>
@@ -74,6 +86,7 @@ const WorkOrders = () => {
                 <th className="p-3 w-28">Status</th>
                 <th className="p-3 w-32">Assignee</th>
                 <th className="p-3 w-32">Due</th>
+                <th className="p-3 w-16 no-print">Print</th>
               </tr>
             </thead>
             <tbody className="font-mono-data text-xs">
@@ -99,11 +112,52 @@ const WorkOrders = () => {
                   <td className="p-3 text-muted-foreground">
                     {new Date(w.dueAt).toISOString().slice(5, 16).replace("T", " ")}
                   </td>
+                  <td className="p-3 no-print">
+                    <button
+                      onClick={() => printSingleWorkOrder(w)}
+                      className="text-muted-foreground hover:text-foreground"
+                      aria-label={`Print ${w.id}`}
+                      title="Print this work order"
+                    >
+                      <Printer className="size-4" />
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </Panel>
+
+        {/* Printable header — only shows when printing the filtered list */}
+        <div className="print-only">
+          <h1 style={{ fontSize: 20, marginBottom: 4 }}>
+            Work Orders — {filter === "all" ? "All" : filter.replace("_", " ").toUpperCase()}
+          </h1>
+          <p style={{ marginBottom: 12, color: "#444" }}>
+            Printed {new Date().toLocaleString()} · {list.length} item(s)
+          </p>
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Title</th><th>Machine</th><th>Priority</th>
+                <th>Status</th><th>Assignee</th><th>Due</th>
+              </tr>
+            </thead>
+            <tbody>
+              {list.map((w) => (
+                <tr key={w.id}>
+                  <td>{w.id}</td>
+                  <td>{w.title}</td>
+                  <td>{w.machineId} — {getMachine(w.machineId)?.name ?? ""}</td>
+                  <td>{w.priority.toUpperCase()}</td>
+                  <td>{w.status.replace("_", " ").toUpperCase()}</td>
+                  <td>{w.assignee}</td>
+                  <td>{new Date(w.dueAt).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </AppLayout>
   );
