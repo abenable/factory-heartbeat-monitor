@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { Printer } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { StatusDot } from "@/components/StatusDot";
@@ -9,7 +10,9 @@ import {
   statusColor,
   statusLabel,
   workOrders,
+  getBacklog,
 } from "@/data/cmms";
+import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 import { SeverityBadge, formatTs } from "./Index";
 
 const MachineDetail = () => {
@@ -38,6 +41,7 @@ const MachineDetail = () => {
   const machineAlerts = alerts.filter((a) => a.machineId === machine.id);
   const machineWO = workOrders.filter((w) => w.machineId === machine.id);
   const machinePM = pmTasks.filter((p) => p.machineId === machine.id);
+  const machineBacklog = getBacklog(machine.id);
 
   return (
     <AppLayout pageTitle={machine.id} breadcrumb={machine.sector.toUpperCase()}>
