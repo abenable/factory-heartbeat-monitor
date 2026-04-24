@@ -120,13 +120,13 @@ const MachineDetail = () => {
         {/* Alerts for this machine */}
         <div>
           <SectionHeading>Alert History</SectionHeading>
-          <Panel className="overflow-hidden">
+          <Panel className="overflow-x-auto">
             {machineAlerts.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
                 NO ALERTS LOGGED
               </div>
             ) : (
-              <table className="w-full text-left">
+              <table className="w-full text-left min-w-[640px]">
                 <thead>
                   <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
                     <th className="p-3 w-44">Timestamp</th>
@@ -153,13 +153,13 @@ const MachineDetail = () => {
         {/* Work orders */}
         <div>
           <SectionHeading>Open Work Orders</SectionHeading>
-          <Panel className="overflow-hidden">
+          <Panel className="overflow-x-auto">
             {machineWO.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
                 NO WORK ORDERS
               </div>
             ) : (
-              <table className="w-full text-left">
+              <table className="w-full text-left min-w-[640px]">
                 <thead>
                   <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
                     <th className="p-3 w-24">ID</th>
@@ -188,13 +188,13 @@ const MachineDetail = () => {
         {/* PM tasks */}
         <div>
           <SectionHeading>Preventive Maintenance Tasks</SectionHeading>
-          <Panel className="overflow-hidden">
+          <Panel className="overflow-x-auto">
             {machinePM.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
                 NO PM TASKS
               </div>
             ) : (
-              <table className="w-full text-left">
+              <table className="w-full text-left min-w-[640px]">
                 <thead>
                   <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
                     <th className="p-3">Task</th>
