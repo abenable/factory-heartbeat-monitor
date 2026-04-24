@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { alerts, workOrders } from "@/data/cmms";
 import { StatusDot } from "@/components/StatusDot";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useLocation } from "react-router-dom";
 
 const nav = [
@@ -116,15 +116,13 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-14 md:h-16 px-4 md:px-8 border-b border-border flex items-center justify-between gap-3 shrink-0 bg-panel">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <SheetTrigger asChild>
-              <button
-                onClick={() => setMobileOpen(true)}
-                className="md:hidden p-1.5 -ml-1.5 text-muted-foreground hover:text-foreground transition-colors"
-                aria-label="Open navigation"
-              >
-                <Menu className="size-5" />
-              </button>
-            </SheetTrigger>
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="md:hidden p-1.5 -ml-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Open navigation"
+            >
+              <Menu className="size-5" />
+            </button>
             <div className="flex items-baseline gap-3 min-w-0">
               <h1 className="text-base md:text-lg font-semibold truncate">
                 {pageTitle}
