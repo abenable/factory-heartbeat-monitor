@@ -109,8 +109,8 @@ const Dashboard = () => {
           >
             Recent Event Log
           </SectionHeading>
-          <Panel className="overflow-hidden">
-            <table className="w-full text-left border-collapse">
+          <Panel className="overflow-x-auto">
+            <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-border bg-panel-elevated">
                   <th className="p-3 font-mono-data text-[10px] text-muted-foreground uppercase w-44">

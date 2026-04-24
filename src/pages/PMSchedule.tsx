@@ -36,8 +36,8 @@ const PMSchedule = () => {
         </div>
 
         <SectionHeading>Upcoming Tasks</SectionHeading>
-        <Panel className="overflow-hidden">
-          <table className="w-full text-left">
+        <Panel className="overflow-x-auto">
+          <table className="w-full text-left min-w-[640px]">
             <thead>
               <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
                 <th className="p-3 w-24">PM ID</th>
