@@ -9,18 +9,24 @@ import {
   BarChart3,
   Menu,
   Inbox,
+  FilePlus2,
+  ClipboardCheck,
+  LogOut,
 } from "lucide-react";
 import { alerts, workOrders, getBacklog } from "@/data/cmms";
 import { StatusDot } from "@/components/StatusDot";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getUser, logout } from "@/lib/auth";
 
 const nav = [
   { to: "/", label: "Live Dashboard", icon: LayoutDashboard, end: true },
   { to: "/machines", label: "Machines", icon: Cpu },
   { to: "/alerts", label: "Alerts", icon: AlertTriangle },
   { to: "/work-orders", label: "Work Orders", icon: ClipboardList },
+  { to: "/work-orders/new", label: "New Work Order", icon: FilePlus2 },
+  { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
   { to: "/backlog", label: "Backlog", icon: Inbox },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
   { to: "/reports", label: "Reports", icon: BarChart3 },
@@ -38,6 +44,8 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const backlogCount = getBacklog().length;
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const user = getUser() ?? "Operator";
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -50,13 +58,21 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
     "/backlog": backlogCount,
   };
 
+  const onLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
+  };
+
   const sidebarContent = (
     <>
-      <div className="h-16 flex items-center px-6 border-b border-border">
-        <div className="flex items-center gap-3">
-          <div className="size-3 bg-foreground" />
-          <span className="font-mono-data tracking-widest font-bold text-sm uppercase">
-            Aegis Ops
+      <div className="px-6 py-4 border-b border-border flex items-center gap-3">
+        <div className="size-3 bg-foreground shrink-0" />
+        <div className="flex flex-col min-w-0">
+          <span className="font-bold text-sm leading-tight truncate">
+            Group 6 Industries
+          </span>
+          <span className="font-mono-data text-[9px] tracking-widest text-muted-foreground uppercase">
+            Limited · CMMS
           </span>
         </div>
       </div>
@@ -86,15 +102,23 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
 
       <div className="p-4 border-t border-border">
         <div className="flex items-center gap-3 px-2 py-2">
-          <div className="size-8 bg-panel-elevated border border-ring flex items-center justify-center font-mono-data text-xs">
-            OP
+          <div className="size-8 bg-panel-elevated border border-ring flex items-center justify-center font-mono-data text-xs shrink-0">
+            {user.slice(0, 2).toUpperCase()}
           </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-medium">Operator 04</span>
+          <div className="flex flex-col min-w-0 flex-1">
+            <span className="text-xs font-medium truncate">{user}</span>
             <span className="text-[10px] font-mono-data text-muted-foreground">
-              AUTH-LVL-3
+              TECHNICIAN
             </span>
           </div>
+          <button
+            onClick={onLogout}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Sign out"
+            title="Sign out"
+          >
+            <LogOut className="size-4" />
+          </button>
         </div>
       </div>
     </>
@@ -166,12 +190,21 @@ function LiveClock() {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
-  const hh = String(now.getUTCHours()).padStart(2, "0");
-  const mm = String(now.getUTCMinutes()).padStart(2, "0");
-  const ss = String(now.getUTCSeconds()).padStart(2, "0");
+  const date = now.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+  const time = now.toLocaleTimeString(undefined, { hour12: false });
   return (
-    <span className="font-mono-data text-xs md:text-sm tracking-tight">
-      {hh}:{mm}:{ss} <span className="hidden sm:inline">UTC</span>
-    </span>
+    <div className="flex flex-col items-end leading-tight">
+      <span className="font-mono-data text-xs md:text-sm tracking-tight">
+        {time}
+      </span>
+      <span className="hidden sm:inline font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+        {date}
+      </span>
+    </div>
   );
 }

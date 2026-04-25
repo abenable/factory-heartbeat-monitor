@@ -43,6 +43,17 @@ export interface WorkOrder {
   assignee: string;
   createdAt: string;
   dueAt: string;
+  // Optional operator-supplied details
+  workArea?: string;
+  equipmentStatus?: string;
+  maintenanceStrategy?: string;
+  estimatedHours?: number;
+  numberOfWorkers?: number;
+  comments?: string;
+}
+
+export function addWorkOrder(wo: WorkOrder) {
+  workOrders.unshift(wo);
 }
 
 export interface PMTask {
