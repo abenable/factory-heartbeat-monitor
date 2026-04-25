@@ -11,6 +11,7 @@ import {
   Inbox,
   ClipboardCheck,
   LogOut,
+  Wrench,
 } from "lucide-react";
 import { alerts, workOrders, getBacklog } from "@/data/cmms";
 import { StatusDot } from "@/components/StatusDot";
@@ -29,6 +30,7 @@ const nav = [
   { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
   { to: "/backlog", label: "Backlog", icon: Inbox },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
+  { to: "/crafts", label: "Crafts", icon: Wrench },
   { to: "/reports", label: "Reports", icon: BarChart3 },
 ];
 

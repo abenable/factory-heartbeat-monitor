@@ -2,7 +2,15 @@
 
 export type MachineStatus = "running" | "idle" | "down" | "maintenance";
 
+export interface SparePart {
+  partNumber: string;
+  name: string;
+  quantity: number;
+  unit?: string;
+}
+
 export interface Machine {
+  // ── Core telemetry ──
   id: string;
   name: string;
   type: string;
@@ -18,6 +26,36 @@ export interface Machine {
   lastService: string; // ISO date
   nextService: string; // ISO date
   runtimeHours: number;
+
+  // ── 1. Asset Identification ──
+  manufacturer?: string;
+  modelNumber?: string;
+  serialNumber?: string;
+
+  // ── 2. Location & Installation ──
+  plant?: string;
+  section?: string;
+  line?: string;
+  installationDate?: string;
+  commissioningDate?: string;
+
+  // ── 3. Technical Specifications ──
+  powerRating?: string;
+  capacity?: string;
+  speed?: string;
+  operatingParameters?: string;
+  designLimits?: string;
+
+  // ── 4. Maintenance Information ──
+  maintenanceProcedures?: string;
+  requiredTools?: string;
+  safetyInstructions?: string;
+
+  // ── 5. Spare Parts & BOM ──
+  spareParts?: SparePart[];
+
+  // ── 6. Assigned Personnel ──
+  assignedTechnicians?: string[]; // worker usernames
 }
 
 export type AlertSeverity = "crit" | "warn" | "info";
@@ -33,6 +71,33 @@ export interface AlertEvent {
 
 export type WorkOrderStatus = "open" | "in_progress" | "blocked" | "done";
 export type WorkOrderPriority = "low" | "medium" | "high" | "critical";
+export type WorkOrderType = "corrective" | "preventive" | "predictive" | "condition-based";
+
+export interface WorkOrderTask {
+  description: string;
+  completed?: boolean;
+}
+
+export interface WorkOrderResource {
+  tools: string[];
+  spareParts: string[];
+  ppe: string[];
+}
+
+export interface WorkOrderSchedule {
+  startDate: string;
+  expectedCompletion: string;
+  actualStart?: string;
+  actualCompletion?: string;
+}
+
+export interface WorkOrderWorkLog {
+  actualStartTime?: string;
+  actualCompletionTime?: string;
+  partsUsed?: string;
+  observations?: string;
+  rootCause?: string;
+}
 
 export interface WorkOrder {
   id: string;
@@ -40,10 +105,21 @@ export interface WorkOrder {
   machineId: string;
   status: WorkOrderStatus;
   priority: WorkOrderPriority;
+  type: WorkOrderType;
   assignee: string;
+  department?: string;
   createdAt: string;
   dueAt: string;
-  // Optional operator-supplied details
+
+  // Enhanced WO fields
+  problemDescription?: string;
+  tasks: WorkOrderTask[];
+  schedule?: WorkOrderSchedule;
+  resources?: WorkOrderResource;
+  authorizedBy?: string;
+  workLog?: WorkOrderWorkLog;
+
+  // Legacy optional fields (for backward compat)
   workArea?: string;
   equipmentStatus?: string;
   maintenanceStrategy?: string;
@@ -81,6 +157,24 @@ export let machines: Machine[] = [
     lastService: "2026-01-25",
     nextService: "2026-04-25",
     runtimeHours: 4218,
+    manufacturer: "Komatsu Industries",
+    modelNumber: "HPF-4000-X",
+    serialNumber: "KI-HP-2019-004412",
+    installationDate: "2019-03-15",
+    commissioningDate: "2019-04-10",
+    powerRating: "75 kW",
+    capacity: "4,000 kN",
+    speed: "14 strokes/min",
+    operatingParameters: "Pressure 3800–4500 PSI, Temp ≤ 60°C",
+    designLimits: "Max pressure 5,200 PSI, Max temp 85°C",
+    maintenanceProcedures: "Daily oil-level check. Weekly filter inspection. Monthly ram alignment.",
+    requiredTools: "Hydraulic gauge set, torque wrench, dial indicator",
+    safetyInstructions: "Lockout-tagout required. Wear face shield during pressure tests.",
+    spareParts: [
+      { partNumber: "SP-HP-001", name: "Hydraulic seal kit", quantity: 2, unit: "set" },
+      { partNumber: "SP-HP-007", name: "Pressure relief valve", quantity: 1, unit: "pc" },
+    ],
+    assignedTechnicians: ["Suubi", "Odeke"],
   },
   {
     id: "LATH-AX-09",
@@ -96,6 +190,24 @@ export let machines: Machine[] = [
     lastService: "2026-01-15",
     nextService: "2026-04-15",
     runtimeHours: 6122,
+    manufacturer: "DMG Mori",
+    modelNumber: "NTX 3000",
+    serialNumber: "DMG-NTX-2018-002891",
+    installationDate: "2018-08-20",
+    commissioningDate: "2018-09-12",
+    powerRating: "45 kW",
+    capacity: "Ø 300 mm × 1,500 mm",
+    speed: "12,000 rpm max",
+    operatingParameters: "Spindle temp ≤ 90°C, coolant flow ≥ 15 L/min",
+    designLimits: "Max spindle 14,000 rpm, Max temp 120°C",
+    maintenanceProcedures: "Daily chip conveyor clean. Weekly coolant pH test. Monthly ball-screw grease.",
+    requiredTools: "Bore gauge, RPM tachometer, coolant test kit",
+    safetyInstructions: "Ensure spindle stop before door open. Eye protection mandatory.",
+    spareParts: [
+      { partNumber: "SP-CNC-003", name: "Spindle bearing (7208)", quantity: 4, unit: "pc" },
+      { partNumber: "SP-CNC-011", name: "Coolant pump seal", quantity: 2, unit: "pc" },
+    ],
+    assignedTechnicians: ["Mukisa", "Ouma"],
   },
   {
     id: "MILL-CN-04",
@@ -125,6 +237,23 @@ export let machines: Machine[] = [
     lastService: "2026-02-10",
     nextService: "2026-05-10",
     runtimeHours: 8900,
+    manufacturer: "Siemens Logistics",
+    modelNumber: "CV-1500-HE",
+    serialNumber: "SL-CV-2020-007331",
+    installationDate: "2020-01-10",
+    commissioningDate: "2020-02-05",
+    powerRating: "11 kW",
+    capacity: "1,500 kg/h",
+    speed: "0.8 m/s",
+    operatingParameters: "Belt tension 2.5–3.0 kN, Vibration ≤ 0.05 mm/s",
+    maintenanceProcedures: "Daily belt-walk inspection. Weekly roller noise check. Monthly tension calibration.",
+    requiredTools: "Belt tension gauge, vibration meter, strobe light",
+    safetyInstructions: "Lock conveyor before entry. No loose clothing near drive rollers.",
+    spareParts: [
+      { partNumber: "SP-CV-002", name: "Drive belt (B-section)", quantity: 3, unit: "m" },
+      { partNumber: "SP-CV-005", name: "Roller bearing 6205", quantity: 8, unit: "pc" },
+    ],
+    assignedTechnicians: ["Odeke", "Tabalaata"],
   },
   {
     id: "WELD-RB-06",
@@ -272,9 +401,31 @@ export const workOrders: WorkOrder[] = [
     machineId: "LATH-AX-09",
     status: "in_progress",
     priority: "critical",
-    assignee: "T. Vance",
+    type: "corrective",
+    assignee: "Mukisa",
+    department: "Electrical Maintenance",
     createdAt: "2026-04-24T14:05:00Z",
     dueAt: "2026-04-24T20:00:00Z",
+    problemDescription: "Spindle bearing thermal threshold exceeded (>110°C). Auto-shutdown engaged. Abnormal noise observed.",
+    tasks: [
+      { description: "Inspect cooling system (fan and vents)", completed: true },
+      { description: "Remove damaged spindle bearing (Type 7208)", completed: false },
+      { description: "Install new bearing and verify runout", completed: false },
+      { description: "Test run and verify temperature < 90°C", completed: false },
+    ],
+    schedule: {
+      startDate: "2026-04-24T14:05:00Z",
+      expectedCompletion: "2026-04-24T20:00:00Z",
+    },
+    resources: {
+      tools: ["Bearing puller set", "Torque wrench", "Dial indicator"],
+      spareParts: ["Spindle bearing 7208 (×4)", "High-temp grease"],
+      ppe: ["Heat-resistant gloves", "Safety goggles", "Face shield"],
+    },
+    authorizedBy: "Nakimbugwe",
+    workLog: {
+      actualStartTime: "2026-04-24T14:30:00Z",
+    },
   },
   {
     id: "WO-2040",
@@ -282,9 +433,28 @@ export const workOrders: WorkOrder[] = [
     machineId: "MILL-CN-04",
     status: "open",
     priority: "high",
-    assignee: "R. Kapoor",
+    type: "corrective",
+    assignee: "Suubi",
+    department: "Mechanical Maintenance",
     createdAt: "2026-04-24T13:50:00Z",
     dueAt: "2026-04-25T17:00:00Z",
+    problemDescription: "Coolant pressure variance detected. Deviation: -4.2%. Potential leak in supply line.",
+    tasks: [
+      { description: "Inspect coolant supply line for leaks" },
+      { description: "Check coolant pump impeller condition" },
+      { description: "Pressure-test cooling circuit" },
+      { description: "Top up coolant and verify flow rate" },
+    ],
+    schedule: {
+      startDate: "2026-04-25T08:00:00Z",
+      expectedCompletion: "2026-04-25T17:00:00Z",
+    },
+    resources: {
+      tools: ["Pressure gauge", "Coolant test kit"],
+      spareParts: ["Coolant pump seal", "Hose clamp set"],
+      ppe: ["Chemical gloves", "Safety goggles"],
+    },
+    authorizedBy: "Nakimbugwe",
   },
   {
     id: "WO-2039",
@@ -292,9 +462,28 @@ export const workOrders: WorkOrder[] = [
     machineId: "WELD-RB-06",
     status: "open",
     priority: "medium",
-    assignee: "M. Okafor",
+    type: "preventive",
+    assignee: "Wagoli",
+    department: "Predictive Maintenance",
     createdAt: "2026-04-24T13:25:00Z",
     dueAt: "2026-04-26T17:00:00Z",
+    problemDescription: "Vibration spike on axis Z (0.08 mm/s). Exceeds baseline by 60%.",
+    tasks: [
+      { description: "Acquire vibration spectrum on Z-axis" },
+      { description: "Inspect spindle bearing and preload" },
+      { description: "Check coupling alignment" },
+      { description: "Lubricate and re-test" },
+    ],
+    schedule: {
+      startDate: "2026-04-26T08:00:00Z",
+      expectedCompletion: "2026-04-26T14:00:00Z",
+    },
+    resources: {
+      tools: ["Vibration analyzer", "Strobe light"],
+      spareParts: ["Bearing grease cartridge"],
+      ppe: ["Safety goggles"],
+    },
+    authorizedBy: "Nakimbugwe",
   },
   {
     id: "WO-2038",
@@ -302,9 +491,31 @@ export const workOrders: WorkOrder[] = [
     machineId: "INJ-MD-11",
     status: "in_progress",
     priority: "medium",
-    assignee: "L. Ferreira",
+    type: "preventive",
+    assignee: "Odeke",
+    department: "Mechanical Maintenance",
     createdAt: "2026-04-23T08:00:00Z",
     dueAt: "2026-04-24T18:00:00Z",
+    problemDescription: "Scheduled quarterly preventive maintenance per OEM checklist.",
+    tasks: [
+      { description: "Replace hydraulic filter element", completed: true },
+      { description: "Check heater band resistance", completed: true },
+      { description: "Calibrate shot-size settings", completed: false },
+      { description: "Verify clamp force", completed: false },
+    ],
+    schedule: {
+      startDate: "2026-04-23T08:00:00Z",
+      expectedCompletion: "2026-04-24T18:00:00Z",
+    },
+    resources: {
+      tools: ["Multimeter", "Torque wrench", "Calipers"],
+      spareParts: ["Hydraulic filter (Type HF-220)", "Heater band (ø 60 mm)"],
+      ppe: ["Heat-resistant gloves", "Safety boots"],
+    },
+    authorizedBy: "Nakimbugwe",
+    workLog: {
+      actualStartTime: "2026-04-23T08:15:00Z",
+    },
   },
   {
     id: "WO-2037",
@@ -312,9 +523,27 @@ export const workOrders: WorkOrder[] = [
     machineId: "PUMP-HY-03",
     status: "open",
     priority: "low",
-    assignee: "Unassigned",
+    type: "preventive",
+    assignee: "Ouma",
+    department: "Instrumentation & Control",
     createdAt: "2026-04-22T10:00:00Z",
     dueAt: "2026-04-29T17:00:00Z",
+    tasks: [
+      { description: "Isolate and drain hydraulic reservoir" },
+      { description: "Remove old filter element and inspect" },
+      { description: "Install new filter and o-rings" },
+      { description: "Refill, bleed, and leak-test" },
+    ],
+    schedule: {
+      startDate: "2026-04-29T08:00:00Z",
+      expectedCompletion: "2026-04-29T12:00:00Z",
+    },
+    resources: {
+      tools: ["Filter wrench", "Drain pan"],
+      spareParts: ["Filter element HF-110", "O-ring kit"],
+      ppe: ["Chemical gloves", "Safety goggles"],
+    },
+    authorizedBy: "Nakimbugwe",
   },
   {
     id: "WO-2036",
@@ -322,9 +551,28 @@ export const workOrders: WorkOrder[] = [
     machineId: "CONV-MN-02",
     status: "blocked",
     priority: "low",
-    assignee: "J. Park",
+    type: "condition-based",
+    assignee: "Tabalaata",
+    department: "Workshop & Fabrication",
     createdAt: "2026-04-21T14:00:00Z",
     dueAt: "2026-04-28T17:00:00Z",
+    problemDescription: "Belt slippage detected during high-load shifts. Tension gauge reads 2.1 kN (target 2.5–3.0 kN).",
+    tasks: [
+      { description: "Measure belt tension across all spans" },
+      { description: "Adjust tensioner and re-measure" },
+      { description: "Inspect drive pulley for wear" },
+      { description: "Run 30-min load test and record vibration" },
+    ],
+    schedule: {
+      startDate: "2026-04-28T08:00:00Z",
+      expectedCompletion: "2026-04-28T14:00:00Z",
+    },
+    resources: {
+      tools: ["Belt tension gauge", "Vibration meter"],
+      spareParts: ["Tensioner spring", "Drive belt (B-section, 5 m)"],
+      ppe: ["Safety gloves", "Hard hat"],
+    },
+    authorizedBy: "Nakimbugwe",
   },
   {
     id: "WO-2035",
@@ -332,9 +580,37 @@ export const workOrders: WorkOrder[] = [
     machineId: "STAMP-PR-01",
     status: "done",
     priority: "low",
-    assignee: "T. Vance",
+    type: "predictive",
+    assignee: "Suubi",
+    department: "Mechanical Maintenance",
     createdAt: "2026-04-20T09:00:00Z",
     dueAt: "2026-04-24T11:00:00Z",
+    problemDescription: "Predictive calibration based on force-drift trend observed over last 90 days.",
+    tasks: [
+      { description: "Baseline force measurement", completed: true },
+      { description: "Adjust hydraulic pressure offset", completed: true },
+      { description: "Verify stroke timing", completed: true },
+      { description: "Record calibration certificate", completed: true },
+    ],
+    schedule: {
+      startDate: "2026-04-24T08:00:00Z",
+      expectedCompletion: "2026-04-24T11:00:00Z",
+      actualStart: "2026-04-24T08:00:00Z",
+      actualCompletion: "2026-04-24T10:45:00Z",
+    },
+    resources: {
+      tools: ["Force transducer", "Digital caliper"],
+      spareParts: ["Calibration shim set"],
+      ppe: ["Safety goggles"],
+    },
+    authorizedBy: "Nakimbugwe",
+    workLog: {
+      actualStartTime: "2026-04-24T08:00:00Z",
+      actualCompletionTime: "2026-04-24T10:45:00Z",
+      partsUsed: "Calibration shim set",
+      observations: "Force drift corrected from +1.8% to +0.1%.",
+      rootCause: "Hydraulic compensator wear",
+    },
   },
 ];
 
@@ -373,6 +649,24 @@ export function statusLabel(status: MachineStatus): string {
     idle: "IDLE",
     down: "DOWN",
     maintenance: "MAINT",
+  }[status];
+}
+
+export function woTypeLabel(type: WorkOrderType): string {
+  return {
+    corrective: "Corrective",
+    preventive: "Preventive",
+    predictive: "Predictive",
+    "condition-based": "Condition-based",
+  }[type];
+}
+
+export function woStatusLabel(status: WorkOrderStatus): string {
+  return {
+    open: "Open",
+    in_progress: "In Progress",
+    blocked: "Blocked",
+    done: "Done",
   }[status];
 }
 

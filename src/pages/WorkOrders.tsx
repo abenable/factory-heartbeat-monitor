@@ -9,6 +9,8 @@ import {
   WorkOrderStatus,
   WorkOrderPriority,
   getMachine,
+  woStatusLabel,
+  woTypeLabel,
 } from "@/data/cmms";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 
@@ -91,6 +93,7 @@ const WorkOrders = () => {
                 <th className="p-3">Title</th>
                 <th className="p-3 w-32">Node</th>
                 <th className="p-3 w-24">Priority</th>
+                <th className="p-3 w-24">Type</th>
                 <th className="p-3 w-28">Status</th>
                 <th className="p-3 w-32">Assignee</th>
                 <th className="p-3 w-32">Due</th>
@@ -113,8 +116,11 @@ const WorkOrders = () => {
                   <td className={`p-3 uppercase ${priorityColor[w.priority]}`}>
                     {w.priority}
                   </td>
+                  <td className="p-3 text-muted-foreground">
+                    {woTypeLabel(w.type)}
+                  </td>
                   <td className="p-3 uppercase text-muted-foreground">
-                    {w.status.replace("_", " ")}
+                    {woStatusLabel(w.status)}
                   </td>
                   <td className="p-3 text-muted-foreground">{w.assignee}</td>
                   <td className="p-3 text-muted-foreground">

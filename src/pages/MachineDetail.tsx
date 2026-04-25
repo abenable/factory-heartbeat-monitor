@@ -15,6 +15,8 @@ import {
 } from "@/data/cmms";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 import { SeverityBadge, formatTs } from "./Index";
+import { getWorker } from "@/data/workers";
+import { Wrench, HardHat, Package, ClipboardList, Users, MapPin, Gauge, Battery } from "lucide-react";
 
 const MachineDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -85,9 +87,89 @@ const MachineDetail = () => {
           </div>
         </Panel>
 
+        {/* Asset Identification */}
+        {(machine.manufacturer || machine.modelNumber || machine.serialNumber) && (
+          <div>
+            <SectionHeading>
+              <span className="flex items-center gap-2">
+                <Package className="size-3.5" />
+                Asset Identification
+              </span>
+            </SectionHeading>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <DetailCell label="Manufacturer" value={machine.manufacturer} />
+              <DetailCell label="Model Number" value={machine.modelNumber} />
+              <DetailCell label="Serial Number" value={machine.serialNumber} />
+              <DetailCell label="Asset ID" value={machine.id} />
+            </div>
+          </div>
+        )}
+
+        {/* Location & Installation */}
+        {(machine.plant || machine.section || machine.line || machine.installationDate || machine.commissioningDate) && (
+          <div>
+            <SectionHeading>
+              <span className="flex items-center gap-2">
+                <MapPin className="size-3.5" />
+                Location &amp; Installation
+              </span>
+            </SectionHeading>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <DetailCell label="Plant" value={machine.plant} />
+              <DetailCell label="Section" value={machine.section} />
+              <DetailCell label="Line" value={machine.line} />
+              <DetailCell label="Sector" value={machine.sector} />
+              <DetailCell label="Installation" value={machine.installationDate} />
+              <DetailCell label="Commissioning" value={machine.commissioningDate} />
+            </div>
+          </div>
+        )}
+
+        {/* Technical Specifications */}
+        {(machine.powerRating || machine.capacity || machine.speed || machine.operatingParameters || machine.designLimits) && (
+          <div>
+            <SectionHeading>
+              <span className="flex items-center gap-2">
+                <Gauge className="size-3.5" />
+                Technical Specifications
+              </span>
+            </SectionHeading>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <DetailCell label="Power Rating" value={machine.powerRating} />
+              <DetailCell label="Capacity" value={machine.capacity} />
+              <DetailCell label="Speed" value={machine.speed} />
+            </div>
+            {(machine.operatingParameters || machine.designLimits) && (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <Panel className="p-4">
+                  <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                    Operating Parameters
+                  </span>
+                  <p className="text-sm mt-2 leading-relaxed">
+                    {machine.operatingParameters ?? "—"}
+                  </p>
+                </Panel>
+                <Panel className="p-4">
+                  <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                    Design Limits
+                  </span>
+                  <p className="text-sm mt-2 leading-relaxed">
+                    {machine.designLimits ?? "—"}
+                  </p>
+                </Panel>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Telemetry grid */}
         <div>
-          <SectionHeading>Live Telemetry</SectionHeading>
+          <SectionHeading>
+            <span className="flex items-center gap-2">
+              <Battery className="size-3.5" />
+              Live Telemetry
+            </span>
+          </SectionHeading>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <TelemetryCell label="Load" value={`${machine.load.toFixed(1)}%`} />
             <TelemetryCell
@@ -129,6 +211,110 @@ const MachineDetail = () => {
             <p className="font-mono-data text-2xl mt-2">{machine.nextService}</p>
           </Panel>
         </div>
+
+        {/* Maintenance Information */}
+        {(machine.maintenanceProcedures || machine.requiredTools || machine.safetyInstructions) && (
+          <div>
+            <SectionHeading>
+              <span className="flex items-center gap-2">
+                <ClipboardList className="size-3.5" />
+                Maintenance Information
+              </span>
+            </SectionHeading>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Panel className="p-4">
+                <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                  Procedures / Checklists
+                </span>
+                <p className="text-sm mt-2 leading-relaxed">
+                  {machine.maintenanceProcedures ?? "—"}
+                </p>
+              </Panel>
+              <Panel className="p-4">
+                <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                  Required Tools
+                </span>
+                <p className="text-sm mt-2 leading-relaxed">
+                  {machine.requiredTools ?? "—"}
+                </p>
+              </Panel>
+              <Panel className="p-4">
+                <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                  Safety Instructions
+                </span>
+                <p className="text-sm mt-2 leading-relaxed">
+                  {machine.safetyInstructions ?? "—"}
+                </p>
+              </Panel>
+            </div>
+          </div>
+        )}
+
+        {/* Spare Parts & BOM */}
+        {machine.spareParts && machine.spareParts.length > 0 && (
+          <div>
+            <SectionHeading>
+              <span className="flex items-center gap-2">
+                <Package className="size-3.5" />
+                Spare Parts &amp; BOM
+              </span>
+            </SectionHeading>
+            <Panel className="overflow-x-auto">
+              <table className="w-full text-left min-w-[480px]">
+                <thead>
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                    <th className="p-3">Part Number</th>
+                    <th className="p-3">Name</th>
+                    <th className="p-3 w-24 text-right">Quantity</th>
+                    <th className="p-3 w-20">Unit</th>
+                  </tr>
+                </thead>
+                <tbody className="font-mono-data text-xs">
+                  {machine.spareParts.map((sp) => (
+                    <tr key={sp.partNumber} className="border-b border-border last:border-b-0">
+                      <td className="p-3 font-bold">{sp.partNumber}</td>
+                      <td className="p-3">{sp.name}</td>
+                      <td className="p-3 text-right">{sp.quantity}</td>
+                      <td className="p-3 text-muted-foreground">{sp.unit ?? "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </Panel>
+          </div>
+        )}
+
+        {/* Assigned Technicians */}
+        {machine.assignedTechnicians && machine.assignedTechnicians.length > 0 && (
+          <div>
+            <SectionHeading>
+              <span className="flex items-center gap-2">
+                <Users className="size-3.5" />
+                Assigned Technicians
+              </span>
+            </SectionHeading>
+            <Panel className="p-5">
+              <div className="flex flex-wrap gap-2">
+                {machine.assignedTechnicians.map((u) => {
+                  const worker = getWorker(u);
+                  return (
+                    <Link
+                      key={u}
+                      to={`/profile`}
+                      className="text-xs px-2.5 py-1 bg-panel-elevated border border-border font-medium rounded-full hover:border-foreground transition-colors"
+                      title={`View ${worker?.name ?? u}`}
+                    >
+                      <span className="flex items-center gap-1.5">
+                        <HardHat className="size-3 text-muted-foreground" />
+                        {worker?.name ?? u}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </Panel>
+          </div>
+        )}
 
         {/* Alerts for this machine */}
         <div>
@@ -294,6 +480,17 @@ const MachineDetail = () => {
     </AppLayout>
   );
 };
+
+function DetailCell({ label, value }: { label: string; value?: string }) {
+  return (
+    <Panel className="p-4">
+      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+        {label}
+      </span>
+      <p className="font-mono-data text-lg mt-2 truncate">{value ?? "—"}</p>
+    </Panel>
+  );
+}
 
 function TelemetryCell({
   label,
