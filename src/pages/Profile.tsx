@@ -1,11 +1,33 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
-import { Printer, BadgeCheck, Mail, Phone, CalendarDays, Clock, Building2, IdCard, Award } from "lucide-react";
+import { Printer, BadgeCheck, Mail, Phone, CalendarDays, Clock, Building2, IdCard, Award, Save, Pencil } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+const overridesKey = (username: string) => `g6-profile-overrides:${username}`;
+
+function loadOverrides(username: string): { email?: string; phone?: string } {
+  try {
+    const raw = localStorage.getItem(overridesKey(username));
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function emailValid(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+}
+function phoneValid(v: string) {
+  return /^[+\d][\d\s\-()]{6,20}$/.test(v.trim());
+}
 
 const Field = ({ label, value, icon: Icon }: { label: string; value: string; icon?: React.ComponentType<{ className?: string }> }) => (
   <div className="flex flex-col gap-1 py-3 border-b border-border last:border-b-0">
@@ -20,9 +42,32 @@ const Field = ({ label, value, icon: Icon }: { label: string; value: string; ico
 const Profile = () => {
   const navigate = useNavigate();
   const username = getUser();
-  const worker = getWorker(username);
+  const baseWorker = getWorker(username);
 
-  if (!worker) {
+  const [overrides, setOverrides] = useState<{ email?: string; phone?: string }>(() =>
+    username ? loadOverrides(username) : {}
+  );
+  const [editing, setEditing] = useState(false);
+  const [emailDraft, setEmailDraft] = useState("");
+  const [phoneDraft, setPhoneDraft] = useState("");
+
+  const worker = useMemo(() => {
+    if (!baseWorker) return null;
+    return {
+      ...baseWorker,
+      email: overrides.email ?? baseWorker.email,
+      phone: overrides.phone ?? baseWorker.phone,
+    };
+  }, [baseWorker, overrides]);
+
+  useEffect(() => {
+    if (worker) {
+      setEmailDraft(worker.email);
+      setPhoneDraft(worker.phone);
+    }
+  }, [worker?.email, worker?.phone]);
+
+  if (!worker || !username) {
     return (
       <AppLayout pageTitle="Worker Profile">
         <Panel className="p-6">
@@ -31,6 +76,28 @@ const Profile = () => {
       </AppLayout>
     );
   }
+
+  const handleSave = () => {
+    if (!emailValid(emailDraft)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!phoneValid(phoneDraft)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    const next = { email: emailDraft.trim(), phone: phoneDraft.trim() };
+    localStorage.setItem(overridesKey(username), JSON.stringify(next));
+    setOverrides(next);
+    setEditing(false);
+    toast.success("Contact details updated.");
+  };
+
+  const handleCancel = () => {
+    setEmailDraft(worker.email);
+    setPhoneDraft(worker.phone);
+    setEditing(false);
+  };
 
   return (
     <AppLayout pageTitle="Worker Profile" breadcrumb={`/ ${worker.workerId}`}>
