@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Printer } from "lucide-react";
+import { Printer, Plus } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
@@ -68,10 +68,18 @@ const WorkOrders = () => {
               </button>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={printFiltered}>
-            <Printer className="size-4" />
-            Print Filtered ({list.length})
-          </Button>
+          <div className="flex gap-2">
+            <Button asChild size="sm">
+              <Link to="/work-orders/new">
+                <Plus className="size-4" />
+                New Work Order
+              </Link>
+            </Button>
+            <Button variant="outline" size="sm" onClick={printFiltered}>
+              <Printer className="size-4" />
+              Print Filtered ({list.length})
+            </Button>
+          </div>
         </div>
 
         <SectionHeading>{list.length} Work Orders</SectionHeading>
