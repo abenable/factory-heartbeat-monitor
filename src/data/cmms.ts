@@ -653,7 +653,7 @@ export function statusLabel(status: MachineStatus): string {
     running: "RUNNING",
     idle: "IDLE",
     down: "DOWN",
-    maintenance: "MAINT",
+    maintenance: "Maintenance",
   }[status];
 }
 

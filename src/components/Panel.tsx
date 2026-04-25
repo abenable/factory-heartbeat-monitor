@@ -9,9 +9,9 @@ interface PanelProps {
 
 const accentMap = {
   default: "bg-border",
-  crit: "bg-led-crit led-glow-crit",
-  warn: "bg-led-warn led-glow-warn",
-  ok: "bg-led-ok led-glow-ok",
+  crit: "bg-led-crit",
+  warn: "bg-led-warn",
+  ok: "bg-led-ok",
   none: "hidden",
 };
 

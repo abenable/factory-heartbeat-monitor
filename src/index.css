@@ -3,110 +3,110 @@
 @tailwind utilities;
 
 /* Industrial CMMS — light + dark. All colors HSL.
-   Light = factory floor (teal primary + amber accent).
+   Light = clean blue professional palette.
    Dark  = stealth control console. */
 
 @layer base {
   :root {
-    /* === LIGHT (default) — industrial teal + amber, sky blue tint === */
-    --background: 200 60% 94%;
-    --foreground: 220 25% 12%;
+    /* === LIGHT (default) — clean blue palette === */
+    --background: 220 30% 96%;
+    --foreground: 220 35% 15%;
 
-    --panel: 200 55% 97%;
-    --panel-elevated: 200 50% 90%;
+    --panel: 220 25% 98%;
+    --panel-elevated: 220 30% 93%;
 
-    --card: 200 55% 97%;
-    --card-foreground: 220 25% 12%;
+    --card: 220 25% 98%;
+    --card-foreground: 220 35% 15%;
 
-    --popover: 200 55% 97%;
-    --popover-foreground: 220 25% 12%;
+    --popover: 220 25% 98%;
+    --popover-foreground: 220 35% 15%;
 
-    /* Teal primary */
-    --primary: 174 62% 38%;
+    /* Royal blue primary */
+    --primary: 215 85% 45%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 200 50% 88%;
-    --secondary-foreground: 220 25% 18%;
+    --secondary: 220 40% 92%;
+    --secondary-foreground: 220 35% 18%;
 
-    --muted: 200 50% 90%;
-    --muted-foreground: 215 14% 40%;
+    --muted: 220 30% 92%;
+    --muted-foreground: 220 15% 42%;
 
-    /* Amber accent */
-    --accent: 38 95% 52%;
-    --accent-foreground: 220 25% 12%;
+    /* Sky blue accent */
+    --accent: 200 90% 55%;
+    --accent-foreground: 220 35% 12%;
 
-    --destructive: 0 75% 48%;
+    --destructive: 355 75% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 45% 82%;
-    --input: 200 45% 82%;
-    --ring: 174 62% 38%;
+    --border: 220 30% 86%;
+    --input: 220 30% 86%;
+    --ring: 215 85% 45%;
 
-    /* Status LEDs (kept readable on light) */
-    --led-ok: 152 70% 36%;
-    --led-warn: 32 95% 48%;
+    /* Status LEDs */
+    --led-ok: 155 70% 36%;
+    --led-warn: 38 95% 50%;
     --led-crit: 0 78% 48%;
-    --led-info: 215 18% 45%;
+    --led-info: 215 60% 45%;
 
     --radius: 0.375rem;
 
     /* Sidebar */
-    --sidebar-background: 200 55% 96%;
-    --sidebar-foreground: 215 18% 32%;
-    --sidebar-primary: 174 62% 38%;
+    --sidebar-background: 220 25% 96%;
+    --sidebar-foreground: 220 18% 32%;
+    --sidebar-primary: 215 85% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 200 50% 92%;
-    --sidebar-accent-foreground: 220 25% 12%;
-    --sidebar-border: 200 45% 84%;
-    --sidebar-ring: 174 62% 38%;
+    --sidebar-accent: 220 35% 92%;
+    --sidebar-accent-foreground: 220 35% 15%;
+    --sidebar-border: 220 30% 86%;
+    --sidebar-ring: 215 85% 45%;
   }
 
   .dark {
-    /* === DARK — stealth console === */
-    --background: 220 33% 4%;
-    --foreground: 213 27% 92%;
+    /* === DARK — deep blue console === */
+    --background: 220 35% 6%;
+    --foreground: 213 30% 92%;
 
-    --panel: 220 22% 7%;
-    --panel-elevated: 222 18% 10%;
+    --panel: 220 28% 10%;
+    --panel-elevated: 222 25% 13%;
 
-    --card: 220 22% 7%;
-    --card-foreground: 213 27% 92%;
+    --card: 220 28% 10%;
+    --card-foreground: 213 30% 92%;
 
-    --popover: 222 18% 10%;
-    --popover-foreground: 213 27% 92%;
+    --popover: 222 25% 13%;
+    --popover-foreground: 213 30% 92%;
 
-    --primary: 174 65% 48%;
-    --primary-foreground: 220 33% 4%;
+    --primary: 215 85% 55%;
+    --primary-foreground: 220 35% 6%;
 
-    --secondary: 222 18% 14%;
-    --secondary-foreground: 213 27% 92%;
+    --secondary: 222 25% 16%;
+    --secondary-foreground: 213 30% 92%;
 
-    --muted: 222 18% 12%;
-    --muted-foreground: 215 14% 62%;
+    --muted: 222 25% 14%;
+    --muted-foreground: 215 18% 62%;
 
-    --accent: 38 95% 56%;
-    --accent-foreground: 220 33% 4%;
+    --accent: 200 90% 58%;
+    --accent-foreground: 220 35% 6%;
 
-    --destructive: 348 100% 56%;
-    --destructive-foreground: 213 27% 95%;
+    --destructive: 355 80% 58%;
+    --destructive-foreground: 213 30% 95%;
 
-    --border: 220 22% 16%;
-    --input: 220 22% 16%;
-    --ring: 174 65% 48%;
+    --border: 220 25% 18%;
+    --input: 220 25% 18%;
+    --ring: 215 85% 55%;
 
-    --led-ok: 156 100% 49%;
-    --led-warn: 28 100% 55%;
-    --led-crit: 348 100% 58%;
-    --led-info: 215 14% 65%;
+    --led-ok: 156 90% 52%;
+    --led-warn: 38 95% 58%;
+    --led-crit: 355 80% 58%;
+    --led-info: 215 55% 60%;
 
-    --sidebar-background: 220 22% 5%;
-    --sidebar-foreground: 215 14% 65%;
-    --sidebar-primary: 174 65% 48%;
-    --sidebar-primary-foreground: 220 33% 4%;
-    --sidebar-accent: 222 18% 10%;
-    --sidebar-accent-foreground: 213 27% 92%;
-    --sidebar-border: 220 22% 14%;
-    --sidebar-ring: 174 65% 48%;
+    --sidebar-background: 220 25% 7%;
+    --sidebar-foreground: 215 18% 62%;
+    --sidebar-primary: 215 85% 55%;
+    --sidebar-primary-foreground: 220 35% 6%;
+    --sidebar-accent: 222 25% 13%;
+    --sidebar-accent-foreground: 213 30% 92%;
+    --sidebar-border: 220 25% 16%;
+    --sidebar-ring: 215 85% 55%;
   }
 }
 
@@ -122,7 +122,7 @@
   }
 
   ::selection {
-    background: hsl(var(--primary) / 0.3);
+    background: hsl(var(--primary) / 0.25);
     color: hsl(var(--foreground));
   }
 }
@@ -133,6 +133,7 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Kept as utilities but no longer used as glow on cards */
   .led-glow-ok {
     box-shadow: 0 0 10px 1px hsl(var(--led-ok) / 0.45);
   }

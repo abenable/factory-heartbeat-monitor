@@ -227,8 +227,8 @@ function Metric({
 
 export function SeverityBadge({ severity }: { severity: "crit" | "warn" | "info" }) {
   const map = {
-    crit: { label: "CRIT", className: "text-led-crit" },
-    warn: { label: "WARN", className: "text-led-warn" },
+    crit: { label: "Critical", className: "text-led-crit" },
+    warn: { label: "Warning", className: "text-led-warn" },
     info: { label: "INFO", className: "text-muted-foreground" },
   };
   const s = map[severity];

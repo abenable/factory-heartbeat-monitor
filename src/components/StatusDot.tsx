@@ -9,9 +9,9 @@ interface StatusDotProps {
 }
 
 const dotMap: Record<Tone, string> = {
-  ok: "bg-led-ok led-glow-ok",
-  warn: "bg-led-warn led-glow-warn",
-  crit: "bg-led-crit led-glow-crit",
+  ok: "bg-led-ok",
+  warn: "bg-led-warn",
+  crit: "bg-led-crit",
   info: "bg-led-info",
 };
 
