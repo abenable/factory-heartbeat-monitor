@@ -17,7 +17,7 @@ const accentMap = {
 
 export function Panel({ children, className, topAccent = "default" }: PanelProps) {
   return (
-    <div className={cn("relative bg-panel border border-border overflow-hidden", className)}>
+    <div className={cn("relative bg-panel border border-border overflow-hidden rounded-2xl", className)}>
       <div className={cn("absolute top-0 left-0 w-full h-px", accentMap[topAccent])} />
       {children}
     </div>

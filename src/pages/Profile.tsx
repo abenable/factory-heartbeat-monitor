@@ -123,10 +123,10 @@ const Profile = () => {
             <h2 className="text-2xl font-bold leading-tight">{worker.name}</h2>
             <p className="text-sm text-primary font-medium">{worker.jobTitle}</p>
             <div className="flex flex-wrap gap-2 justify-center sm:justify-start mt-2">
-              <span className="font-mono-data text-[10px] uppercase tracking-widest bg-panel-elevated border border-border px-2 py-0.5">
+              <span className="font-mono-data text-[10px] uppercase tracking-widest bg-panel-elevated border border-border px-2 py-0.5 rounded-full">
                 {worker.workerId}
               </span>
-              <span className="font-mono-data text-[10px] uppercase tracking-widest bg-panel-elevated border border-border px-2 py-0.5">
+              <span className="font-mono-data text-[10px] uppercase tracking-widest bg-panel-elevated border border-border px-2 py-0.5 rounded-full">
                 {worker.department}
               </span>
             </div>
@@ -218,7 +218,7 @@ const Profile = () => {
               {worker.certifications.map((c) => (
                 <span
                   key={c}
-                  className="text-xs px-2.5 py-1 bg-panel-elevated border border-border font-medium"
+                  className="text-xs px-2.5 py-1 bg-panel-elevated border border-border font-medium rounded-full"
                 >
                   {c}
                 </span>

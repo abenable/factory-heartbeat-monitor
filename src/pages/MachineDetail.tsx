@@ -1,8 +1,9 @@
 import { Link, useParams } from "react-router-dom";
-import { Printer } from "lucide-react";
+import { Printer, Pencil } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { StatusDot } from "@/components/StatusDot";
+import { Button } from "@/components/ui/button";
 import {
   alerts,
   getMachine,
@@ -58,20 +59,28 @@ const MachineDetail = () => {
                 </p>
               </div>
             </div>
-            <div className="font-mono-data text-sm">
-              <span
-                className={
-                  tone === "crit"
-                    ? "text-led-crit"
-                    : tone === "warn"
-                    ? "text-led-warn"
-                    : tone === "ok"
-                    ? "text-led-ok"
-                    : "text-muted-foreground"
-                }
-              >
-                {statusLabel(machine.status)}
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="font-mono-data text-sm">
+                <span
+                  className={
+                    tone === "crit"
+                      ? "text-led-crit"
+                      : tone === "warn"
+                      ? "text-led-warn"
+                      : tone === "ok"
+                      ? "text-led-ok"
+                      : "text-muted-foreground"
+                  }
+                >
+                  {statusLabel(machine.status)}
+                </span>
+              </div>
+              <Button asChild variant="outline" size="sm">
+                <Link to={`/machines/${machine.id}/edit`}>
+                  <Pencil className="size-4" />
+                  Edit
+                </Link>
+              </Button>
             </div>
           </div>
         </Panel>

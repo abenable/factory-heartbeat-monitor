@@ -172,7 +172,7 @@ function FilterChip({
   return (
     <button
       onClick={onClick}
-      className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border transition-colors ${
+      className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
         active
           ? "border-foreground bg-panel-elevated text-foreground"
           : "border-border text-muted-foreground hover:text-foreground"

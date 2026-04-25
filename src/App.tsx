@@ -17,6 +17,7 @@ import Backlog from "./pages/Backlog.tsx";
 import Login from "./pages/Login.tsx";
 import NewWorkOrder from "./pages/NewWorkOrder.tsx";
 import RCA from "./pages/RCA.tsx";
+import MachineForm from "./pages/MachineForm.tsx";
 import Profile from "./pages/Profile.tsx";
 
 const queryClient = new QueryClient();
@@ -32,6 +33,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<RequireAuth><Index /></RequireAuth>} />
             <Route path="/machines" element={<RequireAuth><Machines /></RequireAuth>} />
+            <Route path="/machines/new" element={<RequireAuth><MachineForm /></RequireAuth>} />
+            <Route path="/machines/:id/edit" element={<RequireAuth><MachineForm /></RequireAuth>} />
             <Route path="/machines/:id" element={<RequireAuth><MachineDetail /></RequireAuth>} />
             <Route path="/alerts" element={<RequireAuth><Alerts /></RequireAuth>} />
             <Route path="/work-orders" element={<RequireAuth><WorkOrders /></RequireAuth>} />

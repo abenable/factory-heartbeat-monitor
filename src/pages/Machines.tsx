@@ -1,8 +1,10 @@
 import { Link } from "react-router-dom";
+import { Plus } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel } from "@/components/Panel";
 import { StatusDot } from "@/components/StatusDot";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { machines, statusColor, statusLabel, MachineStatus } from "@/data/cmms";
 import { useMemo, useState } from "react";
 
@@ -35,12 +37,12 @@ const Machines = () => {
       <div className="flex flex-col gap-6">
         {/* Toolbar */}
         <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
-          <div className="flex flex-wrap gap-1">
+          <div className="flex flex-wrap gap-2">
             {filters.map((f) => (
               <button
                 key={f.key}
                 onClick={() => setFilter(f.key)}
-                className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border transition-colors ${
+                className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                   filter === f.key
                     ? "border-foreground bg-panel-elevated text-foreground"
                     : "border-border text-muted-foreground hover:text-foreground"
@@ -50,12 +52,20 @@ const Machines = () => {
               </button>
             ))}
           </div>
-          <Input
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search by ID, name or sector…"
-            className="md:w-80 font-mono-data text-xs bg-panel border-border"
-          />
+          <div className="flex gap-2">
+            <Button asChild size="sm">
+              <Link to="/machines/new">
+                <Plus className="size-4" />
+                New Machine
+              </Link>
+            </Button>
+            <Input
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search by ID, name or sector…"
+              className="md:w-80 font-mono-data text-xs bg-panel border-border"
+            />
+          </div>
         </div>
 
         <Panel className="overflow-x-auto">

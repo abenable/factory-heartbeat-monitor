@@ -65,7 +65,7 @@ export interface PMTask {
   nextDue: string;
 }
 
-export const machines: Machine[] = [
+export let machines: Machine[] = [
   {
     id: "STAMP-PR-01",
     name: "Hydraulic Press T5",
@@ -78,8 +78,8 @@ export const machines: Machine[] = [
     vibration: 0.04,
     cycleTime: 14.2,
     uptime: 99.1,
-    lastService: "2025-09-12",
-    nextService: "2025-12-12",
+    lastService: "2026-01-25",
+    nextService: "2026-04-25",
     runtimeHours: 4218,
   },
   {
@@ -93,8 +93,8 @@ export const machines: Machine[] = [
     vibration: 0,
     errorCode: "ERR-THR-9",
     uptime: 91.4,
-    lastService: "2025-08-04",
-    nextService: "2025-11-04",
+    lastService: "2026-01-15",
+    nextService: "2026-04-15",
     runtimeHours: 6122,
   },
   {
@@ -107,8 +107,8 @@ export const machines: Machine[] = [
     temp: 68.1,
     vibration: 0.02,
     uptime: 97.2,
-    lastService: "2025-10-01",
-    nextService: "2026-01-01",
+    lastService: "2026-02-01",
+    nextService: "2026-05-01",
     runtimeHours: 3420,
   },
   {
@@ -122,8 +122,8 @@ export const machines: Machine[] = [
     vibration: 0.03,
     cycleTime: 0,
     uptime: 99.8,
-    lastService: "2025-10-10",
-    nextService: "2026-01-10",
+    lastService: "2026-02-10",
+    nextService: "2026-05-10",
     runtimeHours: 8900,
   },
   {
@@ -137,8 +137,8 @@ export const machines: Machine[] = [
     vibration: 0.08,
     cycleTime: 22.1,
     uptime: 98.3,
-    lastService: "2025-09-22",
-    nextService: "2025-12-22",
+    lastService: "2025-12-22",
+    nextService: "2026-03-22",
     runtimeHours: 5230,
   },
   {
@@ -151,8 +151,8 @@ export const machines: Machine[] = [
     temp: 28.0,
     pressure: 0,
     uptime: 95.6,
-    lastService: "2025-10-22",
-    nextService: "2026-01-22",
+    lastService: "2026-01-22",
+    nextService: "2026-04-22",
     runtimeHours: 7140,
   },
   {
@@ -165,8 +165,8 @@ export const machines: Machine[] = [
     temp: 51.2,
     pressure: 3100,
     uptime: 99.5,
-    lastService: "2025-09-30",
-    nextService: "2025-12-30",
+    lastService: "2026-02-05",
+    nextService: "2026-05-05",
     runtimeHours: 11200,
   },
   {
@@ -178,8 +178,8 @@ export const machines: Machine[] = [
     load: 88.0,
     temp: 184.6,
     uptime: 98.9,
-    lastService: "2025-10-05",
-    nextService: "2026-01-05",
+    lastService: "2026-01-10",
+    nextService: "2026-04-10",
     runtimeHours: 6750,
   },
   {
@@ -192,8 +192,8 @@ export const machines: Machine[] = [
     temp: 32.0,
     vibration: 0.01,
     uptime: 96.7,
-    lastService: "2025-08-18",
-    nextService: "2025-11-18",
+    lastService: "2026-02-18",
+    nextService: "2026-05-18",
     runtimeHours: 2980,
   },
 ];
@@ -201,7 +201,7 @@ export const machines: Machine[] = [
 export const alerts: AlertEvent[] = [
   {
     id: "A-1042",
-    timestamp: "2025-10-24T14:02:41Z",
+    timestamp: "2026-04-24T14:02:41Z",
     machineId: "LATH-AX-09",
     severity: "crit",
     description: "Spindle bearing thermal threshold exceeded (>110°C). Auto-shutdown engaged.",
@@ -209,7 +209,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1041",
-    timestamp: "2025-10-24T13:45:12Z",
+    timestamp: "2026-04-24T13:45:12Z",
     machineId: "MILL-CN-04",
     severity: "warn",
     description: "Coolant pressure variance detected. Deviation: -4.2%.",
@@ -217,7 +217,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1040",
-    timestamp: "2025-10-24T13:18:09Z",
+    timestamp: "2026-04-24T13:18:09Z",
     machineId: "WELD-RB-06",
     severity: "warn",
     description: "Vibration spike on axis Z (0.08 mm/s). Inspect spindle bearing.",
@@ -225,7 +225,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1039",
-    timestamp: "2025-10-24T11:10:05Z",
+    timestamp: "2026-04-24T11:10:05Z",
     machineId: "STAMP-PR-01",
     severity: "info",
     description: "Routine calibration cycle completed successfully. Offset adjusted.",
@@ -233,7 +233,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1038",
-    timestamp: "2025-10-24T09:42:00Z",
+    timestamp: "2026-04-24T09:42:00Z",
     machineId: "OVEN-CR-08",
     severity: "info",
     description: "Setpoint reached 185°C. Cure cycle nominal.",
@@ -241,7 +241,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1037",
-    timestamp: "2025-10-24T08:30:00Z",
+    timestamp: "2026-04-24T08:30:00Z",
     machineId: "CONV-MN-02",
     severity: "info",
     description: "Shift change logged. Operator 04 session initiated.",
@@ -249,7 +249,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1036",
-    timestamp: "2025-10-23T22:14:55Z",
+    timestamp: "2026-04-23T22:14:55Z",
     machineId: "INJ-MD-11",
     severity: "warn",
     description: "Hydraulic pressure dropped below 2800 PSI. Operator paused machine.",
@@ -257,7 +257,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1035",
-    timestamp: "2025-10-23T18:02:18Z",
+    timestamp: "2026-04-23T18:02:18Z",
     machineId: "PUMP-HY-03",
     severity: "info",
     description: "Filter change reminder due in 5 days.",
@@ -273,8 +273,8 @@ export const workOrders: WorkOrder[] = [
     status: "in_progress",
     priority: "critical",
     assignee: "T. Vance",
-    createdAt: "2025-10-24T14:05:00Z",
-    dueAt: "2025-10-24T20:00:00Z",
+    createdAt: "2026-04-24T14:05:00Z",
+    dueAt: "2026-04-24T20:00:00Z",
   },
   {
     id: "WO-2040",
@@ -283,8 +283,8 @@ export const workOrders: WorkOrder[] = [
     status: "open",
     priority: "high",
     assignee: "R. Kapoor",
-    createdAt: "2025-10-24T13:50:00Z",
-    dueAt: "2025-10-25T17:00:00Z",
+    createdAt: "2026-04-24T13:50:00Z",
+    dueAt: "2026-04-25T17:00:00Z",
   },
   {
     id: "WO-2039",
@@ -293,8 +293,8 @@ export const workOrders: WorkOrder[] = [
     status: "open",
     priority: "medium",
     assignee: "M. Okafor",
-    createdAt: "2025-10-24T13:25:00Z",
-    dueAt: "2025-10-26T17:00:00Z",
+    createdAt: "2026-04-24T13:25:00Z",
+    dueAt: "2026-04-26T17:00:00Z",
   },
   {
     id: "WO-2038",
@@ -303,8 +303,8 @@ export const workOrders: WorkOrder[] = [
     status: "in_progress",
     priority: "medium",
     assignee: "L. Ferreira",
-    createdAt: "2025-10-23T08:00:00Z",
-    dueAt: "2025-10-24T18:00:00Z",
+    createdAt: "2026-04-23T08:00:00Z",
+    dueAt: "2026-04-24T18:00:00Z",
   },
   {
     id: "WO-2037",
@@ -313,8 +313,8 @@ export const workOrders: WorkOrder[] = [
     status: "open",
     priority: "low",
     assignee: "Unassigned",
-    createdAt: "2025-10-22T10:00:00Z",
-    dueAt: "2025-10-29T17:00:00Z",
+    createdAt: "2026-04-22T10:00:00Z",
+    dueAt: "2026-04-29T17:00:00Z",
   },
   {
     id: "WO-2036",
@@ -323,8 +323,8 @@ export const workOrders: WorkOrder[] = [
     status: "blocked",
     priority: "low",
     assignee: "J. Park",
-    createdAt: "2025-10-21T14:00:00Z",
-    dueAt: "2025-10-28T17:00:00Z",
+    createdAt: "2026-04-21T14:00:00Z",
+    dueAt: "2026-04-28T17:00:00Z",
   },
   {
     id: "WO-2035",
@@ -333,21 +333,21 @@ export const workOrders: WorkOrder[] = [
     status: "done",
     priority: "low",
     assignee: "T. Vance",
-    createdAt: "2025-10-20T09:00:00Z",
-    dueAt: "2025-10-24T11:00:00Z",
+    createdAt: "2026-04-20T09:00:00Z",
+    dueAt: "2026-04-24T11:00:00Z",
   },
 ];
 
 export const pmTasks: PMTask[] = [
-  { id: "PM-01", machineId: "STAMP-PR-01", task: "Hydraulic fluid check", intervalDays: 30, lastDone: "2025-10-12", nextDue: "2025-11-11" },
-  { id: "PM-02", machineId: "LATH-AX-09", task: "Spindle lubrication", intervalDays: 14, lastDone: "2025-10-15", nextDue: "2025-10-29" },
-  { id: "PM-03", machineId: "MILL-CN-04", task: "Coolant flush", intervalDays: 60, lastDone: "2025-09-01", nextDue: "2025-10-31" },
-  { id: "PM-04", machineId: "CONV-MN-02", task: "Belt tension inspection", intervalDays: 45, lastDone: "2025-09-25", nextDue: "2025-11-09" },
-  { id: "PM-05", machineId: "WELD-RB-06", task: "Torch tip replacement", intervalDays: 21, lastDone: "2025-10-10", nextDue: "2025-10-31" },
-  { id: "PM-06", machineId: "INJ-MD-11", task: "Quarterly overhaul", intervalDays: 90, lastDone: "2025-10-22", nextDue: "2026-01-20" },
-  { id: "PM-07", machineId: "PUMP-HY-03", task: "Filter replacement", intervalDays: 30, lastDone: "2025-09-30", nextDue: "2025-10-30" },
-  { id: "PM-08", machineId: "OVEN-CR-08", task: "Heating element calibration", intervalDays: 60, lastDone: "2025-10-05", nextDue: "2025-12-04" },
-  { id: "PM-09", machineId: "GRND-SF-12", task: "Wheel balance check", intervalDays: 30, lastDone: "2025-10-18", nextDue: "2025-11-17" },
+  { id: "PM-01", machineId: "STAMP-PR-01", task: "Hydraulic fluid check", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24" },
+  { id: "PM-02", machineId: "LATH-AX-09", task: "Spindle lubrication", intervalDays: 14, lastDone: "2026-04-10", nextDue: "2026-04-24" },
+  { id: "PM-03", machineId: "MILL-CN-04", task: "Coolant flush", intervalDays: 60, lastDone: "2026-02-24", nextDue: "2026-04-25" },
+  { id: "PM-04", machineId: "CONV-MN-02", task: "Belt tension inspection", intervalDays: 45, lastDone: "2026-03-10", nextDue: "2026-04-24" },
+  { id: "PM-05", machineId: "WELD-RB-06", task: "Torch tip replacement", intervalDays: 21, lastDone: "2026-04-03", nextDue: "2026-04-24" },
+  { id: "PM-06", machineId: "INJ-MD-11", task: "Quarterly overhaul", intervalDays: 90, lastDone: "2026-01-24", nextDue: "2026-04-24" },
+  { id: "PM-07", machineId: "PUMP-HY-03", task: "Filter replacement", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24" },
+  { id: "PM-08", machineId: "OVEN-CR-08", task: "Heating element calibration", intervalDays: 60, lastDone: "2026-02-24", nextDue: "2026-04-25" },
+  { id: "PM-09", machineId: "GRND-SF-12", task: "Wheel balance check", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24" },
 ];
 
 export function getMachine(id: string) {
@@ -395,3 +395,13 @@ export function getBacklog(machineId?: string, now: Date = new Date()): WorkOrde
   );
 }
 
+export function addMachine(machine: Machine) {
+  machines.unshift(machine);
+}
+
+export function updateMachine(id: string, updates: Partial<Machine>) {
+  const idx = machines.findIndex((m) => m.id === id);
+  if (idx !== -1) {
+    machines[idx] = { ...machines[idx], ...updates };
+  }
+}

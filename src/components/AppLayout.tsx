@@ -9,7 +9,6 @@ import {
   BarChart3,
   Menu,
   Inbox,
-  FilePlus2,
   ClipboardCheck,
   LogOut,
 } from "lucide-react";
@@ -27,7 +26,6 @@ const nav = [
   { to: "/machines", label: "Machines", icon: Cpu },
   { to: "/alerts", label: "Alerts", icon: AlertTriangle },
   { to: "/work-orders", label: "Work Orders", icon: ClipboardList },
-  { to: "/work-orders/new", label: "New Work Order", icon: FilePlus2 },
   { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
   { to: "/backlog", label: "Backlog", icon: Inbox },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
