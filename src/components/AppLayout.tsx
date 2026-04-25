@@ -44,6 +44,8 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const backlogCount = getBacklog().length;
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const user = getUser() ?? "Operator";
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -54,6 +56,11 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
     "/alerts": openAlerts,
     "/work-orders": openWO,
     "/backlog": backlogCount,
+  };
+
+  const onLogout = () => {
+    logout();
+    navigate("/login", { replace: true });
   };
 
   const sidebarContent = (
