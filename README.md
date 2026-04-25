@@ -1,3 +1,3 @@
-# Welcome to your Lovable project
+# Group 6 Industries — CMMS
 
-TODO: Document your project here
+Computerised Maintenance Management System for factory machine monitoring, alerts, work orders, preventive maintenance, and workforce planning.
