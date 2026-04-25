@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/lib/auth";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import logo from "@/assets/logo.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -30,9 +31,17 @@ const Login = () => {
         <ThemeToggle />
       </div>
       <div className="w-full max-w-md flex flex-col gap-6">
-        <div className="text-center flex flex-col gap-2">
-          <div className="mx-auto size-3 bg-foreground" />
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">
+        <div className="text-center flex flex-col gap-3 items-center">
+          <div className="size-24 md:size-28 flex items-center justify-center">
+            <img
+              src={logo}
+              alt="Group 6 Industries Limited engineering logo"
+              width={112}
+              height={112}
+              className="size-full object-contain drop-shadow-[0_4px_12px_hsl(var(--primary)/0.35)]"
+            />
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-primary">
             Group 6 Industries Limited
           </h1>
           <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">

@@ -17,8 +17,10 @@ import { alerts, workOrders, getBacklog } from "@/data/cmms";
 import { StatusDot } from "@/components/StatusDot";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { getUser, logout } from "@/lib/auth";
+import { getWorker } from "@/data/workers";
+import logo from "@/assets/logo.png";
 
 const nav = [
   { to: "/", label: "Live Dashboard", icon: LayoutDashboard, end: true },
@@ -46,6 +48,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const user = getUser() ?? "Operator";
+  const worker = getWorker(getUser());
 
   // Close mobile drawer on route change
   useEffect(() => {
@@ -66,7 +69,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const sidebarContent = (
     <>
       <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-        <div className="size-3 bg-foreground shrink-0" />
+        <img src={logo} alt="Group 6 Industries" width={32} height={32} className="size-8 shrink-0 object-contain" loading="lazy" />
         <div className="flex flex-col min-w-0">
           <span className="font-bold text-sm leading-tight truncate">
             Group 6 Industries
@@ -101,25 +104,34 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
       </nav>
 
       <div className="p-4 border-t border-border">
-        <div className="flex items-center gap-3 px-2 py-2">
-          <div className="size-8 bg-panel-elevated border border-ring flex items-center justify-center font-mono-data text-xs shrink-0">
+        <Link
+          to="/profile"
+          className="flex items-center gap-3 px-2 py-2 hover:bg-panel-elevated transition-colors"
+          title="View profile"
+        >
+          <div className="size-9 bg-primary/10 border border-primary/30 text-primary flex items-center justify-center font-mono-data text-xs font-bold shrink-0">
             {user.slice(0, 2).toUpperCase()}
           </div>
           <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-xs font-medium truncate">{user}</span>
-            <span className="text-[10px] font-mono-data text-muted-foreground">
-              TECHNICIAN
+            <span className="text-xs font-medium truncate">
+              {worker?.name ?? user}
+            </span>
+            <span className="text-[10px] font-mono-data text-muted-foreground truncate uppercase">
+              {worker?.jobTitle ?? "Technician"}
             </span>
           </div>
           <button
-            onClick={onLogout}
+            onClick={(e) => {
+              e.preventDefault();
+              onLogout();
+            }}
             className="text-muted-foreground hover:text-foreground transition-colors"
             aria-label="Sign out"
             title="Sign out"
           >
             <LogOut className="size-4" />
           </button>
-        </div>
+        </Link>
       </div>
     </>
   );
