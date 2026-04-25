@@ -212,7 +212,7 @@ function Kpi({ label, value, tone }: { label: string; value: string | number; to
       ? "text-led-ok"
       : "text-foreground";
   return (
-    <Panel className="p-5 h-24 flex flex-col justify-between">
+    <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
       <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
         {label}
       </span>

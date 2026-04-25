@@ -194,7 +194,7 @@ export default function PerformanceReports() {
         {/* Delayed Jobs */}
         <div>
           <SectionHeading>Delayed Jobs ({delayedWO.length})</SectionHeading>
-          <Panel className="overflow-x-auto" topAccent={delayedWO.length > 0 ? "crit" : "default"}>
+          <Panel className="overflow-x-auto">
             {delayedWO.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
                 NO DELAYED JOBS
@@ -233,7 +233,7 @@ export default function PerformanceReports() {
         {/* Suspended Work Orders */}
         <div>
           <SectionHeading>Suspended Work Orders ({suspendedWO.length})</SectionHeading>
-          <Panel className="overflow-x-auto" topAccent={suspendedWO.length > 0 ? "warn" : "default"}>
+          <Panel className="overflow-x-auto">
             {suspendedWO.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
                 NO SUSPENDED WORK ORDERS
@@ -403,7 +403,7 @@ function Kpi({ label, value, tone }: { label: string; value: string | number; to
       ? "text-led-ok"
       : "text-foreground";
   return (
-    <Panel className="p-5 h-24 flex flex-col justify-between">
+    <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
       <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
         {label}
       </span>

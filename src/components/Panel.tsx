@@ -4,21 +4,11 @@ import { ReactNode } from "react";
 interface PanelProps {
   children: ReactNode;
   className?: string;
-  topAccent?: "default" | "crit" | "warn" | "ok" | "none";
 }
 
-const accentMap = {
-  default: "bg-border",
-  crit: "bg-led-crit",
-  warn: "bg-led-warn",
-  ok: "bg-led-ok",
-  none: "hidden",
-};
-
-export function Panel({ children, className, topAccent = "default" }: PanelProps) {
+export function Panel({ children, className }: PanelProps) {
   return (
-    <div className={cn("relative bg-panel border border-border overflow-hidden rounded-2xl", className)}>
-      <div className={cn("absolute top-0 left-0 w-full h-px", accentMap[topAccent])} />
+    <div className={cn("bg-panel border border-border overflow-hidden rounded-2xl", className)}>
       {children}
     </div>
   );

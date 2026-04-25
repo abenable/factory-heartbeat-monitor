@@ -50,7 +50,7 @@ const MachineDetail = () => {
     <AppLayout pageTitle={machine.id} breadcrumb={machine.sector.toUpperCase()}>
       <div className="flex flex-col gap-8">
         {/* Header card */}
-        <Panel topAccent={tone === "crit" ? "crit" : "default"} className="p-6">
+        <Panel className="p-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex items-center gap-4">
               <StatusDot tone={tone} pulse={tone === "crit"} className="size-3" />
@@ -419,7 +419,7 @@ const MachineDetail = () => {
           <SectionHeading>
             Backlog · {machineBacklog.length} {machineBacklog.length === 1 ? "item" : "items"}
           </SectionHeading>
-          <Panel className="overflow-x-auto" topAccent={machineBacklog.length > 0 ? "warn" : "default"}>
+          <Panel className="overflow-x-auto">
             {machineBacklog.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
                 NO BACKLOG — UP TO DATE

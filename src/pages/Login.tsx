@@ -1,12 +1,11 @@
 import { useState, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Panel } from "@/components/Panel";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { login } from "@/lib/auth";
-import { ThemeToggle } from "@/components/ThemeToggle";
 import logo from "@/assets/logo.png";
+
+const borderShadow = "rgba(0,0,0,0.08) 0px 0px 0px 1px";
+const subtleShadow = "rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px, rgba(0,0,0,0.04) 0px 8px 8px -8px, #fafafa 0px 0px 0px 1px";
+const focusRing = "hsla(212, 100%, 48%, 1)";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,61 +25,195 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground flex items-center justify-center p-4">
-      <div className="absolute top-4 right-4">
-        <ThemeToggle />
-      </div>
-      <div className="w-full max-w-md flex flex-col gap-6">
-        <div className="text-center flex flex-col gap-3 items-center">
-          <div className="size-24 md:size-28 flex items-center justify-center">
+    <div
+      className="min-h-screen w-full flex items-center justify-center p-4"
+      style={{ background: "#ffffff", fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
+    >
+      <div className="w-full max-w-[420px] flex flex-col items-center gap-10">
+        {/* Logo + brand */}
+        <div className="flex flex-col items-center gap-5">
+          <div className="size-20 flex items-center justify-center">
             <img
               src={logo}
-              alt="Group 6 Industries Limited engineering logo"
-              width={112}
-              height={112}
-              className="size-full object-contain drop-shadow-[0_4px_12px_hsl(var(--primary)/0.35)]"
+              alt="Group 6 Industries Limited"
+              width={80}
+              height={80}
+              className="size-full object-contain"
+              style={{ filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.08))" }}
             />
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-primary">
-            Group 6 Industries Limited
-          </h1>
-          <p className="font-mono-data text-[11px] uppercase tracking-widest text-muted-foreground">
-            Maintenance Operations Console
-          </p>
+          <div className="flex flex-col items-center gap-1">
+            <h1
+              className="font-semibold text-center"
+              style={{
+                fontSize: "32px",
+                lineHeight: 1.2,
+                letterSpacing: "-1.28px",
+                color: "#171717",
+                fontFamily: "'Geist', Arial, system-ui, sans-serif",
+              }}
+            >
+              Sign In
+            </h1>
+            <p
+              className="text-center"
+              style={{
+                fontSize: "16px",
+                lineHeight: 1.5,
+                color: "#4d4d4d",
+                fontFamily: "'Geist', Arial, system-ui, sans-serif",
+              }}
+            >
+              Group 6 Industries — Maintenance Operations Console
+            </p>
+          </div>
         </div>
 
-        <Panel className="p-6 flex flex-col gap-4">
-          <form onSubmit={onSubmit} className="flex flex-col gap-4">
+        {/* Card */}
+        <div
+          className="w-full flex flex-col gap-6"
+          style={{
+            background: "#ffffff",
+            borderRadius: "8px",
+            boxShadow: subtleShadow,
+            padding: "32px",
+          }}
+        >
+          <form onSubmit={onSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="username">User name</Label>
-              <Input
+              <label
+                htmlFor="username"
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  lineHeight: 1.43,
+                  color: "#171717",
+                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                }}
+              >
+                User name
+              </label>
+              <input
                 id="username"
                 autoFocus
                 autoComplete="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                className="w-full outline-none transition-shadow"
+                style={{
+                  height: "40px",
+                  padding: "0 12px",
+                  fontSize: "14px",
+                  lineHeight: 1.43,
+                  color: "#171717",
+                  background: "#ffffff",
+                  borderRadius: "6px",
+                  boxShadow: borderShadow,
+                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${focusRing}, ${borderShadow}`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.boxShadow = borderShadow;
+                }}
               />
             </div>
+
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="password">Password</Label>
-              <Input
+              <label
+                htmlFor="password"
+                style={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  lineHeight: 1.43,
+                  color: "#171717",
+                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                }}
+              >
+                Password
+              </label>
+              <input
                 id="password"
                 type="password"
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                className="w-full outline-none transition-shadow"
+                style={{
+                  height: "40px",
+                  padding: "0 12px",
+                  fontSize: "14px",
+                  lineHeight: 1.43,
+                  color: "#171717",
+                  background: "#ffffff",
+                  borderRadius: "6px",
+                  boxShadow: borderShadow,
+                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                }}
+                onFocus={(e) => {
+                  e.currentTarget.style.boxShadow = `0 0 0 2px ${focusRing}, ${borderShadow}`;
+                }}
+                onBlur={(e) => {
+                  e.currentTarget.style.boxShadow = borderShadow;
+                }}
               />
             </div>
+
             {error && (
-              <p className="text-led-crit text-sm font-mono-data">{error}</p>
+              <p
+                className="text-sm"
+                style={{
+                  color: "#ff5b4f",
+                  fontFamily: "'Geist Mono', ui-monospace, monospace",
+                  fontVariantNumeric: "tabular-nums",
+                }}
+              >
+                {error}
+              </p>
             )}
-            <Button type="submit" className="w-full">
+
+            <button
+              type="submit"
+              className="w-full cursor-pointer transition-colors"
+              style={{
+                height: "40px",
+                padding: "0 16px",
+                fontSize: "14px",
+                fontWeight: 500,
+                lineHeight: 1.43,
+                color: "#ffffff",
+                background: "#171717",
+                borderRadius: "6px",
+                border: "none",
+                fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                letterSpacing: "normal",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#000000";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#171717";
+              }}
+            >
               Sign In
-            </Button>
+            </button>
           </form>
-        </Panel>
+        </div>
+
+        <p
+          className="text-center"
+          style={{
+            fontSize: "12px",
+            lineHeight: 1.33,
+            color: "#808080",
+            fontFamily: "'Geist', Arial, system-ui, sans-serif",
+          }}
+        >
+          Group 6 Industries Limited · CMMS
+        </p>
       </div>
     </div>
   );

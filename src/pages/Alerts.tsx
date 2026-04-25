@@ -157,7 +157,7 @@ function SummaryCard({
   const colorClass =
     tone === "crit" ? "text-led-crit" : tone === "warn" ? "text-led-warn" : "text-foreground";
   return (
-    <Panel topAccent={accent as "crit" | "warn" | "default"} className="p-5 h-28 flex flex-col justify-between">
+    <Panel className="p-5 h-28 flex flex-col justify-between bg-gradient-blue">
       <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
         {label} (Open)
       </span>

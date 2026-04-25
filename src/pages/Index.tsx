@@ -67,7 +67,7 @@ const Dashboard = () => {
                 <Link key={m.id} to={`/machines/${m.id}`}>
                   <Panel
                     className="p-5 flex flex-col gap-6 hover:border-ring transition-colors h-full"
-                    topAccent={tone === "crit" ? "crit" : "default"}
+
                   >
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
@@ -180,7 +180,7 @@ function Kpi({
       ? "text-led-warn"
       : "text-foreground";
   return (
-    <Panel topAccent={accent} className="p-5 h-32 flex flex-col justify-between">
+    <Panel className="p-5 h-32 flex flex-col justify-between bg-gradient-blue">
       <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
         {label}
       </span>

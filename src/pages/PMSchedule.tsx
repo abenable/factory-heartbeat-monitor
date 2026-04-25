@@ -174,7 +174,7 @@ function Stat({
       : "text-foreground";
   return (
     <Panel
-      topAccent={tone === "crit" ? "crit" : tone === "warn" ? "warn" : "default"}
+
       className="p-5 h-28 flex flex-col justify-between"
     >
       <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
