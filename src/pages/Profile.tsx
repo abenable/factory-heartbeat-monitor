@@ -1,11 +1,33 @@
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
-import { Printer, BadgeCheck, Mail, Phone, CalendarDays, Clock, Building2, IdCard, Award } from "lucide-react";
+import { Printer, BadgeCheck, Mail, Phone, CalendarDays, Clock, Building2, IdCard, Award, Save, Pencil } from "lucide-react";
 import logo from "@/assets/logo.png";
+
+const overridesKey = (username: string) => `g6-profile-overrides:${username}`;
+
+function loadOverrides(username: string): { email?: string; phone?: string } {
+  try {
+    const raw = localStorage.getItem(overridesKey(username));
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+}
+
+function emailValid(v: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
+}
+function phoneValid(v: string) {
+  return /^[+\d][\d\s\-()]{6,20}$/.test(v.trim());
+}
 
 const Field = ({ label, value, icon: Icon }: { label: string; value: string; icon?: React.ComponentType<{ className?: string }> }) => (
   <div className="flex flex-col gap-1 py-3 border-b border-border last:border-b-0">
@@ -20,9 +42,32 @@ const Field = ({ label, value, icon: Icon }: { label: string; value: string; ico
 const Profile = () => {
   const navigate = useNavigate();
   const username = getUser();
-  const worker = getWorker(username);
+  const baseWorker = getWorker(username);
 
-  if (!worker) {
+  const [overrides, setOverrides] = useState<{ email?: string; phone?: string }>(() =>
+    username ? loadOverrides(username) : {}
+  );
+  const [editing, setEditing] = useState(false);
+  const [emailDraft, setEmailDraft] = useState("");
+  const [phoneDraft, setPhoneDraft] = useState("");
+
+  const worker = useMemo(() => {
+    if (!baseWorker) return null;
+    return {
+      ...baseWorker,
+      email: overrides.email ?? baseWorker.email,
+      phone: overrides.phone ?? baseWorker.phone,
+    };
+  }, [baseWorker, overrides]);
+
+  useEffect(() => {
+    if (worker) {
+      setEmailDraft(worker.email);
+      setPhoneDraft(worker.phone);
+    }
+  }, [worker?.email, worker?.phone]);
+
+  if (!worker || !username) {
     return (
       <AppLayout pageTitle="Worker Profile">
         <Panel className="p-6">
@@ -31,6 +76,28 @@ const Profile = () => {
       </AppLayout>
     );
   }
+
+  const handleSave = () => {
+    if (!emailValid(emailDraft)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!phoneValid(phoneDraft)) {
+      toast.error("Please enter a valid phone number.");
+      return;
+    }
+    const next = { email: emailDraft.trim(), phone: phoneDraft.trim() };
+    localStorage.setItem(overridesKey(username), JSON.stringify(next));
+    setOverrides(next);
+    setEditing(false);
+    toast.success("Contact details updated.");
+  };
+
+  const handleCancel = () => {
+    setEmailDraft(worker.email);
+    setPhoneDraft(worker.phone);
+    setEditing(false);
+  };
 
   return (
     <AppLayout pageTitle="Worker Profile" breadcrumb={`/ ${worker.workerId}`}>
@@ -79,13 +146,68 @@ const Profile = () => {
           </Panel>
 
           <Panel className="p-5">
-            <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
-              Working Licence
-            </h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
+                Working Licence &amp; Contact
+              </h3>
+              {!editing ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 print:hidden"
+                  onClick={() => setEditing(true)}
+                >
+                  <Pencil className="size-3 mr-1" /> Edit
+                </Button>
+              ) : (
+                <div className="flex gap-1 print:hidden">
+                  <Button variant="ghost" size="sm" className="h-7 px-2" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" className="h-7 px-2" onClick={handleSave}>
+                    <Save className="size-3 mr-1" /> Save
+                  </Button>
+                </div>
+              )}
+            </div>
             <Field icon={BadgeCheck} label="Licence" value={worker.license} />
             <Field icon={CalendarDays} label="Expires" value={worker.licenseExpiry} />
-            <Field icon={Mail} label="Email" value={worker.email} />
-            <Field icon={Phone} label="Phone" value={worker.phone} />
+
+            {editing ? (
+              <>
+                <div className="flex flex-col gap-1.5 py-3 border-b border-border">
+                  <Label htmlFor="profile-email" className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                    <Mail className="size-3" /> Email
+                  </Label>
+                  <Input
+                    id="profile-email"
+                    type="email"
+                    value={emailDraft}
+                    maxLength={255}
+                    onChange={(e) => setEmailDraft(e.target.value)}
+                    placeholder="name@group6.co.ug"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 py-3">
+                  <Label htmlFor="profile-phone" className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                    <Phone className="size-3" /> Phone
+                  </Label>
+                  <Input
+                    id="profile-phone"
+                    type="tel"
+                    value={phoneDraft}
+                    maxLength={24}
+                    onChange={(e) => setPhoneDraft(e.target.value)}
+                    placeholder="+256 ..."
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <Field icon={Mail} label="Email" value={worker.email} />
+                <Field icon={Phone} label="Phone" value={worker.phone} />
+              </>
+            )}
           </Panel>
 
           <Panel className="p-5 md:col-span-2">
