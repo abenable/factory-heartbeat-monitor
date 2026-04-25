@@ -6,7 +6,6 @@ import {
   AlertTriangle,
   ClipboardList,
   CalendarClock,
-  BarChart3,
   Menu,
   Inbox,
   ClipboardCheck,
@@ -35,7 +34,6 @@ const nav = [
   { to: "/material-control", label: "Material Control", icon: Package },
   { to: "/craftsmen-management", label: "Craftsmen Management", icon: Wrench },
   { to: "/performance-reports", label: "Performance Reports", icon: TrendingUp },
-  { to: "/reports", label: "Reports", icon: BarChart3 },
 ];
 
 interface AppLayoutProps {

@@ -12,7 +12,6 @@ import MachineDetail from "./pages/MachineDetail.tsx";
 import Alerts from "./pages/Alerts.tsx";
 import WorkOrders from "./pages/WorkOrders.tsx";
 import PMSchedule from "./pages/PMSchedule.tsx";
-import Reports from "./pages/Reports.tsx";
 import Backlog from "./pages/Backlog.tsx";
 import Login from "./pages/Login.tsx";
 import NewWorkOrder from "./pages/NewWorkOrder.tsx";
@@ -48,7 +47,7 @@ const App = () => (
             <Route path="/material-control" element={<RequireAuth><MaterialControl /></RequireAuth>} />
             <Route path="/craftsmen-management" element={<RequireAuth><CraftsmenManagement /></RequireAuth>} />
             <Route path="/performance-reports" element={<RequireAuth><PerformanceReports /></RequireAuth>} />
-            <Route path="/reports" element={<RequireAuth><Reports /></RequireAuth>} />
+            <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
             <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
