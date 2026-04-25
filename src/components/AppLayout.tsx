@@ -9,18 +9,24 @@ import {
   BarChart3,
   Menu,
   Inbox,
+  FilePlus2,
+  ClipboardCheck,
+  LogOut,
 } from "lucide-react";
 import { alerts, workOrders, getBacklog } from "@/data/cmms";
 import { StatusDot } from "@/components/StatusDot";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import { getUser, logout } from "@/lib/auth";
 
 const nav = [
   { to: "/", label: "Live Dashboard", icon: LayoutDashboard, end: true },
   { to: "/machines", label: "Machines", icon: Cpu },
   { to: "/alerts", label: "Alerts", icon: AlertTriangle },
   { to: "/work-orders", label: "Work Orders", icon: ClipboardList },
+  { to: "/work-orders/new", label: "New Work Order", icon: FilePlus2 },
+  { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
   { to: "/backlog", label: "Backlog", icon: Inbox },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
   { to: "/reports", label: "Reports", icon: BarChart3 },
