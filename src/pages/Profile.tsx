@@ -146,13 +146,68 @@ const Profile = () => {
           </Panel>
 
           <Panel className="p-5">
-            <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
-              Working Licence
-            </h3>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
+                Working Licence &amp; Contact
+              </h3>
+              {!editing ? (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 px-2 print:hidden"
+                  onClick={() => setEditing(true)}
+                >
+                  <Pencil className="size-3 mr-1" /> Edit
+                </Button>
+              ) : (
+                <div className="flex gap-1 print:hidden">
+                  <Button variant="ghost" size="sm" className="h-7 px-2" onClick={handleCancel}>
+                    Cancel
+                  </Button>
+                  <Button size="sm" className="h-7 px-2" onClick={handleSave}>
+                    <Save className="size-3 mr-1" /> Save
+                  </Button>
+                </div>
+              )}
+            </div>
             <Field icon={BadgeCheck} label="Licence" value={worker.license} />
             <Field icon={CalendarDays} label="Expires" value={worker.licenseExpiry} />
-            <Field icon={Mail} label="Email" value={worker.email} />
-            <Field icon={Phone} label="Phone" value={worker.phone} />
+
+            {editing ? (
+              <>
+                <div className="flex flex-col gap-1.5 py-3 border-b border-border">
+                  <Label htmlFor="profile-email" className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                    <Mail className="size-3" /> Email
+                  </Label>
+                  <Input
+                    id="profile-email"
+                    type="email"
+                    value={emailDraft}
+                    maxLength={255}
+                    onChange={(e) => setEmailDraft(e.target.value)}
+                    placeholder="name@group6.co.ug"
+                  />
+                </div>
+                <div className="flex flex-col gap-1.5 py-3">
+                  <Label htmlFor="profile-phone" className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                    <Phone className="size-3" /> Phone
+                  </Label>
+                  <Input
+                    id="profile-phone"
+                    type="tel"
+                    value={phoneDraft}
+                    maxLength={24}
+                    onChange={(e) => setPhoneDraft(e.target.value)}
+                    placeholder="+256 ..."
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <Field icon={Mail} label="Email" value={worker.email} />
+                <Field icon={Phone} label="Phone" value={worker.phone} />
+              </>
+            )}
           </Panel>
 
           <Panel className="p-5 md:col-span-2">
