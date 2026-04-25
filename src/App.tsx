@@ -17,6 +17,7 @@ import Backlog from "./pages/Backlog.tsx";
 import Login from "./pages/Login.tsx";
 import NewWorkOrder from "./pages/NewWorkOrder.tsx";
 import RCA from "./pages/RCA.tsx";
+import Profile from "./pages/Profile.tsx";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +40,7 @@ const App = () => (
             <Route path="/backlog" element={<RequireAuth><Backlog /></RequireAuth>} />
             <Route path="/maintenance" element={<RequireAuth><PMSchedule /></RequireAuth>} />
             <Route path="/reports" element={<RequireAuth><Reports /></RequireAuth>} />
+            <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
