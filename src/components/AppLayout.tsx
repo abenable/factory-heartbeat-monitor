@@ -12,6 +12,8 @@ import {
   ClipboardCheck,
   LogOut,
   Wrench,
+  Package,
+  TrendingUp,
 } from "lucide-react";
 import { alerts, workOrders, getBacklog } from "@/data/cmms";
 import { StatusDot } from "@/components/StatusDot";
@@ -30,7 +32,9 @@ const nav = [
   { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
   { to: "/backlog", label: "Backlog", icon: Inbox },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
-  { to: "/crafts", label: "Crafts", icon: Wrench },
+  { to: "/material-control", label: "Material Control", icon: Package },
+  { to: "/craftsmen-management", label: "Craftsmen Management", icon: Wrench },
+  { to: "/performance-reports", label: "Performance Reports", icon: TrendingUp },
   { to: "/reports", label: "Reports", icon: BarChart3 },
 ];
 

@@ -18,7 +18,9 @@ import Login from "./pages/Login.tsx";
 import NewWorkOrder from "./pages/NewWorkOrder.tsx";
 import RCA from "./pages/RCA.tsx";
 import MachineForm from "./pages/MachineForm.tsx";
-import Crafts from "./pages/Crafts.tsx";
+import MaterialControl from "./pages/MaterialControl.tsx";
+import PerformanceReports from "./pages/PerformanceReports.tsx";
+import CraftsmenManagement from "./pages/CraftsmenManagement.tsx";
 import Profile from "./pages/Profile.tsx";
 
 const queryClient = new QueryClient();
@@ -43,8 +45,10 @@ const App = () => (
             <Route path="/rca" element={<RequireAuth><RCA /></RequireAuth>} />
             <Route path="/backlog" element={<RequireAuth><Backlog /></RequireAuth>} />
             <Route path="/maintenance" element={<RequireAuth><PMSchedule /></RequireAuth>} />
+            <Route path="/material-control" element={<RequireAuth><MaterialControl /></RequireAuth>} />
+            <Route path="/craftsmen-management" element={<RequireAuth><CraftsmenManagement /></RequireAuth>} />
+            <Route path="/performance-reports" element={<RequireAuth><PerformanceReports /></RequireAuth>} />
             <Route path="/reports" element={<RequireAuth><Reports /></RequireAuth>} />
-            <Route path="/crafts" element={<RequireAuth><Crafts /></RequireAuth>} />
             <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

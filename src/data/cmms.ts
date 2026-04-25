@@ -139,6 +139,11 @@ export interface PMTask {
   intervalDays: number;
   lastDone: string;
   nextDue: string;
+  frequency?: "daily" | "weekly" | "monthly" | "quarterly";
+  procedures?: string;
+  requiredTools?: string;
+  safetyInstructions?: string;
+  personInCharge?: string; // worker username
 }
 
 export let machines: Machine[] = [
@@ -615,15 +620,15 @@ export const workOrders: WorkOrder[] = [
 ];
 
 export const pmTasks: PMTask[] = [
-  { id: "PM-01", machineId: "STAMP-PR-01", task: "Hydraulic fluid check", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24" },
-  { id: "PM-02", machineId: "LATH-AX-09", task: "Spindle lubrication", intervalDays: 14, lastDone: "2026-04-10", nextDue: "2026-04-24" },
-  { id: "PM-03", machineId: "MILL-CN-04", task: "Coolant flush", intervalDays: 60, lastDone: "2026-02-24", nextDue: "2026-04-25" },
-  { id: "PM-04", machineId: "CONV-MN-02", task: "Belt tension inspection", intervalDays: 45, lastDone: "2026-03-10", nextDue: "2026-04-24" },
-  { id: "PM-05", machineId: "WELD-RB-06", task: "Torch tip replacement", intervalDays: 21, lastDone: "2026-04-03", nextDue: "2026-04-24" },
-  { id: "PM-06", machineId: "INJ-MD-11", task: "Quarterly overhaul", intervalDays: 90, lastDone: "2026-01-24", nextDue: "2026-04-24" },
-  { id: "PM-07", machineId: "PUMP-HY-03", task: "Filter replacement", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24" },
-  { id: "PM-08", machineId: "OVEN-CR-08", task: "Heating element calibration", intervalDays: 60, lastDone: "2026-02-24", nextDue: "2026-04-25" },
-  { id: "PM-09", machineId: "GRND-SF-12", task: "Wheel balance check", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24" },
+  { id: "PM-01", machineId: "STAMP-PR-01", task: "Hydraulic fluid check", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24", frequency: "monthly", procedures: "Check reservoir level. Inspect for leaks. Top up if < 80%.", requiredTools: "Dipstick, inspection lamp", safetyInstructions: "Ensure press is de-energized. Wear safety gloves.", personInCharge: "Wagoli" },
+  { id: "PM-02", machineId: "LATH-AX-09", task: "Spindle lubrication", intervalDays: 14, lastDone: "2026-04-10", nextDue: "2026-04-24", frequency: "weekly", procedures: "Apply grease to spindle bearings (2 pumps). Check oil mist level.", requiredTools: "Grease gun, lint-free cloth", safetyInstructions: "Spindle must be at rest. Lockout before access.", personInCharge: "Mukisa" },
+  { id: "PM-03", machineId: "MILL-CN-04", task: "Coolant flush", intervalDays: 60, lastDone: "2026-02-24", nextDue: "2026-04-25", frequency: "monthly", procedures: "Drain old coolant. Flush tank with clean water. Refill with 5% concentrate mix.", requiredTools: "Drain pan, pH test kit", safetyInstructions: "Wear chemical-resistant gloves and goggles.", personInCharge: "Suubi" },
+  { id: "PM-04", machineId: "CONV-MN-02", task: "Belt tension inspection", intervalDays: 45, lastDone: "2026-03-10", nextDue: "2026-04-24", frequency: "monthly", procedures: "Measure belt tension across all spans. Adjust tensioner if < 2.5 kN. Inspect for cracks.", requiredTools: "Belt tension gauge, flashlight", safetyInstructions: "Lockout conveyor before entry.", personInCharge: "Odeke" },
+  { id: "PM-05", machineId: "WELD-RB-06", task: "Torch tip replacement", intervalDays: 21, lastDone: "2026-04-03", nextDue: "2026-04-24", frequency: "weekly", procedures: "Remove worn tip. Clean threads. Install new tip. Verify gas flow.", requiredTools: "Tip wrench, wire brush", safetyInstructions: "Purge gas lines before disassembly.", personInCharge: "Tabalaata" },
+  { id: "PM-06", machineId: "INJ-MD-11", task: "Quarterly overhaul", intervalDays: 90, lastDone: "2026-01-24", nextDue: "2026-04-24", frequency: "quarterly", procedures: "Replace hydraulic filter. Check heater bands. Calibrate shot size. Verify clamp force.", requiredTools: "Filter wrench, multimeter, calipers", safetyInstructions: "Depressurize hydraulic system. Allow heaters to cool.", personInCharge: "Odeke" },
+  { id: "PM-07", machineId: "PUMP-HY-03", task: "Filter replacement", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24", frequency: "monthly", procedures: "Isolate pump. Drain reservoir. Remove filter housing. Replace element and o-rings. Refill.", requiredTools: "Filter wrench, drain pan", safetyInstructions: "Lockout pump motor. Wear chemical gloves.", personInCharge: "Ouma" },
+  { id: "PM-08", machineId: "OVEN-CR-08", task: "Heating element calibration", intervalDays: 60, lastDone: "2026-02-24", nextDue: "2026-04-25", frequency: "monthly", procedures: "Verify setpoint vs actual temperature at 3 zones. Adjust PID offsets. Record drift.", requiredTools: "Thermocouple calibrator", safetyInstructions: "Allow oven to cool to < 50°C before entry.", personInCharge: "Ouma" },
+  { id: "PM-09", machineId: "GRND-SF-12", task: "Wheel balance check", intervalDays: 30, lastDone: "2026-03-25", nextDue: "2026-04-24", frequency: "monthly", procedures: "Remove grinding wheel. Check balance on stand. Dress wheel face. Reinstall and verify runout.", requiredTools: "Wheel dresser, dial indicator", safetyInstructions: "Wear face shield during dressing. Check flange tightness.", personInCharge: "Suubi" },
 ];
 
 export function getMachine(id: string) {

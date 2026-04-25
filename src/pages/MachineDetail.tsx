@@ -16,7 +16,7 @@ import {
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 import { SeverityBadge, formatTs } from "./Index";
 import { getWorker } from "@/data/workers";
-import { Wrench, HardHat, Package, ClipboardList, Users, MapPin, Gauge, Battery } from "lucide-react";
+import { Wrench, HardHat, Package, ClipboardList, Users, MapPin, Gauge, Battery, History, AlertOctagon } from "lucide-react";
 
 const MachineDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -249,6 +249,71 @@ const MachineDetail = () => {
             </div>
           </div>
         )}
+
+        {/* Equipment History */}
+        <div>
+          <SectionHeading>
+            <span className="flex items-center gap-2">
+              <History className="size-3.5" />
+              Equipment History
+            </span>
+          </SectionHeading>
+          <div className="flex flex-col gap-3">
+            {/* Timeline items */}
+            {machine.installationDate && (
+              <HistoryItem
+                date={machine.installationDate}
+                title="Installation"
+                detail={`Installed at ${machine.plant ?? machine.sector}${machine.section ? ` · Section ${machine.section}` : ""}`}
+                tone="ok"
+              />
+            )}
+            {machine.commissioningDate && (
+              <HistoryItem
+                date={machine.commissioningDate}
+                title="Commissioning"
+                detail="Initial commissioning and acceptance testing completed."
+                tone="ok"
+              />
+            )}
+            {machine.lastService && (
+              <HistoryItem
+                date={machine.lastService}
+                title="Last Service"
+                detail={`Routine service performed. Next due: ${machine.nextService}`}
+                tone="info"
+              />
+            )}
+            {machine.errorCode && (
+              <HistoryItem
+                date={new Date().toISOString().slice(0, 10)}
+                title={`Shutdown — ${machine.errorCode}`}
+                detail="Machine auto-shutdown triggered due to critical fault."
+                tone="crit"
+              />
+            )}
+            {machineAlerts
+              .filter((a) => a.severity === "crit")
+              .map((a) => (
+                <HistoryItem
+                  key={a.id}
+                  date={a.timestamp.slice(0, 10)}
+                  title={`Critical Alert — ${a.id}`}
+                  detail={a.description}
+                  tone="crit"
+                />
+              ))}
+            {machinePM.slice(0, 3).map((pm) => (
+              <HistoryItem
+                key={pm.id}
+                date={pm.lastDone}
+                title={`PM Completed — ${pm.task}`}
+                detail={`Interval: ${pm.intervalDays}d · Next: ${pm.nextDue}`}
+                tone="ok"
+              />
+            ))}
+          </div>
+        </div>
 
         {/* Spare Parts & BOM */}
         {machine.spareParts && machine.spareParts.length > 0 && (
@@ -514,6 +579,39 @@ function TelemetryCell({
         {value}
       </p>
     </Panel>
+  );
+}
+
+function HistoryItem({
+  date,
+  title,
+  detail,
+  tone = "info",
+}: {
+  date: string;
+  title: string;
+  detail: string;
+  tone?: "ok" | "warn" | "crit" | "info";
+}) {
+  const lineColor =
+    tone === "crit" ? "bg-led-crit" : tone === "warn" ? "bg-led-warn" : tone === "ok" ? "bg-led-ok" : "bg-border";
+  const textColor =
+    tone === "crit" ? "text-led-crit" : tone === "warn" ? "text-led-warn" : tone === "ok" ? "text-led-ok" : "text-muted-foreground";
+
+  return (
+    <div className="flex gap-4 items-start">
+      <div className="flex flex-col items-center gap-1 pt-1">
+        <div className={`w-2 h-2 rounded-full ${lineColor}`} />
+        <div className="w-px h-full bg-border" />
+      </div>
+      <div className="pb-4">
+        <span className={`font-mono-data text-[10px] uppercase tracking-widest ${textColor}`}>
+          {date}
+        </span>
+        <p className="text-sm font-medium mt-0.5">{title}</p>
+        <p className="text-xs text-muted-foreground mt-0.5">{detail}</p>
+      </div>
+    </div>
   );
 }
 
