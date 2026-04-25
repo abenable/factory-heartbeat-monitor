@@ -8,27 +8,27 @@
 
 @layer base {
   :root {
-    /* === LIGHT (default) — industrial teal + amber, soft blue tint === */
-    --background: 210 45% 96%;
+    /* === LIGHT (default) — industrial teal + amber, sky blue tint === */
+    --background: 200 60% 94%;
     --foreground: 220 25% 12%;
 
-    --panel: 210 50% 99%;
-    --panel-elevated: 210 45% 93%;
+    --panel: 200 55% 97%;
+    --panel-elevated: 200 50% 90%;
 
-    --card: 210 50% 99%;
+    --card: 200 55% 97%;
     --card-foreground: 220 25% 12%;
 
-    --popover: 210 50% 99%;
+    --popover: 200 55% 97%;
     --popover-foreground: 220 25% 12%;
 
     /* Teal primary */
     --primary: 174 62% 38%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 35% 90%;
+    --secondary: 200 50% 88%;
     --secondary-foreground: 220 25% 18%;
 
-    --muted: 210 35% 92%;
+    --muted: 200 50% 90%;
     --muted-foreground: 215 14% 40%;
 
     /* Amber accent */
@@ -38,8 +38,8 @@
     --destructive: 0 75% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 30% 82%;
-    --input: 210 30% 82%;
+    --border: 200 45% 82%;
+    --input: 200 45% 82%;
     --ring: 174 62% 38%;
 
     /* Status LEDs (kept readable on light) */
@@ -51,13 +51,13 @@
     --radius: 0.375rem;
 
     /* Sidebar */
-    --sidebar-background: 210 50% 98%;
+    --sidebar-background: 200 55% 96%;
     --sidebar-foreground: 215 18% 32%;
     --sidebar-primary: 174 62% 38%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 40% 92%;
+    --sidebar-accent: 200 50% 92%;
     --sidebar-accent-foreground: 220 25% 12%;
-    --sidebar-border: 210 30% 84%;
+    --sidebar-border: 200 45% 84%;
     --sidebar-ring: 174 62% 38%;
   }
 
