@@ -61,8 +61,9 @@ const Login = () => {
                 fontSize: "32px",
                 lineHeight: 1.2,
                 letterSpacing: "-1.28px",
-                color: "#171717",
+                color: "#ffffff",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                textShadow: "0 2px 12px rgba(0,0,0,0.5)",
               }}
             >
               Sign In
@@ -72,8 +73,9 @@ const Login = () => {
               style={{
                 fontSize: "16px",
                 lineHeight: 1.5,
-                color: "#4d4d4d",
+                color: "rgba(255,255,255,0.85)",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                textShadow: "0 1px 8px rgba(0,0,0,0.5)",
               }}
             >
               Group 6 Industries — Maintenance Operations Console
@@ -220,8 +222,9 @@ const Login = () => {
           style={{
             fontSize: "12px",
             lineHeight: 1.33,
-            color: "#808080",
+            color: "rgba(255,255,255,0.75)",
             fontFamily: "'Geist', Arial, system-ui, sans-serif",
+            textShadow: "0 1px 6px rgba(0,0,0,0.5)",
           }}
         >
           Group 6 Industries Limited · CMMS
