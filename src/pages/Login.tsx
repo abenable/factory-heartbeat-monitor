@@ -113,10 +113,11 @@ const Login = () => {
                 htmlFor="username"
                 style={{
                   fontSize: "14px",
-                  fontWeight: 500,
+                  fontWeight: 600,
                   lineHeight: 1.43,
-                  color: "#171717",
+                  color: "#F5FAFF",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                  textShadow: "0 1px 4px rgba(5,20,50,0.45)",
                 }}
               >
                 User name
@@ -134,8 +135,8 @@ const Login = () => {
                   padding: "0 12px",
                   fontSize: "14px",
                   lineHeight: 1.43,
-                  color: "#171717",
-                  background: "#ffffff",
+                  color: "#0E1F3A",
+                  background: "rgba(255,255,255,0.78)",
                   borderRadius: "6px",
                   boxShadow: borderShadow,
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
@@ -154,10 +155,11 @@ const Login = () => {
                 htmlFor="password"
                 style={{
                   fontSize: "14px",
-                  fontWeight: 500,
+                  fontWeight: 600,
                   lineHeight: 1.43,
-                  color: "#171717",
+                  color: "#F5FAFF",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                  textShadow: "0 1px 4px rgba(5,20,50,0.45)",
                 }}
               >
                 Password
@@ -175,8 +177,8 @@ const Login = () => {
                   padding: "0 12px",
                   fontSize: "14px",
                   lineHeight: 1.43,
-                  color: "#171717",
-                  background: "#ffffff",
+                  color: "#0E1F3A",
+                  background: "rgba(255,255,255,0.78)",
                   borderRadius: "6px",
                   boxShadow: borderShadow,
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
@@ -237,7 +239,7 @@ const Login = () => {
             fontSize: "12px",
             lineHeight: 1.33,
             letterSpacing: "0.6px",
-            color: "rgba(255,230,210,0.85)",
+            color: "rgba(220,235,255,0.85)",
             fontFamily: "'Geist Mono', ui-monospace, monospace",
             textShadow: "0 1px 6px rgba(10,25,55,0.5)",
           }}
