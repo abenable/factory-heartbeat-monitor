@@ -54,12 +54,14 @@ const Machines = () => {
             ))}
           </div>
           <div className="flex gap-2">
-            <Button asChild size="sm">
-              <Link to="/machines/new">
-                <Plus className="size-4" />
-                New Machine
-              </Link>
-            </Button>
+            {!isViewer() && (
+              <Button asChild size="sm">
+                <Link to="/machines/new">
+                  <Plus className="size-4" />
+                  New Machine
+                </Link>
+              </Button>
+            )}
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}
