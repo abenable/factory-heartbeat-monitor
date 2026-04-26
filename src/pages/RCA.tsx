@@ -147,7 +147,7 @@ const RCA = () => {
         {/* Printable report */}
         <div className="print-only">
           <h1 style={{ fontSize: 22, marginBottom: 4 }}>
-            Group 6 Industries Limited — Root Cause Analysis
+            Alma Industry Limited — Root Cause Analysis
           </h1>
           <p style={{ marginBottom: 16, color: "#444" }}>
             Printed {new Date().toLocaleString()}

@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { machines, statusColor, statusLabel, MachineStatus } from "@/data/cmms";
 import { useMemo, useState } from "react";
+import { isViewer } from "@/lib/auth";
 
 const filters: { key: MachineStatus | "all"; label: string }[] = [
   { key: "all", label: "All" },
@@ -53,12 +54,14 @@ const Machines = () => {
             ))}
           </div>
           <div className="flex gap-2">
-            <Button asChild size="sm">
-              <Link to="/machines/new">
-                <Plus className="size-4" />
-                New Machine
-              </Link>
-            </Button>
+            {!isViewer() && (
+              <Button asChild size="sm">
+                <Link to="/machines/new">
+                  <Plus className="size-4" />
+                  New Machine
+                </Link>
+              </Button>
+            )}
             <Input
               value={q}
               onChange={(e) => setQ(e.target.value)}

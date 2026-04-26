@@ -65,7 +65,7 @@ export const materialDraws: MaterialDraw[] = [
 
 export const materialReturns: MaterialReturn[] = [
   { id: "MR-011", date: "2026-04-20", item: "Bearing grease cartridge", qty: 2, unit: "pc", returnedBy: "Wagoli", reason: "Wrong spec — needed high-temp grade" },
-  { id: "MR-012", date: "2026-04-18", item: "O-ring kit (metric)", qty: 1, unit: "set", returnedBy: "Ouma", reason: "Excess from WO-2037" },
+  { id: "MR-012", date: "2026-04-18", item: "O-ring kit (metric)", qty: 1, unit: "set", returnedBy: "Oumo", reason: "Excess from WO-2037" },
 ];
 
 export const inventory: InventoryItem[] = [

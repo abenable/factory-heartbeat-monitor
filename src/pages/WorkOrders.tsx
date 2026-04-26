@@ -13,6 +13,7 @@ import {
   woTypeLabel,
 } from "@/data/cmms";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
+import { isViewer } from "@/lib/auth";
 
 const statusFilters: { key: WorkOrderStatus | "all"; label: string }[] = [
   { key: "all", label: "All" },
@@ -71,12 +72,14 @@ const WorkOrders = () => {
             ))}
           </div>
           <div className="flex gap-2">
-            <Button asChild size="sm">
-              <Link to="/work-orders/new">
-                <Plus className="size-4" />
-                New Work Order
-              </Link>
-            </Button>
+            {!isViewer() && (
+              <Button asChild size="sm">
+                <Link to="/work-orders/new">
+                  <Plus className="size-4" />
+                  New Work Order
+                </Link>
+              </Button>
+            )}
             <Button variant="outline" size="sm" onClick={printFiltered}>
               <Printer className="size-4" />
               Print Filtered ({list.length})

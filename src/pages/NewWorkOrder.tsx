@@ -1,5 +1,6 @@
 import { useState, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { isViewer } from "@/lib/auth";
 import { Printer, Save, ArrowLeft, Plus, X, Wrench } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
@@ -446,7 +447,7 @@ function PrintView({
 }) {
   return (
     <div className="print-only">
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Group 6 Industries Limited — Work Order</h1>
+      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Alma Industry Limited — Work Order</h1>
       <p style={{ marginBottom: 16, color: "#444" }}>Printed {new Date().toLocaleString()}</p>
 
       <h2 style={{ fontSize: 14, borderBottom: "1px solid #000", paddingBottom: 4, marginBottom: 8 }}>
@@ -577,4 +578,5 @@ function SigLine({ label }: { label: string }) {
   );
 }
 
-export default NewWorkOrder;
+const NewWorkOrderGuarded = () => (isViewer() ? <Navigate to="/work-orders" replace /> : <NewWorkOrder />);
+export default NewWorkOrderGuarded;

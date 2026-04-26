@@ -1,5 +1,6 @@
 import { useState, FormEvent, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
+import { isViewer } from "@/lib/auth";
 import { Save, ArrowLeft } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
@@ -457,4 +458,5 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export default MachineForm;
+const MachineFormGuarded = () => (isViewer() ? <Navigate to="/machines" replace /> : <MachineForm />);
+export default MachineFormGuarded;

@@ -16,6 +16,7 @@ import {
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 import { SeverityBadge, formatTs } from "./Index";
 import { getWorker } from "@/data/workers";
+import { isViewer } from "@/lib/auth";
 import { Wrench, HardHat, Package, ClipboardList, Users, MapPin, Gauge, Battery, History, AlertOctagon } from "lucide-react";
 
 const MachineDetail = () => {
@@ -77,12 +78,14 @@ const MachineDetail = () => {
                   {statusLabel(machine.status)}
                 </span>
               </div>
-              <Button asChild variant="outline" size="sm">
-                <Link to={`/machines/${machine.id}/edit`}>
-                  <Pencil className="size-4" />
-                  Edit
-                </Link>
-              </Button>
+              {!isViewer() && (
+                <Button asChild variant="outline" size="sm">
+                  <Link to={`/machines/${machine.id}/edit`}>
+                    <Pencil className="size-4" />
+                    Edit
+                  </Link>
+                </Button>
+              )}
             </div>
           </div>
         </Panel>

@@ -39,46 +39,49 @@ const Login = () => {
       <div
         aria-hidden
         className="absolute inset-0"
-        style={{ background: "linear-gradient(135deg, rgba(5,15,30,0.72), rgba(5,15,30,0.55))" }}
+        style={{
+          background:
+            "linear-gradient(135deg, rgba(255,210,180,0.42) 0%, rgba(20,40,80,0.38) 55%, rgba(10,25,55,0.55) 100%)",
+        }}
       />
       <div className="w-full max-w-[420px] flex flex-col items-center gap-10 relative z-10">
         {/* Logo + brand */}
         <div className="flex flex-col items-center gap-5">
-          <div className="size-20 flex items-center justify-center">
+          <div className="size-20 flex items-center justify-center rounded-full bg-white/85 backdrop-blur-sm p-3 shadow-lg">
             <img
               src={logo}
-              alt="Group 6 Industries Limited"
+              alt="Alma Industry Limited"
               width={80}
               height={80}
               className="size-full object-contain"
-              style={{ filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.08))" }}
             />
           </div>
-          <div className="flex flex-col items-center gap-1">
+          <div className="flex flex-col items-center gap-1.5">
             <h1
               className="font-semibold text-center"
               style={{
-                fontSize: "32px",
-                lineHeight: 1.2,
-                letterSpacing: "-1.28px",
-                color: "#ffffff",
+                fontSize: "30px",
+                lineHeight: 1.15,
+                letterSpacing: "-0.5px",
+                color: "#FFE6D2",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                textShadow: "0 2px 12px rgba(0,0,0,0.5)",
+                textShadow: "0 2px 14px rgba(10,25,55,0.55)",
               }}
             >
-              Sign In
+              Alma Industry Limited
             </h1>
             <p
               className="text-center"
               style={{
-                fontSize: "16px",
+                fontSize: "14px",
                 lineHeight: 1.5,
-                color: "rgba(255,255,255,0.85)",
+                letterSpacing: "0.4px",
+                color: "rgba(255,230,210,0.92)",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                textShadow: "0 1px 8px rgba(0,0,0,0.5)",
+                textShadow: "0 1px 8px rgba(10,25,55,0.5)",
               }}
             >
-              Group 6 Industries — Maintenance Operations Console
+              Maintenance Operations Console
             </p>
           </div>
         </div>
@@ -222,12 +225,13 @@ const Login = () => {
           style={{
             fontSize: "12px",
             lineHeight: 1.33,
-            color: "rgba(255,255,255,0.75)",
-            fontFamily: "'Geist', Arial, system-ui, sans-serif",
-            textShadow: "0 1px 6px rgba(0,0,0,0.5)",
+            letterSpacing: "0.6px",
+            color: "rgba(255,230,210,0.85)",
+            fontFamily: "'Geist Mono', ui-monospace, monospace",
+            textShadow: "0 1px 6px rgba(10,25,55,0.5)",
           }}
         >
-          Group 6 Industries Limited · CMMS
+          Alma Industry Limited · CMMS
         </p>
       </div>
     </div>

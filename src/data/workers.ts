@@ -11,6 +11,9 @@ export interface WorkerProfile {
   phone: string;
   email: string;
   certifications: string[];
+  /** Viewers can browse the CMMS but cannot create, edit or delete records.
+   *  They may still update their own contact details on their profile. */
+  viewer?: boolean;
 }
 
 // All workers share the same demo password: "Angel"
@@ -71,9 +74,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     email: "odeke@group6.co.ug",
     certifications: ["Confined Space Entry", "Rigging & Slinging"],
   },
-  Ouma: {
-    username: "Ouma",
-    name: "Ouma Benjamin",
+  Oumo: {
+    username: "Oumo",
+    name: "Oumo Benjamin",
     jobTitle: "Instrumentation Technician",
     workerId: "21/U/1522",
     department: "Instrumentation & Control",
@@ -82,7 +85,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2021-01-25",
     shift: "Swing · 14:00 – 22:00",
     phone: "+256 772 100 005",
-    email: "ouma@group6.co.ug",
+    email: "oumo@group6.co.ug",
     certifications: ["HART Field Comm", "Loop Tuning"],
   },
   Ahereza: {
@@ -166,8 +169,23 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2024-01-15",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 011",
-    email: "mutebi@group6.co.ug",
+    email: "mutebi@alma.co.ug",
     certifications: ["Basic Electrical Safety"],
+  },
+  Tumusiime: {
+    username: "Tumusiime",
+    name: "Tumusiime Edmund",
+    jobTitle: "Shareholder · Read-only Viewer",
+    workerId: "ALMA/SH/001",
+    department: "Board & Shareholders",
+    license: "N/A · Non-operational role",
+    licenseExpiry: "—",
+    joined: "2015-01-10",
+    shift: "Off-site · By appointment",
+    phone: "+256 772 100 012",
+    email: "edmund.tumusiime@alma.co.ug",
+    certifications: ["Board Member"],
+    viewer: true,
   },
 };
 
