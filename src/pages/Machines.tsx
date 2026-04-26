@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { machines, statusColor, statusLabel, MachineStatus } from "@/data/cmms";
 import { useMemo, useState } from "react";
+import { isViewer } from "@/lib/auth";
 
 const filters: { key: MachineStatus | "all"; label: string }[] = [
   { key: "all", label: "All" },
