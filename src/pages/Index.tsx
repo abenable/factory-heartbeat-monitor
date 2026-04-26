@@ -82,7 +82,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                      <Metric label="Status" value={statusLabel(m.status)} tone={tone} isStatus />
+                      <Metric label="Status" value={statusLabel(m.status)} tone={tone} />
                       <Metric label="Load" value={`${m.load.toFixed(1)}%`} />
                       <Metric
                         label="Core Temp"
@@ -200,30 +200,16 @@ function Metric({
   label,
   value,
   tone,
-  isStatus,
 }: {
   label: string;
   value: string;
   tone?: "ok" | "warn" | "crit" | "info";
-  isStatus?: boolean;
 }) {
-  if (isStatus) {
-    return (
-      <div className="flex flex-col">
-        <span className="font-mono-data text-[10px] text-cyan uppercase">
-          {label}
-        </span>
-        <span className="mt-1">
-          <span className="badge-cyan">{value}</span>
-        </span>
-      </div>
-    );
-  }
   const colorMap = {
-    ok: "text-cyan",
+    ok: "text-led-ok",
     warn: "text-led-warn",
     crit: "text-led-crit",
-    info: "text-cyan",
+    info: "text-led-info",
   };
   return (
     <div className="flex flex-col">
