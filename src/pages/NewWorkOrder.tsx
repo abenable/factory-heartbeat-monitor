@@ -446,7 +446,7 @@ function PrintView({
 }) {
   return (
     <div className="print-only">
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Group 6 Industries Limited — Work Order</h1>
+      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Alma Industry Limited — Work Order</h1>
       <p style={{ marginBottom: 16, color: "#444" }}>Printed {new Date().toLocaleString()}</p>
 
       <h2 style={{ fontSize: 14, borderBottom: "1px solid #000", paddingBottom: 4, marginBottom: 8 }}>

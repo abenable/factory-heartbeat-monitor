@@ -350,7 +350,7 @@ export default function PerformanceReports() {
 
         {/* Printable summary */}
         <div className="print-only">
-          <h1 style={{ fontSize: 20, marginBottom: 4 }}>Group 6 Industries — Performance Report</h1>
+          <h1 style={{ fontSize: 20, marginBottom: 4 }}>Alma Industry — Performance Report</h1>
           <p style={{ marginBottom: 12, color: "#444" }}>
             Printed {new Date().toLocaleString()}
           </p>

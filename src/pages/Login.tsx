@@ -47,7 +47,7 @@ const Login = () => {
           <div className="size-20 flex items-center justify-center">
             <img
               src={logo}
-              alt="Group 6 Industries Limited"
+              alt="Alma Industry Limited"
               width={80}
               height={80}
               className="size-full object-contain"
@@ -78,7 +78,7 @@ const Login = () => {
                 textShadow: "0 1px 8px rgba(0,0,0,0.5)",
               }}
             >
-              Group 6 Industries — Maintenance Operations Console
+              Alma Industry — Maintenance Operations Console
             </p>
           </div>
         </div>
@@ -227,7 +227,7 @@ const Login = () => {
             textShadow: "0 1px 6px rgba(0,0,0,0.5)",
           }}
         >
-          Group 6 Industries Limited · CMMS
+          Alma Industry Limited · CMMS
         </p>
       </div>
     </div>
