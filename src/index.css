@@ -8,29 +8,29 @@
 
 @layer base {
   :root {
-    /* === LIGHT — dark light royal blue === */
-    --background:  225  35%  78%;
-    --foreground:  220  45%  10%;
+    /* === LIGHT — warm peach === */
+    --background:   24  85%  92%;
+    --foreground:   20  35%  12%;
 
-    --panel:       225  30%  85%;
-    --panel-elevated:  225  35%  80%;
+    --panel:        26  80%  95%;
+    --panel-elevated:  26  85%  93%;
 
-    --card:        225  30%  85%;
-    --card-foreground:  220  45%  10%;
+    --card:         26  80%  95%;
+    --card-foreground:   20  35%  12%;
 
-    --popover:     225  30%  85%;
-    --popover-foreground:  220  45%  10%;
+    --popover:      26  80%  95%;
+    --popover-foreground:   20  35%  12%;
 
     /* Primary: deep royal blue */
     --primary:     220  85%  46%;
     --primary-foreground:  0  0%  100%;
 
     /* Secondary: periwinkle */
-    --secondary:   225  35%  82%;
-    --secondary-foreground:  220  45%  14%;
+    --secondary:    26  70%  90%;
+    --secondary-foreground:   20  35%  16%;
 
-    --muted:       225  30%  83%;
-    --muted-foreground:  220  20%  32%;
+    --muted:        26  60%  91%;
+    --muted-foreground:   20  20%  34%;
 
     /* Accent: bright sky blue */
     --accent:      200  92%  55%;
@@ -39,8 +39,8 @@
     --destructive:  355  75%  48%;
     --destructive-foreground:  0  0%  100%;
 
-    --border:      225  30%  72%;
-    --input:       225  30%  72%;
+    --border:       24  55%  82%;
+    --input:        24  55%  82%;
     --ring:        220  85%  46%;
 
     /* Status LEDs */
@@ -52,13 +52,13 @@
     --radius: 0.375rem;
 
     /* Sidebar */
-    --sidebar-background:  225  35%  80%;
-    --sidebar-foreground:  220  20%  24%;
+    --sidebar-background:   26  80%  93%;
+    --sidebar-foreground:   20  25%  24%;
     --sidebar-primary:     220  85%  46%;
     --sidebar-primary-foreground:  0  0%  100%;
-    --sidebar-accent:      225  35%  78%;
-    --sidebar-accent-foreground:  220  45%  10%;
-    --sidebar-border:      225  30%  72%;
+    --sidebar-accent:       24  75%  90%;
+    --sidebar-accent-foreground:   20  35%  12%;
+    --sidebar-border:       24  55%  82%;
     --sidebar-ring:        220  85%  46%;
   }
 
