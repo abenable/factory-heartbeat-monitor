@@ -578,4 +578,5 @@ function SigLine({ label }: { label: string }) {
   );
 }
 
-export default NewWorkOrder;
+const NewWorkOrderGuarded = () => (isViewer() ? <Navigate to="/work-orders" replace /> : <NewWorkOrder />);
+export default NewWorkOrderGuarded;

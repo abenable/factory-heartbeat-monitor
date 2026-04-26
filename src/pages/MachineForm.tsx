@@ -458,4 +458,5 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-export default MachineForm;
+const MachineFormGuarded = () => (isViewer() ? <Navigate to="/machines" replace /> : <MachineForm />);
+export default MachineFormGuarded;
