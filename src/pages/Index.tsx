@@ -227,12 +227,11 @@ function Metric({
 
 export function SeverityBadge({ severity }: { severity: "crit" | "warn" | "info" }) {
   const map = {
-    crit: { label: "Critical", className: "text-led-crit" },
-    warn: { label: "Warning", className: "text-led-warn" },
-    info: { label: "INFO", className: "text-muted-foreground" },
+    crit: "Critical",
+    warn: "Warning",
+    info: "INFO",
   };
-  const s = map[severity];
-  return <span className={`font-bold ${s.className}`}>{s.label}</span>;
+  return <span className="badge-cyan">{map[severity]}</span>;
 }
 
 export function formatTs(iso: string) {

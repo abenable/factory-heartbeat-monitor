@@ -55,7 +55,7 @@ export default function CraftsmenManagement() {
                       <span className="font-mono-data text-xs uppercase tracking-widest text-muted-foreground">
                         {LEVEL_LABELS[level]}
                       </span>
-                      <span className="font-mono-data text-[10px] bg-panel-elevated border border-border px-2 py-0.5 rounded-full">
+                      <span className="font-mono-data text-[10px] bg-primary text-primary-foreground border border-primary px-2 py-0.5 rounded-full">
                         ${rate}/hr
                       </span>
                     </div>
@@ -102,7 +102,7 @@ export default function CraftsmenManagement() {
                 return (
                   <span
                     key={u}
-                    className="text-xs px-2.5 py-1 bg-panel-elevated border border-border font-medium rounded-full"
+                    className="text-xs px-2.5 py-1 bg-primary text-primary-foreground border border-primary font-medium rounded-full"
                   >
                     {worker?.name ?? u}
                   </span>

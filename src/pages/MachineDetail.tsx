@@ -367,7 +367,7 @@ const MachineDetail = () => {
                     <Link
                       key={u}
                       to={`/profile`}
-                      className="text-xs px-2.5 py-1 bg-panel-elevated border border-border font-medium rounded-full hover:border-foreground transition-colors"
+                      className="text-xs px-2.5 py-1 bg-primary text-primary-foreground border border-primary font-medium rounded-full hover:opacity-90 transition-opacity"
                       title={`View ${worker?.name ?? u}`}
                     >
                       <span className="flex items-center gap-1.5">

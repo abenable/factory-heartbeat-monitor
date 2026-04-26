@@ -348,7 +348,7 @@ const NewWorkOrder = () => {
                       key={u}
                       type="button"
                       onClick={() => update("assignee", worker?.name ?? u)}
-                      className="text-left text-xs px-3 py-2 bg-panel-elevated border border-border rounded-full hover:border-foreground transition-colors"
+                      className="text-left text-xs px-3 py-2 bg-primary text-primary-foreground border border-primary rounded-full hover:opacity-90 transition-opacity"
                     >
                       <span className="font-medium">{worker?.name ?? u}</span>
                       {cs.length > 0 && (

@@ -63,7 +63,7 @@ const WorkOrders = () => {
                 onClick={() => setFilter(f.key)}
                 className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                   filter === f.key
-                    ? "border-foreground bg-panel-elevated text-foreground"
+                    ? "border-primary bg-primary text-primary-foreground"
                     : "border-border text-muted-foreground hover:text-foreground"
                 }`}
               >

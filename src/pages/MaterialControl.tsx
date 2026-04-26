@@ -50,7 +50,7 @@ export default function MaterialControl() {
                   onClick={() => setPoFilter(f.key)}
                   className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                     poFilter === f.key
-                      ? "border-foreground bg-panel-elevated text-foreground"
+                      ? "border-primary bg-primary text-primary-foreground"
                       : "border-border text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -193,13 +193,7 @@ export default function MaterialControl() {
 }
 
 function POStatusBadge({ status }: { status: POStatus }) {
-  const cls =
-    status === "open"
-      ? "text-foreground"
-      : status === "closed"
-      ? "text-led-ok"
-      : "text-led-crit";
-  return <span className={`font-mono-data text-[10px] uppercase ${cls}`}>{status}</span>;
+  return <span className="badge-cyan">{status}</span>;
 }
 
 function Kpi({ label, value, tone }: { label: string; value: string | number; tone?: "ok" | "warn" | "crit" }) {
