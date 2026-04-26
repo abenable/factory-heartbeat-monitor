@@ -155,13 +155,13 @@ function SummaryCard({
 }) {
   const accent = tone === "info" ? "default" : tone;
   const colorClass =
-    tone === "crit" ? "text-white" : tone === "warn" ? "text-white" : "text-white";
+    tone === "crit" ? "text-led-crit" : tone === "warn" ? "text-led-warn" : "text-foreground";
   return (
-    <Panel className="p-5 h-28 flex flex-col justify-between bg-cyan-kpi">
-      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
+    <Panel className="p-5 h-28 flex flex-col justify-between bg-gradient-blue">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label} (Open)
       </span>
-      <span className={`font-mono-data text-4xl font-bold text-white`}>
+      <span className={`font-mono-data text-4xl font-bold ${colorClass}`}>
         {String(count).padStart(2, "0")}
       </span>
     </Panel>

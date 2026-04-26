@@ -51,7 +51,7 @@ export default function MaterialControl() {
                   className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                     poFilter === f.key
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border text-white/70 hover:text-primary"
+                      : "border-border text-muted-foreground hover:text-primary"
                   }`}
                 >
                   {f.label}
@@ -78,10 +78,10 @@ export default function MaterialControl() {
                   <tr key={po.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                     <td className="p-3 font-bold">{po.id}</td>
                     <td className="p-3">{po.item}</td>
-                    <td className="p-3 text-white/70">{po.supplier}</td>
+                    <td className="p-3 text-muted-foreground">{po.supplier}</td>
                     <td className="p-3">{po.qty} {po.unit}</td>
                     <td className="p-3 text-right">${po.costUSD}</td>
-                    <td className="p-3 text-white/70">{po.orderDate}</td>
+                    <td className="p-3 text-muted-foreground">{po.orderDate}</td>
                     <td className="p-3">{po.deliveryDeadline}</td>
                     <td className="p-3">
                       <POStatusBadge status={po.status} />
@@ -112,11 +112,11 @@ export default function MaterialControl() {
                 {materialDraws.map((d) => (
                   <tr key={d.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                     <td className="p-3 font-bold">{d.id}</td>
-                    <td className="p-3 text-white/70">{d.date}</td>
+                    <td className="p-3 text-muted-foreground">{d.date}</td>
                     <td className="p-3">{d.item}</td>
                     <td className="p-3">{d.qty} {d.unit}</td>
-                    <td className="p-3 text-white/70">{d.drawnBy}</td>
-                    <td className="p-3 text-white/70">{d.workOrderId ?? "—"}</td>
+                    <td className="p-3 text-muted-foreground">{d.drawnBy}</td>
+                    <td className="p-3 text-muted-foreground">{d.workOrderId ?? "—"}</td>
                   </tr>
                 ))}
               </tbody>
@@ -143,10 +143,10 @@ export default function MaterialControl() {
                 {materialReturns.map((r) => (
                   <tr key={r.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                     <td className="p-3 font-bold">{r.id}</td>
-                    <td className="p-3 text-white/70">{r.date}</td>
+                    <td className="p-3 text-muted-foreground">{r.date}</td>
                     <td className="p-3">{r.item}</td>
                     <td className="p-3">{r.qty} {r.unit}</td>
-                    <td className="p-3 text-white/70">{r.returnedBy}</td>
+                    <td className="p-3 text-muted-foreground">{r.returnedBy}</td>
                     <td className="p-3">{r.reason}</td>
                   </tr>
                 ))}
@@ -162,14 +162,14 @@ export default function MaterialControl() {
             {inventory.map((item) => {
               const levelColor =
                 item.status === "critical"
-                  ? "text-white"
+                  ? "text-led-crit"
                   : item.status === "low"
-                  ? "text-white"
-                  : "text-white";
+                  ? "text-led-warn"
+                  : "text-led-ok";
               return (
                 <Panel key={item.id} className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
+                    <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                       {item.partNumber}
                     </span>
                     <span className={`font-mono-data text-[10px] uppercase ${levelColor}`}>
@@ -178,10 +178,10 @@ export default function MaterialControl() {
                   </div>
                   <p className="text-sm font-medium">{item.name}</p>
                   <div className="flex justify-between mt-3 font-mono-data text-xs">
-                    <span className="text-white/70">Stock: {item.qtyOnHand} {item.unit}</span>
-                    <span className="text-white/70">Min: {item.minStock}</span>
+                    <span className="text-muted-foreground">Stock: {item.qtyOnHand} {item.unit}</span>
+                    <span className="text-muted-foreground">Min: {item.minStock}</span>
                   </div>
-                  <p className="font-mono-data text-[10px] text-white/70 mt-1">{item.location}</p>
+                  <p className="font-mono-data text-[10px] text-muted-foreground mt-1">{item.location}</p>
                 </Panel>
               );
             })}
@@ -202,8 +202,8 @@ function POStatusBadge({ status }: { status: POStatus }) {
   };
   const textMap = {
     open: "text-led-info",
-    closed: "text-white",
-    overdue: "text-white",
+    closed: "text-led-ok",
+    overdue: "text-led-crit",
   };
   return (
     <span className="inline-flex items-center gap-1.5">
@@ -218,15 +218,15 @@ function POStatusBadge({ status }: { status: POStatus }) {
 function Kpi({ label, value, tone }: { label: string; value: string | number; tone?: "ok" | "warn" | "crit" }) {
   const colorClass =
     tone === "crit"
-      ? "text-white"
+      ? "text-led-crit"
       : tone === "warn"
-      ? "text-white"
+      ? "text-led-warn"
       : tone === "ok"
-      ? "text-white"
-      : "text-white";
+      ? "text-led-ok"
+      : "text-foreground";
   return (
-    <Panel className="p-5 h-24 flex flex-col justify-between bg-cyan-kpi">
-      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
+    <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>{value}</span>

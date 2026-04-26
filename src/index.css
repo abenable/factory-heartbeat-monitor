@@ -172,11 +172,6 @@
   .bg-gradient-blue {
     background: linear-gradient(135deg, hsl(var(--panel)) 0%, hsl(var(--accent) / 0.15) 100%);
   }
-
-  /* Dark cyan KPI/stat card background */
-  .bg-cyan-kpi {
-    background: hsl(186 85% 28%);
-  }
 }
 
 /* === Print styles === */

@@ -46,7 +46,7 @@ const Reports = () => {
                   <div key={b.id} className="flex flex-col gap-1">
                     <div className="flex justify-between font-mono-data text-xs">
                       <span>{b.id}</span>
-                      <span className="text-white/70">
+                      <span className="text-muted-foreground">
                         {b.downtime.toFixed(1)}h
                       </span>
                     </div>
@@ -101,8 +101,8 @@ const Reports = () => {
 
 function Kpi({ label, value }: { label: string; value: string }) {
   return (
-    <Panel className="p-5 h-28 flex flex-col justify-between bg-cyan-kpi">
-      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
+    <Panel className="p-5 h-28 flex flex-col justify-between bg-gradient-blue">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <span className="font-mono-data text-3xl font-bold">{value}</span>
@@ -126,7 +126,7 @@ function SevBar({
     <div className="flex flex-col gap-1">
       <div className="flex justify-between font-mono-data text-xs">
         <span className="uppercase">{label}</span>
-        <span className="text-white/70">
+        <span className="text-muted-foreground">
           {count} ({pct.toFixed(0)}%)
         </span>
       </div>
@@ -140,7 +140,7 @@ function SevBar({
 function Stat({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] text-white/70 uppercase tracking-widest">
+      <span className="text-[10px] text-muted-foreground uppercase tracking-widest">
         {label}
       </span>
       <span className="text-3xl font-bold">{String(value).padStart(2, "0")}</span>
