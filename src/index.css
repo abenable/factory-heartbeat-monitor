@@ -8,58 +8,58 @@
 
 @layer base {
   :root {
-    /* === LIGHT — sky blue === */
-    --background:  205  85%  88%;
-    --foreground:  215  45%  14%;
+    /* === LIGHT — cyan === */
+    --background:  180  60%  85%;
+    --foreground:  195  55%  10%;
 
-    --panel:       204  80%  93%;
-    --panel-elevated:  204  85%  95%;
+    --panel:       180  50%  90%;
+    --panel-elevated:  180  55%  87%;
 
-    --card:        204  80%  94%;
-    --card-foreground:  215  45%  14%;
+    --card:        180  50%  91%;
+    --card-foreground:  195  55%  10%;
 
-    --popover:     204  80%  95%;
-    --popover-foreground:  215  45%  14%;
+    --popover:     180  50%  92%;
+    --popover-foreground:  195  55%  10%;
 
-    /* Primary: deep royal blue */
-    --primary:     215  88%  44%;
+    /* Primary: vivid cyan */
+    --primary:     180  85%  34%;
     --primary-foreground:  0  0%  100%;
 
-    /* Secondary: soft sky */
-    --secondary:   204  70%  90%;
-    --secondary-foreground:  215  45%  18%;
+    /* Secondary: pale cyan */
+    --secondary:   180  45%  86%;
+    --secondary-foreground:  195  50%  14%;
 
-    --muted:       204  55%  90%;
-    --muted-foreground:  215  22%  36%;
+    --muted:       180  40%  86%;
+    --muted-foreground:  195  22%  32%;
 
-    /* Accent: cyan teal — complements sky blue */
-    --accent:      192  78%  44%;
+    /* Accent: bright teal */
+    --accent:      174  80%  40%;
     --accent-foreground:  0  0%  100%;
 
     --destructive:  355  75%  48%;
     --destructive-foreground:  0  0%  100%;
 
-    --border:      204  45%  78%;
-    --input:       204  45%  80%;
-    --ring:        215  88%  44%;
+    --border:      180  35%  76%;
+    --input:       180  35%  78%;
+    --ring:        180  85%  34%;
 
     /* Status LEDs */
     --led-ok:      155  70%  36%;
     --led-warn:    38   95%  50%;
     --led-crit:    0    78%  48%;
-    --led-info:    215  60%  45%;
+    --led-info:    180  65%  40%;
 
     --radius: 0.375rem;
 
     /* Sidebar */
-    --sidebar-background:  204  78%  90%;
-    --sidebar-foreground:  215  30%  24%;
-    --sidebar-primary:     215  88%  44%;
+    --sidebar-background:  180  50%  88%;
+    --sidebar-foreground:  195  28%  24%;
+    --sidebar-primary:     180  85%  34%;
     --sidebar-primary-foreground:  0  0%  100%;
-    --sidebar-accent:      204  70%  86%;
-    --sidebar-accent-foreground:  215  45%  14%;
-    --sidebar-border:      204  45%  78%;
-    --sidebar-ring:        215  88%  44%;
+    --sidebar-accent:      180  45%  84%;
+    --sidebar-accent-foreground:  195  55%  10%;
+    --sidebar-border:      180  35%  76%;
+    --sidebar-ring:        180  85%  34%;
   }
 
   .dark {
