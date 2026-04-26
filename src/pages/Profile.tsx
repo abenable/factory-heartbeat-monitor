@@ -114,11 +114,11 @@ const Profile = () => {
         {/* Header card */}
         <Panel className="p-6 flex flex-col sm:flex-row gap-6 items-center sm:items-start">
           <div className="size-24 sm:size-28 shrink-0 bg-panel-elevated border border-border flex items-center justify-center overflow-hidden">
-            <img src={logo} alt="Alma Industry" width={112} height={112} loading="lazy" className="size-full object-contain p-2" />
+            <img src={logo} alt="Alpha Industry Limited" width={112} height={112} loading="lazy" className="size-full object-contain p-2" />
           </div>
           <div className="flex-1 flex flex-col gap-1.5 text-center sm:text-left">
             <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
-              Alma Industry Limited
+              Alpha Industry Limited
             </span>
             <h2 className="text-2xl font-bold leading-tight">{worker.name}</h2>
             <p className="text-sm text-primary font-medium">{worker.jobTitle}</p>

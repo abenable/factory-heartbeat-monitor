@@ -71,10 +71,10 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const sidebarContent = (
     <>
       <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-        <img src={logo} alt="Alma Industry" width={32} height={32} className="size-8 shrink-0 object-contain" loading="lazy" />
+        <img src={logo} alt="Alpha Industry Limited" width={32} height={32} className="size-8 shrink-0 object-contain" loading="lazy" />
         <div className="flex flex-col min-w-0">
           <span className="font-bold text-sm leading-tight truncate">
-            Alma Industry
+            Alpha Industry Limited
           </span>
           <span className="font-mono-data text-[9px] tracking-widest text-muted-foreground uppercase">
             Limited · CMMS

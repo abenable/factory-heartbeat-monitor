@@ -60,7 +60,7 @@ const Login = () => {
           <div className="size-20 flex items-center justify-center rounded-full bg-white/85 backdrop-blur-sm p-3 shadow-lg">
             <img
               src={logo}
-              alt="Alma Industry Limited"
+              alt="Alpha Industry Limited"
               width={80}
               height={80}
               className="size-full object-contain"
@@ -78,7 +78,7 @@ const Login = () => {
                 textShadow: "0 2px 16px rgba(5,20,50,0.7)",
               }}
             >
-              Alma Industry Limited
+              Alpha Industry Limited
             </h1>
             <p
               className="text-center"
@@ -244,7 +244,7 @@ const Login = () => {
             textShadow: "0 1px 6px rgba(10,25,55,0.5)",
           }}
         >
-          Alma Industry Limited · CMMS
+          Alpha Industry Limited · CMMS
         </p>
       </div>
     </div>
