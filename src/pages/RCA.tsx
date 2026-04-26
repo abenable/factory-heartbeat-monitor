@@ -179,7 +179,7 @@ const RCA = () => {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
+      <Label className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
         {label}
       </Label>
       {children}

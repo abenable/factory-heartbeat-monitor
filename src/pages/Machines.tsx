@@ -46,7 +46,7 @@ const Machines = () => {
                 className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                   filter === f.key
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground"
+                    : "border-border text-muted-foreground hover:text-primary"
                 }`}
               >
                 {f.label}
@@ -74,7 +74,7 @@ const Machines = () => {
         <Panel className="overflow-x-auto">
           <table className="w-full text-left border-collapse min-w-[640px]">
             <thead>
-              <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+              <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                 <th className="p-3 w-10"></th>
                 <th className="p-3">Node ID</th>
                 <th className="p-3">Type</th>
@@ -97,7 +97,7 @@ const Machines = () => {
                       <StatusDot tone={tone} pulse={tone === "crit"} />
                     </td>
                     <td className="p-3">
-                      <Link to={`/machines/${m.id}`} className="font-bold hover:text-foreground">
+                      <Link to={`/machines/${m.id}`} className="font-bold hover:text-primary">
                         {m.id}
                       </Link>
                     </td>

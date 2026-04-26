@@ -427,7 +427,7 @@ const MachineForm = () => {
                   className={`cursor-pointer select-none px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                     checked
                       ? "border-foreground bg-panel-elevated text-foreground"
-                      : "border-border text-muted-foreground hover:text-foreground"
+                      : "border-border text-muted-foreground hover:text-primary"
                   }`}
                 >
                   <input
@@ -450,7 +450,7 @@ const MachineForm = () => {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
+      <Label className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
         {label}
       </Label>
       {children}

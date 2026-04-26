@@ -66,7 +66,7 @@ const Alerts = () => {
                 className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                   filter === f.key
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground"
+                    : "border-border text-muted-foreground hover:text-primary"
                 }`}
               >
                 {f.label}
@@ -87,7 +87,7 @@ const Alerts = () => {
         <Panel className="overflow-x-auto">
           <table className="w-full text-left min-w-[640px]">
             <thead>
-              <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+              <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                 <th className="p-3 w-24">ID</th>
                 <th className="p-3 w-44">Timestamp</th>
                 <th className="p-3 w-20">Severity</th>
@@ -110,7 +110,7 @@ const Alerts = () => {
                     <SeverityBadge severity={a.severity} />
                   </td>
                   <td className="p-3">
-                    <Link to={`/machines/${a.machineId}`} className="hover:text-foreground">
+                    <Link to={`/machines/${a.machineId}`} className="hover:text-primary">
                       {a.machineId}
                     </Link>
                   </td>
@@ -158,7 +158,7 @@ function SummaryCard({
     tone === "crit" ? "text-led-crit" : tone === "warn" ? "text-led-warn" : "text-foreground";
   return (
     <Panel className="p-5 h-28 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label} (Open)
       </span>
       <span className={`font-mono-data text-4xl font-bold ${colorClass}`}>

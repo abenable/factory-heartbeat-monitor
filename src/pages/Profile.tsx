@@ -31,7 +31,7 @@ function phoneValid(v: string) {
 
 const Field = ({ label, value, icon: Icon }: { label: string; value: string; icon?: React.ComponentType<{ className?: string }> }) => (
   <div className="flex flex-col gap-1 py-3 border-b border-border last:border-b-0">
-    <span className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+    <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary flex items-center gap-1.5">
       {Icon && <Icon className="size-3" />}
       {label}
     </span>
@@ -117,7 +117,7 @@ const Profile = () => {
             <img src={logo} alt="Alma Industry" width={112} height={112} loading="lazy" className="size-full object-contain p-2" />
           </div>
           <div className="flex-1 flex flex-col gap-1.5 text-center sm:text-left">
-            <span className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
+            <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
               Alma Industry Limited
             </span>
             <h2 className="text-2xl font-bold leading-tight">{worker.name}</h2>
@@ -136,7 +136,7 @@ const Profile = () => {
         {/* Details grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Panel className="p-5">
-            <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground mb-2">
+            <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-primary mb-2">
               Identification
             </h3>
             <Field icon={IdCard} label="Worker ID" value={worker.workerId} />
@@ -147,7 +147,7 @@ const Profile = () => {
 
           <Panel className="p-5">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
+              <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
                 Working Licence &amp; Contact
               </h3>
               {!editing ? (
@@ -176,7 +176,7 @@ const Profile = () => {
             {editing ? (
               <>
                 <div className="flex flex-col gap-1.5 py-3 border-b border-border">
-                  <Label htmlFor="profile-email" className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Label htmlFor="profile-email" className="font-mono-data text-[10px] uppercase tracking-widest text-primary flex items-center gap-1.5">
                     <Mail className="size-3" /> Email
                   </Label>
                   <Input
@@ -189,7 +189,7 @@ const Profile = () => {
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 py-3">
-                  <Label htmlFor="profile-phone" className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Label htmlFor="profile-phone" className="font-mono-data text-[10px] uppercase tracking-widest text-primary flex items-center gap-1.5">
                     <Phone className="size-3" /> Phone
                   </Label>
                   <Input
@@ -211,7 +211,7 @@ const Profile = () => {
           </Panel>
 
           <Panel className="p-5 md:col-span-2">
-            <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground mb-3 flex items-center gap-1.5">
+            <h3 className="font-mono-data text-[10px] uppercase tracking-widest text-primary mb-3 flex items-center gap-1.5">
               <Award className="size-3" /> Certifications
             </h3>
             <div className="flex flex-wrap gap-2">

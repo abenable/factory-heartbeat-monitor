@@ -164,7 +164,7 @@ export default function PerformanceReports() {
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
-                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                   <th className="p-3 w-24">ID</th>
                   <th className="p-3">Title</th>
                   <th className="p-3 w-32">Assignee</th>
@@ -202,7 +202,7 @@ export default function PerformanceReports() {
             ) : (
               <table className="w-full text-left min-w-[600px]">
                 <thead>
-                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                     <th className="p-3 w-24">ID</th>
                     <th className="p-3">Title</th>
                     <th className="p-3 w-32">Assignee</th>
@@ -241,7 +241,7 @@ export default function PerformanceReports() {
             ) : (
               <table className="w-full text-left min-w-[600px]">
                 <thead>
-                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                     <th className="p-3 w-24">ID</th>
                     <th className="p-3">Title</th>
                     <th className="p-3 w-32">Assignee</th>
@@ -271,7 +271,7 @@ export default function PerformanceReports() {
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[480px]">
               <thead>
-                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                   <th className="p-3">Technician</th>
                   <th className="p-3 w-20 text-right">Total WOs</th>
                   <th className="p-3 w-20 text-right">Completed</th>
@@ -320,7 +320,7 @@ export default function PerformanceReports() {
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[480px]">
               <thead>
-                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                   <th className="p-3">Type</th>
                   <th className="p-3 w-20 text-right">Total</th>
                   <th className="p-3 w-20 text-right">Done</th>
@@ -404,7 +404,7 @@ function Kpi({ label, value, tone }: { label: string; value: string | number; to
       : "text-foreground";
   return (
     <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>{value}</span>
@@ -424,7 +424,7 @@ function CountCard({ label, count, tone }: { label: string; count: number; tone?
   return (
     <Panel className="p-4 text-center">
       <p className={`font-mono-data text-2xl font-bold ${colorClass}`}>{String(count).padStart(2, "0")}</p>
-      <p className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest mt-1">{label}</p>
+      <p className="font-mono-data text-[10px] text-primary uppercase tracking-widest mt-1">{label}</p>
     </Panel>
   );
 }

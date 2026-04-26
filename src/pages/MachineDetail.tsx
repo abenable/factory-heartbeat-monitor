@@ -143,7 +143,7 @@ const MachineDetail = () => {
             {(machine.operatingParameters || machine.designLimits) && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                 <Panel className="p-4">
-                  <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                  <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                     Operating Parameters
                   </span>
                   <p className="text-sm mt-2 leading-relaxed">
@@ -151,7 +151,7 @@ const MachineDetail = () => {
                   </p>
                 </Panel>
                 <Panel className="p-4">
-                  <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                  <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                     Design Limits
                   </span>
                   <p className="text-sm mt-2 leading-relaxed">
@@ -200,13 +200,13 @@ const MachineDetail = () => {
         {/* Service info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Panel className="p-5">
-            <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+            <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
               Last Service
             </span>
             <p className="font-mono-data text-2xl mt-2">{machine.lastService}</p>
           </Panel>
           <Panel className="p-5">
-            <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+            <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
               Next Scheduled Service
             </span>
             <p className="font-mono-data text-2xl mt-2">{machine.nextService}</p>
@@ -224,7 +224,7 @@ const MachineDetail = () => {
             </SectionHeading>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <Panel className="p-4">
-                <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                   Procedures / Checklists
                 </span>
                 <p className="text-sm mt-2 leading-relaxed">
@@ -232,7 +232,7 @@ const MachineDetail = () => {
                 </p>
               </Panel>
               <Panel className="p-4">
-                <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                   Required Tools
                 </span>
                 <p className="text-sm mt-2 leading-relaxed">
@@ -240,7 +240,7 @@ const MachineDetail = () => {
                 </p>
               </Panel>
               <Panel className="p-4">
-                <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                   Safety Instructions
                 </span>
                 <p className="text-sm mt-2 leading-relaxed">
@@ -328,7 +328,7 @@ const MachineDetail = () => {
             <Panel className="overflow-x-auto">
               <table className="w-full text-left min-w-[480px]">
                 <thead>
-                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                     <th className="p-3">Part Number</th>
                     <th className="p-3">Name</th>
                     <th className="p-3 w-24 text-right">Quantity</th>
@@ -393,7 +393,7 @@ const MachineDetail = () => {
             ) : (
               <table className="w-full text-left min-w-[640px]">
                 <thead>
-                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                     <th className="p-3 w-44">Timestamp</th>
                     <th className="p-3 w-20">Severity</th>
                     <th className="p-3">Description</th>
@@ -428,7 +428,7 @@ const MachineDetail = () => {
             ) : (
               <table className="w-full text-left min-w-[640px]">
                 <thead>
-                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                     <th className="p-3 w-24">ID</th>
                     <th className="p-3">Title</th>
                     <th className="p-3 w-24">Priority</th>
@@ -450,7 +450,7 @@ const MachineDetail = () => {
                         <td className="p-3">
                           <button
                             onClick={() => printSingleWorkOrder(w)}
-                            className="text-muted-foreground hover:text-foreground"
+                            className="text-muted-foreground hover:text-primary"
                             aria-label={`Print ${w.id}`}
                           >
                             <Printer className="size-4" />
@@ -476,7 +476,7 @@ const MachineDetail = () => {
             ) : (
               <table className="w-full text-left min-w-[640px]">
                 <thead>
-                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                     <th className="p-3 w-24">ID</th>
                     <th className="p-3">Title</th>
                     <th className="p-3 w-28">Priority</th>
@@ -496,7 +496,7 @@ const MachineDetail = () => {
                       <td className="p-3">
                         <button
                           onClick={() => printSingleWorkOrder(w)}
-                          className="text-muted-foreground hover:text-foreground"
+                          className="text-muted-foreground hover:text-primary"
                           aria-label={`Print ${w.id}`}
                         >
                           <Printer className="size-4" />
@@ -521,7 +521,7 @@ const MachineDetail = () => {
             ) : (
               <table className="w-full text-left min-w-[640px]">
                 <thead>
-                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                     <th className="p-3">Task</th>
                     <th className="p-3 w-24">Interval</th>
                     <th className="p-3 w-32">Last Done</th>
@@ -550,7 +550,7 @@ const MachineDetail = () => {
 function DetailCell({ label, value }: { label: string; value?: string }) {
   return (
     <Panel className="p-4">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <p className="font-mono-data text-lg mt-2 truncate">{value ?? "—"}</p>
@@ -569,7 +569,7 @@ function TelemetryCell({
 }) {
   return (
     <Panel className="p-4">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <p

@@ -64,7 +64,7 @@ const WorkOrders = () => {
                 className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                   filter === f.key
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground"
+                    : "border-border text-muted-foreground hover:text-primary"
                 }`}
               >
                 {f.label}
@@ -91,7 +91,7 @@ const WorkOrders = () => {
         <Panel className="overflow-x-auto">
           <table className="w-full text-left min-w-[640px]">
             <thead>
-              <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+              <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                 <th className="p-3 w-24">ID</th>
                 <th className="p-3">Title</th>
                 <th className="p-3 w-32">Node</th>
@@ -112,7 +112,7 @@ const WorkOrders = () => {
                   <td className="p-3 font-bold">{w.id}</td>
                   <td className="p-3">{w.title}</td>
                   <td className="p-3">
-                    <Link to={`/machines/${w.machineId}`} className="text-muted-foreground hover:text-foreground">
+                    <Link to={`/machines/${w.machineId}`} className="text-muted-foreground hover:text-primary">
                       {w.machineId}
                     </Link>
                   </td>
@@ -132,7 +132,7 @@ const WorkOrders = () => {
                   <td className="p-3 no-print">
                     <button
                       onClick={() => printSingleWorkOrder(w)}
-                      className="text-muted-foreground hover:text-foreground"
+                      className="text-muted-foreground hover:text-primary"
                       aria-label={`Print ${w.id}`}
                       title="Print this work order"
                     >
@@ -199,7 +199,7 @@ function Stat({
       : "text-foreground";
   return (
     <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>

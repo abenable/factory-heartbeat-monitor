@@ -69,7 +69,7 @@ export default function PMSchedule() {
                 className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                   freqFilter === f.key
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-foreground"
+                    : "border-border text-muted-foreground hover:text-primary"
                 }`}
               >
                 {f.label}
@@ -97,7 +97,7 @@ export default function PMSchedule() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3">
                       <span className="font-mono-data text-xs font-bold">{p.id}</span>
-                      <span className="font-mono-data text-[10px] text-muted-foreground uppercase">
+                      <span className="font-mono-data text-[10px] text-primary uppercase">
                         {freqLabel(p.frequency)}
                       </span>
                       <span className={`font-mono-data text-[10px] uppercase ${colorClass}`}>
@@ -108,7 +108,7 @@ export default function PMSchedule() {
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
                       <Link
                         to={`/machines/${p.machineId}`}
-                        className="hover:text-foreground transition-colors"
+                        className="hover:text-primary transition-colors"
                       >
                         {p.machineId}
                       </Link>
@@ -149,7 +149,7 @@ export default function PMSchedule() {
 function Detail({ label, value }: { label: string; value?: string }) {
   return (
     <div>
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <p className="text-sm mt-1 leading-relaxed">{value ?? "—"}</p>
@@ -177,7 +177,7 @@ function Stat({
 
       className="p-5 h-28 flex flex-col justify-between"
     >
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-4xl font-bold ${colorClass}`}>

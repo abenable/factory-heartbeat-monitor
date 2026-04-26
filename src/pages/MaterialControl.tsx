@@ -51,7 +51,7 @@ export default function MaterialControl() {
                   className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                     poFilter === f.key
                       ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border text-muted-foreground hover:text-foreground"
+                      : "border-border text-muted-foreground hover:text-primary"
                   }`}
                 >
                   {f.label}
@@ -62,7 +62,7 @@ export default function MaterialControl() {
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[720px]">
               <thead>
-                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                   <th className="p-3 w-24">PO ID</th>
                   <th className="p-3">Item</th>
                   <th className="p-3 w-32">Supplier</th>
@@ -99,7 +99,7 @@ export default function MaterialControl() {
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
-                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                   <th className="p-3 w-20">ID</th>
                   <th className="p-3 w-28">Date</th>
                   <th className="p-3">Item</th>
@@ -130,7 +130,7 @@ export default function MaterialControl() {
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
-                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-muted-foreground uppercase">
+                <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                   <th className="p-3 w-20">ID</th>
                   <th className="p-3 w-28">Date</th>
                   <th className="p-3">Item</th>
@@ -169,7 +169,7 @@ export default function MaterialControl() {
               return (
                 <Panel key={item.id} className="p-4">
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                    <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                       {item.partNumber}
                     </span>
                     <span className={`font-mono-data text-[10px] uppercase ${levelColor}`}>
@@ -207,7 +207,7 @@ function Kpi({ label, value, tone }: { label: string; value: string | number; to
       : "text-foreground";
   return (
     <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>{value}</span>

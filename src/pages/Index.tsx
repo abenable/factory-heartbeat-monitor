@@ -52,7 +52,7 @@ const Dashboard = () => {
             right={
               <Link
                 to="/machines"
-                className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
               >
                 View all →
               </Link>
@@ -74,7 +74,7 @@ const Dashboard = () => {
                         <span className="font-mono-data text-sm font-bold">
                           {m.id}
                         </span>
-                        <span className="font-mono-data text-[10px] text-muted-foreground uppercase">
+                        <span className="font-mono-data text-[10px] text-primary uppercase">
                           {m.type}
                         </span>
                       </div>
@@ -108,7 +108,7 @@ const Dashboard = () => {
             right={
               <Link
                 to="/alerts"
-                className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground hover:text-foreground transition-colors"
+                className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
               >
                 Open alerts page →
               </Link>
@@ -120,16 +120,16 @@ const Dashboard = () => {
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-border bg-panel-elevated">
-                  <th className="p-3 font-mono-data text-[10px] text-muted-foreground uppercase w-44">
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-44">
                     Timestamp
                   </th>
-                  <th className="p-3 font-mono-data text-[10px] text-muted-foreground uppercase w-24">
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-24">
                     Severity
                   </th>
-                  <th className="p-3 font-mono-data text-[10px] text-muted-foreground uppercase w-36">
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-36">
                     Node ID
                   </th>
-                  <th className="p-3 font-mono-data text-[10px] text-muted-foreground uppercase">
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase">
                     Description
                   </th>
                 </tr>

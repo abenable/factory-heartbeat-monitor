@@ -83,7 +83,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
       </div>
 
       <nav className="flex-1 py-6 px-4 flex flex-col gap-1">
-        <div className="text-[10px] font-mono-data text-muted-foreground uppercase tracking-widest px-2 mb-2">
+        <div className="text-[10px] font-mono-data text-primary uppercase tracking-widest px-2 mb-2">
           Telemetry
         </div>
         {nav.map((item) => (
@@ -92,7 +92,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
             to={item.to}
             end={item.end}
             className="flex items-center gap-3 px-2 py-2 border-l-2 border-transparent text-muted-foreground hover:text-foreground hover:bg-panel-elevated transition-colors text-sm font-medium"
-            activeClassName="bg-panel-elevated !border-foreground !text-foreground"
+            activeClassName="bg-panel-elevated !border-primary !text-primary"
           >
             <item.icon className="size-4 shrink-0" />
             <span className="truncate flex-1">{item.label}</span>
@@ -167,11 +167,11 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
               <Menu className="size-5" />
             </button>
             <div className="flex items-baseline gap-3 min-w-0">
-              <h1 className="text-base md:text-lg font-semibold truncate">
+              <h1 className="text-base md:text-lg font-semibold truncate text-primary">
                 {pageTitle}
               </h1>
               {breadcrumb && (
-                <span className="hidden sm:inline font-mono-data text-muted-foreground text-xs truncate">
+                <span className="hidden sm:inline font-mono-data text-primary text-xs truncate">
                   {breadcrumb}
                 </span>
               )}

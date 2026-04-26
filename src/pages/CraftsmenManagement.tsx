@@ -25,7 +25,7 @@ export default function CraftsmenManagement() {
                 : 0;
             return (
               <Panel key={skill} className="p-5">
-                <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+                <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
                   {SKILL_LABELS[skill]}
                 </span>
                 <p className="font-mono-data text-3xl font-bold mt-2">
@@ -52,7 +52,7 @@ export default function CraftsmenManagement() {
                 return (
                   <Panel key={level} className="p-5">
                     <div className="flex items-center justify-between mb-3">
-                      <span className="font-mono-data text-xs uppercase tracking-widest text-muted-foreground">
+                      <span className="font-mono-data text-xs uppercase tracking-widest text-primary">
                         {LEVEL_LABELS[level]}
                       </span>
                       <span className="font-mono-data text-[10px] bg-primary text-primary-foreground border border-primary px-2 py-0.5 rounded-full">
@@ -75,7 +75,7 @@ export default function CraftsmenManagement() {
                               <span className="font-medium">
                                 {worker?.name ?? c.workerUsername}
                               </span>
-                              <span className="font-mono-data text-[10px] text-muted-foreground uppercase">
+                              <span className="font-mono-data text-[10px] text-primary uppercase">
                                 {worker?.workerId ?? "—"}
                               </span>
                             </li>

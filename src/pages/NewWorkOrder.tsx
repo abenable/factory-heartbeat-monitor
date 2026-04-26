@@ -368,7 +368,7 @@ const NewWorkOrder = () => {
         <SectionHeading>Required Resources</SectionHeading>
         <Panel className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
           <div>
-            <Label className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5 block">
+            <Label className="font-mono-data text-[10px] uppercase tracking-widest text-primary mb-1.5 block">
               Tools
             </Label>
             <Textarea
@@ -379,7 +379,7 @@ const NewWorkOrder = () => {
             />
           </div>
           <div>
-            <Label className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5 block">
+            <Label className="font-mono-data text-[10px] uppercase tracking-widest text-primary mb-1.5 block">
               Spare Parts
             </Label>
             <Textarea
@@ -390,7 +390,7 @@ const NewWorkOrder = () => {
             />
           </div>
           <div>
-            <Label className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5 block">
+            <Label className="font-mono-data text-[10px] uppercase tracking-widest text-primary mb-1.5 block">
               PPE
             </Label>
             <Textarea
@@ -423,7 +423,7 @@ const NewWorkOrder = () => {
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <Label className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground">
+      <Label className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
         {label}
       </Label>
       {children}
