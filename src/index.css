@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /* Industrial CMMS — light + dark. All colors HSL.
-   Light = royal blue steel palette.
-   Dark  = deep blue control console. */
+   Light = clean white with cyan accents.
+   Dark  = deep cyan control console. */
 
 @layer base {
   :root {
@@ -21,8 +21,8 @@
     --popover:     0  0%  100%;
     --popover-foreground:  220  20%  18%;
 
-    /* Primary: dark cyan */
-    --primary:     186  85%  28%;
+    /* Primary: #27ae9c cyan */
+    --primary:     172  63%  42%;
     --primary-foreground:  0  0%  100%;
 
     /* Secondary: pale gray-blue */
@@ -32,8 +32,8 @@
     --muted:       220  15%  95%;
     --muted-foreground:  220  12%  45%;
 
-    /* Accent: bright cyan */
-    --accent:      180  80%  42%;
+    /* Accent: #27ae9c cyan */
+    --accent:      172  63%  42%;
     --accent-foreground:  0  0%  100%;
 
     --destructive:  355  75%  48%;
@@ -41,73 +41,73 @@
 
     --border:      220  15%  90%;
     --input:       220  15%  90%;
-    --ring:        186  85%  28%;
+    --ring:        172  63%  42%;
 
     /* Status LEDs */
     --led-ok:      155  70%  36%;
     --led-warn:    38   95%  50%;
     --led-crit:    0    78%  48%;
-    --led-info:    180  65%  42%;
+    --led-info:    172  63%  42%;
 
     --radius: 0.375rem;
 
     /* Sidebar */
     --sidebar-background:  0  0%  99%;
     --sidebar-foreground:  220  15%  32%;
-    --sidebar-primary:     186  85%  28%;
+    --sidebar-primary:     172  63%  42%;
     --sidebar-primary-foreground:  0  0%  100%;
     --sidebar-accent:      220  15%  94%;
     --sidebar-accent-foreground:  220  20%  18%;
     --sidebar-border:      220  15%  90%;
-    --sidebar-ring:        186  85%  28%;
+    --sidebar-ring:        172  63%  42%;
   }
 
   .dark {
     /* === DARK — deep cyan control console === */
-    --background:  190  45%  6%;
-    --foreground:  180  30%  92%;
+    --background:  172  45%  6%;
+    --foreground:  175  30%  92%;
 
-    --panel:       190  35%  10%;
-    --panel-elevated:  188  30%  14%;
+    --panel:       172  35%  10%;
+    --panel-elevated:  172  30%  14%;
 
-    --card:        190  35%  10%;
-    --card-foreground:  180  30%  92%;
+    --card:        172  35%  10%;
+    --card-foreground:  175  30%  92%;
 
-    --popover:     188  30%  14%;
-    --popover-foreground:  180  30%  92%;
+    --popover:     172  30%  14%;
+    --popover-foreground:  175  30%  92%;
 
-    --primary:     186  85%  55%;
-    --primary-foreground:  190  45%  6%;
+    --primary:     172  63%  55%;
+    --primary-foreground:  172  45%  6%;
 
-    --secondary:   188  30%  18%;
-    --secondary-foreground:  180  30%  92%;
+    --secondary:   172  30%  18%;
+    --secondary-foreground:  175  30%  92%;
 
-    --muted:       188  30%  16%;
-    --muted-foreground:  185  18%  58%;
+    --muted:       172  30%  16%;
+    --muted-foreground:  172  18%  58%;
 
-    --accent:      174  92%  58%;
-    --accent-foreground:  190  45%  6%;
+    --accent:      172  63%  58%;
+    --accent-foreground:  172  45%  6%;
 
     --destructive:  355  80%  58%;
-    --destructive-foreground:  180  30%  95%;
+    --destructive-foreground:  175  30%  95%;
 
-    --border:      190  25%  18%;
-    --input:       190  25%  18%;
-    --ring:        186  85%  55%;
+    --border:      172  25%  18%;
+    --input:       172  25%  18%;
+    --ring:        172  63%  55%;
 
     --led-ok:      156  90%  52%;
     --led-warn:    38   95%  58%;
     --led-crit:    355  80%  58%;
-    --led-info:    186  65%  58%;
+    --led-info:    172  63%  58%;
 
-    --sidebar-background:  190  35%  8%;
-    --sidebar-foreground:  185  18%  58%;
-    --sidebar-primary:     186  85%  55%;
-    --sidebar-primary-foreground:  190  45%  6%;
-    --sidebar-accent:      188  30%  14%;
-    --sidebar-accent-foreground:  180  30%  92%;
-    --sidebar-border:      190  25%  16%;
-    --sidebar-ring:        186  85%  55%;
+    --sidebar-background:  172  35%  8%;
+    --sidebar-foreground:  172  18%  58%;
+    --sidebar-primary:     172  63%  55%;
+    --sidebar-primary-foreground:  172  45%  6%;
+    --sidebar-accent:      172  30%  14%;
+    --sidebar-accent-foreground:  175  30%  92%;
+    --sidebar-border:      172  25%  16%;
+    --sidebar-ring:        172  63%  55%;
   }
 }
 
@@ -146,7 +146,7 @@
   .bg-panel  { background-color: hsl(var(--panel)); }
   .bg-panel-elevated { background-color: hsl(var(--panel-elevated)); }
 
-  /* Cyan status badge — solid dark cyan */
+  /* Cyan status badge — solid #27ae9c */
   .badge-cyan {
     display: inline-flex;
     align-items: center;
@@ -155,7 +155,7 @@
     font-size: 12px;
     font-weight: 500;
     line-height: 1.33;
-    background: hsl(186 85% 28%);
+    background: hsl(172 63% 42%);
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -163,12 +163,12 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Dark cyan text */
+  /* Cyan text #27ae9c */
   .text-cyan {
-    color: hsl(186 85% 28%);
+    color: hsl(172 63% 42%);
   }
 
-  /* Theme-aware subtle gradient (peach → soft teal in light, blues in dark) */
+  /* Theme-aware subtle gradient */
   .bg-gradient-blue {
     background: linear-gradient(135deg, hsl(var(--panel)) 0%, hsl(var(--accent) / 0.15) 100%);
   }
