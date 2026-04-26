@@ -43,8 +43,6 @@ const MachineForm = () => {
   const isEdit = Boolean(id);
   const existing = id ? getMachine(id) : undefined;
 
-  if (isViewer()) return <Navigate to="/machines" replace />;
-
   const [form, setForm] = useState<Machine>(emptyMachine());
 
   useEffect(() => {
