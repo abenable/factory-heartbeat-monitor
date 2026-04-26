@@ -24,10 +24,10 @@ const statusFilters: { key: WorkOrderStatus | "all"; label: string }[] = [
 ];
 
 const priorityColor: Record<WorkOrderPriority, string> = {
-  critical: "text-led-crit",
-  high: "text-led-warn",
-  medium: "text-foreground",
-  low: "text-muted-foreground",
+  critical: "text-white",
+  high: "text-white",
+  medium: "text-white",
+  low: "text-white/70",
 };
 
 const WorkOrders = () => {
@@ -64,7 +64,7 @@ const WorkOrders = () => {
                 className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
                   filter === f.key
                     ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border text-muted-foreground hover:text-primary"
+                    : "border-border text-white/70 hover:text-primary"
                 }`}
               >
                 {f.label}
@@ -112,27 +112,27 @@ const WorkOrders = () => {
                   <td className="p-3 font-bold">{w.id}</td>
                   <td className="p-3">{w.title}</td>
                   <td className="p-3">
-                    <Link to={`/machines/${w.machineId}`} className="text-muted-foreground hover:text-primary">
+                    <Link to={`/machines/${w.machineId}`} className="text-white/70 hover:text-primary">
                       {w.machineId}
                     </Link>
                   </td>
                   <td className={`p-3 uppercase ${priorityColor[w.priority]}`}>
                     {w.priority}
                   </td>
-                  <td className="p-3 text-muted-foreground">
+                  <td className="p-3 text-white/70">
                     {woTypeLabel(w.type)}
                   </td>
-                  <td className="p-3 uppercase text-muted-foreground">
+                  <td className="p-3 uppercase text-white/70">
                     {woStatusLabel(w.status)}
                   </td>
-                  <td className="p-3 text-muted-foreground">{w.assignee}</td>
-                  <td className="p-3 text-muted-foreground">
+                  <td className="p-3 text-white/70">{w.assignee}</td>
+                  <td className="p-3 text-white/70">
                     {new Date(w.dueAt).toISOString().slice(5, 16).replace("T", " ")}
                   </td>
                   <td className="p-3 no-print">
                     <button
                       onClick={() => printSingleWorkOrder(w)}
-                      className="text-muted-foreground hover:text-primary"
+                      className="text-white/70 hover:text-primary"
                       aria-label={`Print ${w.id}`}
                       title="Print this work order"
                     >
@@ -191,15 +191,15 @@ function Stat({
 }) {
   const colorClass =
     tone === "crit"
-      ? "text-led-crit"
+      ? "text-white"
       : tone === "warn"
-      ? "text-led-warn"
+      ? "text-white"
       : tone === "ok"
-      ? "text-led-ok"
-      : "text-foreground";
+      ? "text-white"
+      : "text-white";
   return (
-    <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
+    <Panel className="p-5 h-24 flex flex-col justify-between bg-cyan-kpi">
+      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>

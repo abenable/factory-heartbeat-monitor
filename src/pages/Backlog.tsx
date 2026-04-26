@@ -8,10 +8,10 @@ import { Button } from "@/components/ui/button";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 
 const priorityColor: Record<WorkOrderPriority, string> = {
-  critical: "text-led-crit",
-  high: "text-led-warn",
-  medium: "text-foreground",
-  low: "text-muted-foreground",
+  critical: "text-white",
+  high: "text-white",
+  medium: "text-white",
+  low: "text-white/70",
 };
 
 const Backlog = () => {
@@ -65,7 +65,7 @@ const Backlog = () => {
         <SectionHeading>{list.length} Backlog Items</SectionHeading>
         <Panel className="overflow-x-auto">
           {list.length === 0 ? (
-            <div className="p-8 text-center font-mono-data text-xs text-muted-foreground">
+            <div className="p-8 text-center font-mono-data text-xs text-white/70">
               NO BACKLOG — ALL CAUGHT UP
             </div>
           ) : (
@@ -98,7 +98,7 @@ const Backlog = () => {
                       <td className="p-3">
                         <Link
                           to={`/machines/${w.machineId}`}
-                          className="text-muted-foreground hover:text-primary"
+                          className="text-white/70 hover:text-primary"
                         >
                           {w.machineId}
                         </Link>
@@ -106,14 +106,14 @@ const Backlog = () => {
                       <td className={`p-3 uppercase ${priorityColor[w.priority]}`}>
                         {w.priority}
                       </td>
-                      <td className={`p-3 ${isOverdue ? "text-led-crit" : "text-muted-foreground"}`}>
+                      <td className={`p-3 ${isOverdue ? "text-white" : "text-white/70"}`}>
                         {due.toISOString().slice(5, 16).replace("T", " ")}
                       </td>
-                      <td className="p-3 text-muted-foreground">{ageDays}d</td>
+                      <td className="p-3 text-white/70">{ageDays}d</td>
                       <td className="p-3 no-print">
                         <button
                           onClick={() => printSingleWorkOrder(w)}
-                          className="text-muted-foreground hover:text-primary"
+                          className="text-white/70 hover:text-primary"
                           aria-label={`Print ${w.id}`}
                         >
                           <Printer className="size-4" />
@@ -142,15 +142,15 @@ function Stat({
 }) {
   const colorClass =
     tone === "crit"
-      ? "text-led-crit"
+      ? "text-white"
       : tone === "warn"
-      ? "text-led-warn"
+      ? "text-white"
       : tone === "ok"
-      ? "text-led-ok"
-      : "text-foreground";
+      ? "text-white"
+      : "text-white";
   return (
-    <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
+    <Panel className="p-5 h-24 flex flex-col justify-between bg-cyan-kpi">
+      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>
@@ -175,7 +175,7 @@ function FilterChip({
       className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
         active
           ? "border-primary bg-primary text-primary-foreground"
-          : "border-border text-muted-foreground hover:text-primary"
+          : "border-border text-white/70 hover:text-primary"
       }`}
     >
       {children}

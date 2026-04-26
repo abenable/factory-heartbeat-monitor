@@ -175,21 +175,21 @@ function Kpi({
   const accent = tone === "default" ? "default" : tone;
   const valueClass =
     tone === "crit"
-      ? "text-led-crit"
+      ? "text-white"
       : tone === "warn"
-      ? "text-led-warn"
-      : "text-foreground";
+      ? "text-white"
+      : "text-white";
   return (
-    <Panel className="p-5 h-32 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-cyan uppercase tracking-widest">
+    <Panel className="p-5 h-32 flex flex-col justify-between bg-cyan-kpi">
+      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
         {label}
       </span>
       <div className="flex items-baseline gap-2">
-        <span className={`font-mono-data text-4xl font-bold tracking-tight ${valueClass}`}>
+        <span className={`font-mono-data text-4xl font-bold tracking-tight text-white`}>
           {value}
         </span>
         {unit && (
-          <span className="font-mono-data text-sm text-muted-foreground">{unit}</span>
+          <span className="font-mono-data text-sm text-white/70">{unit}</span>
         )}
       </div>
     </Panel>

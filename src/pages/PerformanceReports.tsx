@@ -110,7 +110,7 @@ export default function PerformanceReports() {
                   <div key={b.id} className="flex flex-col gap-1">
                     <div className="flex justify-between font-mono-data text-xs">
                       <span>{b.id}</span>
-                      <span className="text-muted-foreground">{b.downtime.toFixed(1)}h</span>
+                      <span className="text-white/70">{b.downtime.toFixed(1)}h</span>
                     </div>
                     <div className="h-2 bg-panel-elevated rounded-full overflow-hidden">
                       <div className="h-full bg-foreground/70 rounded-full" style={{ width: `${(b.downtime / maxDown) * 100}%` }} />
@@ -177,9 +177,9 @@ export default function PerformanceReports() {
                   <tr key={wo.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                     <td className="p-3 font-bold">{wo.id}</td>
                     <td className="p-3">{wo.title}</td>
-                    <td className="p-3 text-muted-foreground">{wo.assignee}</td>
-                    <td className="p-3 text-muted-foreground">{woTypeLabel(wo.type)}</td>
-                    <td className="p-3 text-muted-foreground">
+                    <td className="p-3 text-white/70">{wo.assignee}</td>
+                    <td className="p-3 text-white/70">{woTypeLabel(wo.type)}</td>
+                    <td className="p-3 text-white/70">
                       {wo.workLog?.actualCompletionTime
                         ? new Date(wo.workLog.actualCompletionTime).toLocaleString()
                         : "—"}
@@ -196,7 +196,7 @@ export default function PerformanceReports() {
           <SectionHeading>Delayed Jobs ({delayedWO.length})</SectionHeading>
           <Panel className="overflow-x-auto">
             {delayedWO.length === 0 ? (
-              <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
+              <div className="p-6 text-center font-mono-data text-xs text-white/70">
                 NO DELAYED JOBS
               </div>
             ) : (
@@ -215,11 +215,11 @@ export default function PerformanceReports() {
                     <tr key={wo.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                       <td className="p-3 font-bold">{wo.id}</td>
                       <td className="p-3">{wo.title}</td>
-                      <td className="p-3 text-muted-foreground">{wo.assignee}</td>
-                      <td className="p-3 text-led-crit">
+                      <td className="p-3 text-white/70">{wo.assignee}</td>
+                      <td className="p-3 text-white">
                         {new Date(wo.dueAt).toLocaleString()}
                       </td>
-                      <td className="p-3 uppercase text-muted-foreground">
+                      <td className="p-3 uppercase text-white/70">
                         {woStatusLabel(wo.status)}
                       </td>
                     </tr>
@@ -235,7 +235,7 @@ export default function PerformanceReports() {
           <SectionHeading>Suspended Work Orders ({suspendedWO.length})</SectionHeading>
           <Panel className="overflow-x-auto">
             {suspendedWO.length === 0 ? (
-              <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
+              <div className="p-6 text-center font-mono-data text-xs text-white/70">
                 NO SUSPENDED WORK ORDERS
               </div>
             ) : (
@@ -253,8 +253,8 @@ export default function PerformanceReports() {
                     <tr key={wo.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                       <td className="p-3 font-bold">{wo.id}</td>
                       <td className="p-3">{wo.title}</td>
-                      <td className="p-3 text-muted-foreground">{wo.assignee}</td>
-                      <td className="p-3 text-muted-foreground">
+                      <td className="p-3 text-white/70">{wo.assignee}</td>
+                      <td className="p-3 text-white/70">
                         {new Date(wo.dueAt).toLocaleString()}
                       </td>
                     </tr>
@@ -288,7 +288,7 @@ export default function PerformanceReports() {
                       <tr key={c.workerUsername} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                         <td className="p-3">
                           <span className="font-medium">{worker?.name ?? c.workerUsername}</span>
-                          <span className="block text-[10px] text-muted-foreground uppercase">
+                          <span className="block text-[10px] text-white/70 uppercase">
                             {SKILL_LABELS[c.skill]} · {LEVEL_LABELS[c.level]}
                           </span>
                         </td>
@@ -396,15 +396,15 @@ export default function PerformanceReports() {
 function Kpi({ label, value, tone }: { label: string; value: string | number; tone?: "ok" | "warn" | "crit" }) {
   const colorClass =
     tone === "crit"
-      ? "text-led-crit"
+      ? "text-white"
       : tone === "warn"
-      ? "text-led-warn"
+      ? "text-white"
       : tone === "ok"
-      ? "text-led-ok"
-      : "text-foreground";
+      ? "text-white"
+      : "text-white";
   return (
-    <Panel className="p-5 h-24 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
+    <Panel className="p-5 h-24 flex flex-col justify-between bg-cyan-kpi">
+      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
         {label}
       </span>
       <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>{value}</span>
@@ -415,16 +415,16 @@ function Kpi({ label, value, tone }: { label: string; value: string | number; to
 function CountCard({ label, count, tone }: { label: string; count: number; tone?: "ok" | "warn" | "crit" }) {
   const colorClass =
     tone === "crit"
-      ? "text-led-crit"
+      ? "text-white"
       : tone === "warn"
-      ? "text-led-warn"
+      ? "text-white"
       : tone === "ok"
-      ? "text-led-ok"
-      : "text-foreground";
+      ? "text-white"
+      : "text-white";
   return (
     <Panel className="p-4 text-center">
       <p className={`font-mono-data text-2xl font-bold ${colorClass}`}>{String(count).padStart(2, "0")}</p>
-      <p className="font-mono-data text-[10px] text-primary uppercase tracking-widest mt-1">{label}</p>
+      <p className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest mt-1">{label}</p>
     </Panel>
   );
 }
@@ -435,7 +435,7 @@ function SevBar({ label, count, total, className }: { label: string; count: numb
     <div className="flex flex-col gap-1">
       <div className="flex justify-between font-mono-data text-xs">
         <span className="uppercase">{label}</span>
-        <span className="text-muted-foreground">
+        <span className="text-white/70">
           {count} ({pct.toFixed(0)}%)
         </span>
       </div>
@@ -449,7 +449,7 @@ function SevBar({ label, count, total, className }: { label: string; count: numb
 function RawStat({ label, value }: { label: string; value: number }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] text-muted-foreground uppercase tracking-widest">{label}</span>
+      <span className="text-[10px] text-white/70 uppercase tracking-widest">{label}</span>
       <span className="text-3xl font-bold">{String(value).padStart(2, "0")}</span>
     </div>
   );

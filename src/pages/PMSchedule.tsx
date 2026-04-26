@@ -168,19 +168,18 @@ function Stat({
 }) {
   const colorClass =
     tone === "crit"
-      ? "text-led-crit"
+      ? "text-white"
       : tone === "warn"
-      ? "text-led-warn"
-      : "text-foreground";
+      ? "text-white"
+      : "text-white";
   return (
     <Panel
-
-      className="p-5 h-28 flex flex-col justify-between"
+      className="p-5 h-28 flex flex-col justify-between bg-cyan-kpi"
     >
-      <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-white/70 uppercase tracking-widest">
         {label}
       </span>
-      <span className={`font-mono-data text-4xl font-bold ${colorClass}`}>
+      <span className={`font-mono-data text-4xl font-bold text-white`}>
         {String(value).padStart(2, "0")}
       </span>
     </Panel>
