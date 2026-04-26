@@ -192,8 +192,27 @@ export default function MaterialControl() {
   );
 }
 
+import { StatusDot } from "@/components/StatusDot";
+
 function POStatusBadge({ status }: { status: POStatus }) {
-  return <span className="badge-cyan">{status}</span>;
+  const toneMap = {
+    open: "info" as const,
+    closed: "ok" as const,
+    overdue: "crit" as const,
+  };
+  const textMap = {
+    open: "text-led-info",
+    closed: "text-led-ok",
+    overdue: "text-led-crit",
+  };
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <StatusDot tone={toneMap[status]} pulse={status === "overdue"} />
+      <span className={`font-mono-data text-[10px] uppercase ${textMap[status]}`}>
+        {status}
+      </span>
+    </span>
+  );
 }
 
 function Kpi({ label, value, tone }: { label: string; value: string | number; tone?: "ok" | "warn" | "crit" }) {

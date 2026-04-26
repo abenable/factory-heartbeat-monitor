@@ -225,13 +225,25 @@ function Metric({
   );
 }
 
+import { StatusDot } from "@/components/StatusDot";
+
 export function SeverityBadge({ severity }: { severity: "crit" | "warn" | "info" }) {
   const map = {
-    crit: "Critical",
-    warn: "Warning",
-    info: "INFO",
+    crit: { label: "Critical", tone: "crit" as const },
+    warn: { label: "Warning", tone: "warn" as const },
+    info: { label: "INFO", tone: "info" as const },
   };
-  return <span className="badge-cyan">{map[severity]}</span>;
+  const s = map[severity];
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <StatusDot tone={s.tone} pulse={s.tone === "crit"} />
+      <span className={`font-bold ${
+        s.tone === "crit" ? "text-led-crit" : s.tone === "warn" ? "text-led-warn" : "text-led-info"
+      }`}>
+        {s.label}
+      </span>
+    </span>
+  );
 }
 
 export function formatTs(iso: string) {
