@@ -4,9 +4,7 @@ import { login } from "@/lib/auth";
 import logo from "@/assets/logo.png";
 import loginBg from "@/assets/login-bg.jpeg";
 
-const borderShadow = "rgba(0,0,0,0.08) 0px 0px 0px 1px";
-const subtleShadow = "rgba(0,0,0,0.25) 0px 10px 40px -10px, rgba(0,0,0,0.15) 0px 4px 12px";
-const focusRing = "hsla(212, 100%, 48%, 1)";
+const focusRing = "#27ae9c";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -26,98 +24,137 @@ const Login = () => {
   };
 
   return (
-    <div
-      className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden"
-      style={{
-        fontFamily: "'Geist', Arial, system-ui, sans-serif",
-      }}
-    >
-      {/* Blurred background image layer */}
+    <div className="min-h-screen w-full flex relative overflow-hidden">
+      {/* Left side — sharp industrial background image */}
       <div
         aria-hidden
-        className="absolute inset-0"
+        className="hidden lg:flex lg:w-3/5 relative"
         style={{
           backgroundImage: `url(${loginBg})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
-          filter: "blur(6px) saturate(0.9)",
-          transform: "scale(1.08)",
         }}
-      />
-      {/* Soft tint overlay for readability */}
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(135deg, rgba(10,40,80,0.55) 0%, rgba(15,55,110,0.45) 60%, rgba(8,30,70,0.6) 100%)",
-        }}
-      />
-      <div className="w-full max-w-[420px] flex flex-col items-center gap-10 relative z-10">
-        {/* Logo + brand */}
-        <div className="flex flex-col items-center gap-5">
-          <div className="size-20 flex items-center justify-center rounded-full bg-white/85 backdrop-blur-sm p-3 shadow-lg">
+      >
+        {/* Dark overlay for readability */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, rgba(2,12,30,0.55) 0%, rgba(2,12,30,0.70) 100%)",
+          }}
+        />
+        {/* Left-side content — branding */}
+        <div className="relative z-10 flex flex-col justify-end p-12 pb-16">
+          <div className="flex items-center gap-3 mb-4">
             <img
               src={logo}
               alt="Alpha Industry Limited"
-              width={80}
-              height={80}
-              className="size-full object-contain"
+              width={40}
+              height={40}
+              className="size-10 object-contain"
             />
+            <div className="flex flex-col">
+              <span
+                className="font-semibold text-white text-lg tracking-tight"
+                style={{
+                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                  textShadow: "0 2px 12px rgba(0,0,0,0.4)",
+                }}
+              >
+                Alpha Industry Limited
+              </span>
+              <span
+                className="text-white/60 text-xs font-mono-data uppercase tracking-widest"
+                style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}
+              >
+                Industrial Maintenance Systems
+              </span>
+            </div>
           </div>
-          <div className="flex flex-col items-center gap-1.5">
+          <p
+            className="text-white/50 text-sm font-mono-data max-w-md leading-relaxed"
+            style={{ textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}
+          >
+            Computerised Maintenance Management System.
+            Monitor factory machines, alerts, work orders, and
+            preventive maintenance in real time.
+          </p>
+        </div>
+      </div>
+
+      {/* Mobile top image (shows on small screens) */}
+      <div
+        aria-hidden
+        className="lg:hidden absolute inset-0"
+        style={{
+          backgroundImage: `url(${loginBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          filter: "brightness(0.5)",
+        }}
+      />
+      <div className="lg:hidden absolute inset-0 bg-white/90 backdrop-blur-sm" />
+
+      {/* Right side — solid white sign-in form */}
+      <div className="relative z-10 flex-1 flex items-center justify-center p-6 lg:p-12 bg-background lg:bg-white">
+        <div className="w-full max-w-[400px]">
+          {/* Logo visible on mobile */}
+          <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
+            <img
+              src={logo}
+              alt="Alpha Industry Limited"
+              width={36}
+              height={36}
+              className="size-9 object-contain"
+            />
+            <div className="flex flex-col">
+              <span className="font-semibold text-lg tracking-tight">
+                Alpha Industry Limited
+              </span>
+              <span className="text-muted-foreground text-xs font-mono-data uppercase tracking-widest">
+                Maintenance Operations
+              </span>
+            </div>
+          </div>
+
+          {/* Desktop heading */}
+          <div className="hidden lg:block mb-8">
             <h1
-              className="font-semibold text-center"
+              className="font-semibold tracking-tight"
               style={{
-                fontSize: "30px",
-                lineHeight: 1.15,
+                fontSize: "28px",
+                lineHeight: 1.2,
                 letterSpacing: "-0.5px",
-                color: "#EAF4FF",
+                color: "#111",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                textShadow: "0 2px 16px rgba(5,20,50,0.7)",
               }}
             >
-              Alpha Industry Limited
+              Welcome back
             </h1>
             <p
-              className="text-center"
+              className="mt-1.5"
               style={{
                 fontSize: "14px",
                 lineHeight: 1.5,
-                letterSpacing: "0.4px",
-                color: "rgba(220,235,255,0.92)",
+                color: "#666",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                textShadow: "0 1px 8px rgba(5,20,50,0.6)",
               }}
             >
-              Maintenance Operations Console
+              Sign in to your maintenance operations console
             </p>
           </div>
-        </div>
 
-        {/* Card — translucent glass */}
-        <div
-          className="w-full flex flex-col gap-6 backdrop-blur-md"
-          style={{
-            background: "rgba(255,255,255,0.18)",
-            border: "1px solid rgba(255,255,255,0.28)",
-            borderRadius: "10px",
-            boxShadow: subtleShadow,
-            padding: "32px",
-          }}
-        >
+          {/* Sign-in card */}
           <form onSubmit={onSubmit} className="flex flex-col gap-5">
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="username"
+                className="text-sm font-semibold"
                 style={{
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  lineHeight: 1.43,
-                  color: "#F5FAFF",
+                  color: "#333",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  textShadow: "0 1px 4px rgba(5,20,50,0.45)",
                 }}
               >
                 User name
@@ -131,21 +168,23 @@ const Login = () => {
                 required
                 className="w-full outline-none transition-shadow"
                 style={{
-                  height: "40px",
-                  padding: "0 12px",
+                  height: "44px",
+                  padding: "0 14px",
                   fontSize: "14px",
                   lineHeight: 1.43,
-                  color: "#0E1F3A",
-                  background: "rgba(255,255,255,0.78)",
-                  borderRadius: "6px",
-                  boxShadow: borderShadow,
+                  color: "#111",
+                  background: "#fff",
+                  borderRadius: "8px",
+                  border: "1.5px solid #e5e5e5",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.boxShadow = `0 0 0 2px ${focusRing}, ${borderShadow}`;
+                  e.currentTarget.style.borderColor = focusRing;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(39,174,156,0.15)`;
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.boxShadow = borderShadow;
+                  e.currentTarget.style.borderColor = "#e5e5e5";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
             </div>
@@ -153,13 +192,10 @@ const Login = () => {
             <div className="flex flex-col gap-1.5">
               <label
                 htmlFor="password"
+                className="text-sm font-semibold"
                 style={{
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  lineHeight: 1.43,
-                  color: "#F5FAFF",
+                  color: "#333",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  textShadow: "0 1px 4px rgba(5,20,50,0.45)",
                 }}
               >
                 Password
@@ -173,33 +209,31 @@ const Login = () => {
                 required
                 className="w-full outline-none transition-shadow"
                 style={{
-                  height: "40px",
-                  padding: "0 12px",
+                  height: "44px",
+                  padding: "0 14px",
                   fontSize: "14px",
                   lineHeight: 1.43,
-                  color: "#0E1F3A",
-                  background: "rgba(255,255,255,0.78)",
-                  borderRadius: "6px",
-                  boxShadow: borderShadow,
+                  color: "#111",
+                  background: "#fff",
+                  borderRadius: "8px",
+                  border: "1.5px solid #e5e5e5",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
                 }}
                 onFocus={(e) => {
-                  e.currentTarget.style.boxShadow = `0 0 0 2px ${focusRing}, ${borderShadow}`;
+                  e.currentTarget.style.borderColor = focusRing;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(39,174,156,0.15)`;
                 }}
                 onBlur={(e) => {
-                  e.currentTarget.style.boxShadow = borderShadow;
+                  e.currentTarget.style.borderColor = "#e5e5e5";
+                  e.currentTarget.style.boxShadow = "none";
                 }}
               />
             </div>
 
             {error && (
               <p
-                className="text-sm"
-                style={{
-                  color: "#ff5b4f",
-                  fontFamily: "'Geist Mono', ui-monospace, monospace",
-                  fontVariantNumeric: "tabular-nums",
-                }}
+                className="text-sm font-mono-data"
+                style={{ color: "#e74c3c" }}
               >
                 {error}
               </p>
@@ -207,45 +241,45 @@ const Login = () => {
 
             <button
               type="submit"
-              className="w-full cursor-pointer transition-colors"
+              className="w-full cursor-pointer transition-all"
               style={{
-                height: "40px",
+                height: "44px",
                 padding: "0 16px",
                 fontSize: "14px",
                 fontWeight: 500,
                 lineHeight: 1.43,
                 color: "#ffffff",
-                background: "#171717",
-                borderRadius: "6px",
+                background: "#27ae9c",
+                borderRadius: "8px",
                 border: "none",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
                 letterSpacing: "normal",
+                boxShadow: "0 4px 14px rgba(39,174,156,0.25)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#000000";
+                e.currentTarget.style.background = "#219a8a";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#171717";
+                e.currentTarget.style.background = "#27ae9c";
               }}
             >
               Sign In
             </button>
           </form>
-        </div>
 
-        <p
-          className="text-center"
-          style={{
-            fontSize: "12px",
-            lineHeight: 1.33,
-            letterSpacing: "0.6px",
-            color: "rgba(220,235,255,0.85)",
-            fontFamily: "'Geist Mono', ui-monospace, monospace",
-            textShadow: "0 1px 6px rgba(10,25,55,0.5)",
-          }}
-        >
-          Alpha Industry Limited · CMMS
-        </p>
+          <p
+            className="text-center mt-10"
+            style={{
+              fontSize: "12px",
+              lineHeight: 1.33,
+              color: "#999",
+              fontFamily: "'Geist Mono', ui-monospace, monospace",
+              fontVariantNumeric: "tabular-nums",
+            }}
+          >
+            © Alpha Industry Limited · CMMS
+          </p>
+        </div>
       </div>
     </div>
   );
