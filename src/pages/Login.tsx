@@ -2,9 +2,10 @@ import { useState, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "@/lib/auth";
 import logo from "@/assets/logo.png";
+import loginBg from "@/assets/login-bg.jpeg";
 
 const borderShadow = "rgba(0,0,0,0.08) 0px 0px 0px 1px";
-const subtleShadow = "rgba(0,0,0,0.08) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 2px, rgba(0,0,0,0.04) 0px 8px 8px -8px, #fafafa 0px 0px 0px 1px";
+const subtleShadow = "rgba(0,0,0,0.25) 0px 10px 40px -10px, rgba(0,0,0,0.15) 0px 4px 12px";
 const focusRing = "hsla(212, 100%, 48%, 1)";
 
 const Login = () => {
@@ -26,10 +27,21 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center p-4"
-      style={{ background: "#ffffff", fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
+      className="min-h-screen w-full flex items-center justify-center p-4 relative"
+      style={{
+        backgroundImage: `url(${loginBg})`,
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+        fontFamily: "'Geist', Arial, system-ui, sans-serif",
+      }}
     >
-      <div className="w-full max-w-[420px] flex flex-col items-center gap-10">
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(135deg, rgba(5,15,30,0.72), rgba(5,15,30,0.55))" }}
+      />
+      <div className="w-full max-w-[420px] flex flex-col items-center gap-10 relative z-10">
         {/* Logo + brand */}
         <div className="flex flex-col items-center gap-5">
           <div className="size-20 flex items-center justify-center">
@@ -49,8 +61,9 @@ const Login = () => {
                 fontSize: "32px",
                 lineHeight: 1.2,
                 letterSpacing: "-1.28px",
-                color: "#171717",
+                color: "#ffffff",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                textShadow: "0 2px 12px rgba(0,0,0,0.5)",
               }}
             >
               Sign In
@@ -60,8 +73,9 @@ const Login = () => {
               style={{
                 fontSize: "16px",
                 lineHeight: 1.5,
-                color: "#4d4d4d",
+                color: "rgba(255,255,255,0.85)",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                textShadow: "0 1px 8px rgba(0,0,0,0.5)",
               }}
             >
               Group 6 Industries — Maintenance Operations Console
@@ -208,8 +222,9 @@ const Login = () => {
           style={{
             fontSize: "12px",
             lineHeight: 1.33,
-            color: "#808080",
+            color: "rgba(255,255,255,0.75)",
             fontFamily: "'Geist', Arial, system-ui, sans-serif",
+            textShadow: "0 1px 6px rgba(0,0,0,0.5)",
           }}
         >
           Group 6 Industries Limited · CMMS
