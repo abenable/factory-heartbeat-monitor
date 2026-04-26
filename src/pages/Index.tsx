@@ -181,7 +181,7 @@ function Kpi({
       : "text-foreground";
   return (
     <Panel className="p-5 h-32 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-cyan uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
         {label}
       </span>
       <div className="flex items-baseline gap-2">
@@ -210,7 +210,7 @@ function Metric({
   if (isStatus) {
     return (
       <div className="flex flex-col">
-        <span className="font-mono-data text-[10px] text-cyan uppercase">
+        <span className="font-mono-data text-[10px] text-muted-foreground uppercase">
           {label}
         </span>
         <span className="mt-1">
@@ -220,14 +220,14 @@ function Metric({
     );
   }
   const colorMap = {
-    ok: "text-cyan",
+    ok: "text-led-ok",
     warn: "text-led-warn",
     crit: "text-led-crit",
-    info: "text-cyan",
+    info: "text-led-info",
   };
   return (
     <div className="flex flex-col">
-      <span className="font-mono-data text-[10px] text-cyan uppercase">
+      <span className="font-mono-data text-[10px] text-muted-foreground uppercase">
         {label}
       </span>
       <span
