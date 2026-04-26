@@ -71,9 +71,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     email: "odeke@group6.co.ug",
     certifications: ["Confined Space Entry", "Rigging & Slinging"],
   },
-  Ouma: {
-    username: "Ouma",
-    name: "Ouma Benjamin",
+  Oumo: {
+    username: "Oumo",
+    name: "Oumo Benjamin",
     jobTitle: "Instrumentation Technician",
     workerId: "21/U/1522",
     department: "Instrumentation & Control",
@@ -82,7 +82,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2021-01-25",
     shift: "Swing · 14:00 – 22:00",
     phone: "+256 772 100 005",
-    email: "ouma@group6.co.ug",
+    email: "oumo@group6.co.ug",
     certifications: ["HART Field Comm", "Loop Tuning"],
   },
   Ahereza: {
