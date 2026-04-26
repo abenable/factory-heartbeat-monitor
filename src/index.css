@@ -8,58 +8,58 @@
 
 @layer base {
   :root {
-    /* === LIGHT — cyan === */
-    --background:  180  60%  85%;
-    --foreground:  195  55%  10%;
+    /* === LIGHT — clean white with cyan accents === */
+    --background:  0  0%  98%;
+    --foreground:  220  20%  18%;
 
-    --panel:       180  50%  90%;
-    --panel-elevated:  180  55%  87%;
+    --panel:       0  0%  100%;
+    --panel-elevated:  220  15%  96%;
 
-    --card:        180  50%  91%;
-    --card-foreground:  195  55%  10%;
+    --card:        0  0%  100%;
+    --card-foreground:  220  20%  18%;
 
-    --popover:     180  50%  92%;
-    --popover-foreground:  195  55%  10%;
+    --popover:     0  0%  100%;
+    --popover-foreground:  220  20%  18%;
 
     /* Primary: vivid cyan */
-    --primary:     180  85%  34%;
+    --primary:     180  85%  38%;
     --primary-foreground:  0  0%  100%;
 
-    /* Secondary: pale cyan */
-    --secondary:   180  45%  86%;
-    --secondary-foreground:  195  50%  14%;
+    /* Secondary: pale gray-blue */
+    --secondary:   220  20%  94%;
+    --secondary-foreground:  220  20%  20%;
 
-    --muted:       180  40%  86%;
-    --muted-foreground:  195  22%  32%;
+    --muted:       220  15%  95%;
+    --muted-foreground:  220  12%  45%;
 
-    /* Accent: bright teal */
-    --accent:      174  80%  40%;
+    /* Accent: bright cyan */
+    --accent:      180  80%  42%;
     --accent-foreground:  0  0%  100%;
 
     --destructive:  355  75%  48%;
     --destructive-foreground:  0  0%  100%;
 
-    --border:      180  35%  76%;
-    --input:       180  35%  78%;
-    --ring:        180  85%  34%;
+    --border:      220  15%  90%;
+    --input:       220  15%  90%;
+    --ring:        180  85%  38%;
 
     /* Status LEDs */
     --led-ok:      155  70%  36%;
     --led-warn:    38   95%  50%;
     --led-crit:    0    78%  48%;
-    --led-info:    180  65%  40%;
+    --led-info:    180  65%  42%;
 
     --radius: 0.375rem;
 
     /* Sidebar */
-    --sidebar-background:  180  50%  88%;
-    --sidebar-foreground:  195  28%  24%;
-    --sidebar-primary:     180  85%  34%;
+    --sidebar-background:  0  0%  99%;
+    --sidebar-foreground:  220  15%  32%;
+    --sidebar-primary:     180  85%  38%;
     --sidebar-primary-foreground:  0  0%  100%;
-    --sidebar-accent:      180  45%  84%;
-    --sidebar-accent-foreground:  195  55%  10%;
-    --sidebar-border:      180  35%  76%;
-    --sidebar-ring:        180  85%  34%;
+    --sidebar-accent:      220  15%  94%;
+    --sidebar-accent-foreground:  220  20%  18%;
+    --sidebar-border:      220  15%  90%;
+    --sidebar-ring:        180  85%  38%;
   }
 
   .dark {
@@ -145,6 +145,28 @@
 
   .bg-panel  { background-color: hsl(var(--panel)); }
   .bg-panel-elevated { background-color: hsl(var(--panel-elevated)); }
+
+  /* Cyan status badge */
+  .badge-cyan {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: 9999px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1.33;
+    background: linear-gradient(135deg, hsl(180 70% 42%) 0%, hsl(186 80% 36%) 100%);
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-family: 'Geist Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Cyan text for dashboard emphasis */
+  .text-cyan {
+    color: hsl(180 85% 38%);
+  }
 
   /* Theme-aware subtle gradient (peach → soft teal in light, blues in dark) */
   .bg-gradient-blue {

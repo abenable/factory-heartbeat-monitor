@@ -82,7 +82,7 @@ const Dashboard = () => {
                     </div>
 
                     <div className="grid grid-cols-2 gap-x-4 gap-y-3">
-                      <Metric label="Status" value={statusLabel(m.status)} tone={tone} />
+                      <Metric label="Status" value={statusLabel(m.status)} tone={tone} isStatus />
                       <Metric label="Load" value={`${m.load.toFixed(1)}%`} />
                       <Metric
                         label="Core Temp"
@@ -181,7 +181,7 @@ function Kpi({
       : "text-foreground";
   return (
     <Panel className="p-5 h-32 flex flex-col justify-between bg-gradient-blue">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+      <span className="font-mono-data text-[10px] text-cyan uppercase tracking-widest">
         {label}
       </span>
       <div className="flex items-baseline gap-2">
@@ -200,20 +200,34 @@ function Metric({
   label,
   value,
   tone,
+  isStatus,
 }: {
   label: string;
   value: string;
   tone?: "ok" | "warn" | "crit" | "info";
+  isStatus?: boolean;
 }) {
+  if (isStatus) {
+    return (
+      <div className="flex flex-col">
+        <span className="font-mono-data text-[10px] text-cyan uppercase">
+          {label}
+        </span>
+        <span className="mt-1">
+          <span className="badge-cyan">{value}</span>
+        </span>
+      </div>
+    );
+  }
   const colorMap = {
-    ok: "text-led-ok",
+    ok: "text-cyan",
     warn: "text-led-warn",
     crit: "text-led-crit",
-    info: "text-led-info",
+    info: "text-cyan",
   };
   return (
     <div className="flex flex-col">
-      <span className="font-mono-data text-[10px] text-muted-foreground uppercase">
+      <span className="font-mono-data text-[10px] text-cyan uppercase">
         {label}
       </span>
       <span

@@ -104,17 +104,7 @@ const Machines = () => {
                     <td className="p-3 text-muted-foreground">{m.type}</td>
                     <td className="p-3 text-muted-foreground">{m.sector}</td>
                     <td className="p-3 text-right">
-                      <span
-                        className={
-                          tone === "crit"
-                            ? "text-led-crit"
-                            : tone === "warn"
-                            ? "text-led-warn"
-                            : tone === "ok"
-                            ? "text-led-ok"
-                            : "text-muted-foreground"
-                        }
-                      >
+                      <span className="badge-cyan">
                         {statusLabel(m.status)}
                       </span>
                     </td>

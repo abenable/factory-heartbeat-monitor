@@ -22,7 +22,7 @@ interface SectionHeadingProps {
 export function SectionHeading({ children, right }: SectionHeadingProps) {
   return (
     <div className="flex items-end justify-between border-b border-border pb-2 mb-4">
-      <h2 className="font-mono-data text-xs text-muted-foreground uppercase tracking-widest">
+      <h2 className="font-mono-data text-xs text-cyan uppercase tracking-widest">
         {children}
       </h2>
       {right}

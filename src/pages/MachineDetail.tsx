@@ -63,21 +63,9 @@ const MachineDetail = () => {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="font-mono-data text-sm">
-                <span
-                  className={
-                    tone === "crit"
-                      ? "text-led-crit"
-                      : tone === "warn"
-                      ? "text-led-warn"
-                      : tone === "ok"
-                      ? "text-led-ok"
-                      : "text-muted-foreground"
-                  }
-                >
-                  {statusLabel(machine.status)}
-                </span>
-              </div>
+              <span className="badge-cyan">
+                {statusLabel(machine.status)}
+              </span>
               {!isViewer() && (
                 <Button asChild variant="outline" size="sm">
                   <Link to={`/machines/${machine.id}/edit`}>
