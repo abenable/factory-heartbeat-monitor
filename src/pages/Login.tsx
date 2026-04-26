@@ -27,21 +27,31 @@ const Login = () => {
 
   return (
     <div
-      className="min-h-screen w-full flex items-center justify-center p-4 relative"
+      className="min-h-screen w-full flex items-center justify-center p-4 relative overflow-hidden"
       style={{
-        backgroundImage: `url(${loginBg})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        backgroundRepeat: "no-repeat",
         fontFamily: "'Geist', Arial, system-ui, sans-serif",
       }}
     >
+      {/* Blurred background image layer */}
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          backgroundImage: `url(${loginBg})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
+          filter: "blur(6px) saturate(0.9)",
+          transform: "scale(1.08)",
+        }}
+      />
+      {/* Soft tint overlay for readability */}
       <div
         aria-hidden
         className="absolute inset-0"
         style={{
           background:
-            "linear-gradient(135deg, rgba(255,210,180,0.42) 0%, rgba(20,40,80,0.38) 55%, rgba(10,25,55,0.55) 100%)",
+            "linear-gradient(135deg, rgba(10,40,80,0.55) 0%, rgba(15,55,110,0.45) 60%, rgba(8,30,70,0.6) 100%)",
         }}
       />
       <div className="w-full max-w-[420px] flex flex-col items-center gap-10 relative z-10">
@@ -63,9 +73,9 @@ const Login = () => {
                 fontSize: "30px",
                 lineHeight: 1.15,
                 letterSpacing: "-0.5px",
-                color: "#FFE6D2",
+                color: "#EAF4FF",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                textShadow: "0 2px 14px rgba(10,25,55,0.55)",
+                textShadow: "0 2px 16px rgba(5,20,50,0.7)",
               }}
             >
               Alma Industry Limited
@@ -76,9 +86,9 @@ const Login = () => {
                 fontSize: "14px",
                 lineHeight: 1.5,
                 letterSpacing: "0.4px",
-                color: "rgba(255,230,210,0.92)",
+                color: "rgba(220,235,255,0.92)",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                textShadow: "0 1px 8px rgba(10,25,55,0.5)",
+                textShadow: "0 1px 8px rgba(5,20,50,0.6)",
               }}
             >
               Maintenance Operations Console
@@ -86,12 +96,13 @@ const Login = () => {
           </div>
         </div>
 
-        {/* Card */}
+        {/* Card — translucent glass */}
         <div
-          className="w-full flex flex-col gap-6"
+          className="w-full flex flex-col gap-6 backdrop-blur-md"
           style={{
-            background: "#ffffff",
-            borderRadius: "8px",
+            background: "rgba(255,255,255,0.18)",
+            border: "1px solid rgba(255,255,255,0.28)",
+            borderRadius: "10px",
             boxShadow: subtleShadow,
             padding: "32px",
           }}
@@ -102,10 +113,11 @@ const Login = () => {
                 htmlFor="username"
                 style={{
                   fontSize: "14px",
-                  fontWeight: 500,
+                  fontWeight: 600,
                   lineHeight: 1.43,
-                  color: "#171717",
+                  color: "#F5FAFF",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                  textShadow: "0 1px 4px rgba(5,20,50,0.45)",
                 }}
               >
                 User name
@@ -123,8 +135,8 @@ const Login = () => {
                   padding: "0 12px",
                   fontSize: "14px",
                   lineHeight: 1.43,
-                  color: "#171717",
-                  background: "#ffffff",
+                  color: "#0E1F3A",
+                  background: "rgba(255,255,255,0.78)",
                   borderRadius: "6px",
                   boxShadow: borderShadow,
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
@@ -143,10 +155,11 @@ const Login = () => {
                 htmlFor="password"
                 style={{
                   fontSize: "14px",
-                  fontWeight: 500,
+                  fontWeight: 600,
                   lineHeight: 1.43,
-                  color: "#171717",
+                  color: "#F5FAFF",
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
+                  textShadow: "0 1px 4px rgba(5,20,50,0.45)",
                 }}
               >
                 Password
@@ -164,8 +177,8 @@ const Login = () => {
                   padding: "0 12px",
                   fontSize: "14px",
                   lineHeight: 1.43,
-                  color: "#171717",
-                  background: "#ffffff",
+                  color: "#0E1F3A",
+                  background: "rgba(255,255,255,0.78)",
                   borderRadius: "6px",
                   boxShadow: borderShadow,
                   fontFamily: "'Geist', Arial, system-ui, sans-serif",
@@ -226,7 +239,7 @@ const Login = () => {
             fontSize: "12px",
             lineHeight: 1.33,
             letterSpacing: "0.6px",
-            color: "rgba(255,230,210,0.85)",
+            color: "rgba(220,235,255,0.85)",
             fontFamily: "'Geist Mono', ui-monospace, monospace",
             textShadow: "0 1px 6px rgba(10,25,55,0.5)",
           }}
