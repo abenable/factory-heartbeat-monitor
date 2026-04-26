@@ -1,5 +1,6 @@
 import { useState, FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
+import { isViewer } from "@/lib/auth";
 import { Printer, Save, ArrowLeft, Plus, X, Wrench } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";

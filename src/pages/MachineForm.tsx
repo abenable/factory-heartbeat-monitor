@@ -1,5 +1,6 @@
 import { useState, FormEvent, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
+import { isViewer } from "@/lib/auth";
 import { Save, ArrowLeft } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
@@ -41,6 +42,8 @@ const MachineForm = () => {
   const { id } = useParams<{ id: string }>();
   const isEdit = Boolean(id);
   const existing = id ? getMachine(id) : undefined;
+
+  if (isViewer()) return <Navigate to="/machines" replace />;
 
   const [form, setForm] = useState<Machine>(emptyMachine());
 
