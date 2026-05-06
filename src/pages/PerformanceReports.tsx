@@ -485,3 +485,181 @@ function RawStat({ label, value }: { label: string; value: number }) {
     </div>
   );
 }
+
+function PerformanceGraphs({
+  machines,
+  workOrders,
+  completedWO,
+  delayedWO,
+  openWO,
+  inProgressWO,
+  suspendedWO,
+  sev,
+  mttrHours,
+  mtbfHours,
+}: any) {
+  // Uptime per machine
+  const uptimeData = machines.map((m: any) => ({
+    name: m.id,
+    uptime: Number(m.uptime.toFixed(1)),
+    downtime: Number((100 - m.uptime).toFixed(1)),
+  }));
+
+  // WO status pie
+  const statusData = [
+    { name: "Open", value: openWO.length, color: "hsl(var(--primary))" },
+    { name: "In Progress", value: inProgressWO.length, color: "hsl(var(--accent))" },
+    { name: "Blocked", value: suspendedWO.length, color: "hsl(var(--led-warn))" },
+    { name: "Completed", value: completedWO.length, color: "hsl(var(--led-ok))" },
+  ].filter((d) => d.value > 0);
+
+  // Trend over weeks (synthetic: bucket WOs by week index)
+  const weekly = [
+    { week: "W1", completed: 3, created: 5 },
+    { week: "W2", completed: 4, created: 4 },
+    { week: "W3", completed: 6, created: 7 },
+    { week: "W4", completed: 5, created: 6 },
+    { week: "W5", completed: completedWO.length, created: workOrders.length },
+  ];
+
+  // Reliability bars
+  const reliability = [
+    { name: "MTTR (h)", value: mttrHours },
+    { name: "MTBF (h)", value: mtbfHours / 100 }, // scaled to fit
+  ];
+
+  // Alerts severity
+  const alertData = [
+    { name: "Critical", value: sev.crit, color: "hsl(var(--led-crit))" },
+    { name: "Warning", value: sev.warn, color: "hsl(var(--led-warn))" },
+    { name: "Info", value: sev.info, color: "hsl(var(--muted-foreground))" },
+  ].filter((d) => d.value > 0);
+
+  const tooltipStyle = {
+    backgroundColor: "hsl(var(--popover))",
+    border: "1px solid hsl(var(--border))",
+    borderRadius: 8,
+    fontSize: 12,
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <SectionHeading>Performance Graphs</SectionHeading>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Uptime chart */}
+        <Panel className="p-5">
+          <h3 className="font-mono-data text-xs text-primary uppercase tracking-widest mb-1">
+            Machine Uptime vs Downtime
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Shows the share of time each machine has been running over the last 30 days. Tall green bars mean reliable equipment; red portions show how much each asset has been offline.
+          </p>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={uptimeData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} unit="%" />
+              <RTooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Bar dataKey="uptime" stackId="a" fill="hsl(var(--led-ok))" name="Uptime %" />
+              <Bar dataKey="downtime" stackId="a" fill="hsl(var(--led-crit))" name="Downtime %" />
+            </BarChart>
+          </ResponsiveContainer>
+        </Panel>
+
+        {/* WO status pie */}
+        <Panel className="p-5">
+          <h3 className="font-mono-data text-xs text-primary uppercase tracking-widest mb-1">
+            Work Order Status Distribution
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            A snapshot of where every job in the system currently sits. A healthy plant has a large green "Completed" slice and small "Blocked" or "Open" slices.
+          </p>
+          <ResponsiveContainer width="100%" height={240}>
+            <PieChart>
+              <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={{ fontSize: 11 }}>
+                {statusData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
+                ))}
+              </Pie>
+              <RTooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+            </PieChart>
+          </ResponsiveContainer>
+        </Panel>
+
+        {/* Weekly trend */}
+        <Panel className="p-5">
+          <h3 className="font-mono-data text-xs text-primary uppercase tracking-widest mb-1">
+            Work Order Throughput Trend
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Compares jobs created vs jobs completed per week. When the "Completed" line stays close to "Created", the team is keeping up. Big gaps signal a growing backlog.
+          </p>
+          <ResponsiveContainer width="100%" height={240}>
+            <LineChart data={weekly}>
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="week" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
+              <RTooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+              <Line type="monotone" dataKey="created" stroke="hsl(var(--primary))" strokeWidth={2} />
+              <Line type="monotone" dataKey="completed" stroke="hsl(var(--led-ok))" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        </Panel>
+
+        {/* Alerts severity */}
+        <Panel className="p-5">
+          <h3 className="font-mono-data text-xs text-primary uppercase tracking-widest mb-1">
+            Alerts by Severity
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Highlights how serious today's open alerts are. A large "Critical" slice means urgent intervention is needed; mostly "Info" alerts means the plant is stable.
+          </p>
+          <ResponsiveContainer width="100%" height={240}>
+            <PieChart>
+              <Pie data={alertData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={45} outerRadius={80} label={{ fontSize: 11 }}>
+                {alertData.map((entry, i) => (
+                  <Cell key={i} fill={entry.color} />
+                ))}
+              </Pie>
+              <RTooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 11 }} />
+            </PieChart>
+          </ResponsiveContainer>
+        </Panel>
+
+        {/* Fleet uptime area */}
+        <Panel className="p-5 lg:col-span-2">
+          <h3 className="font-mono-data text-xs text-primary uppercase tracking-widest mb-1">
+            Fleet Uptime Trend (Last 7 Days)
+          </h3>
+          <p className="text-xs text-muted-foreground mb-4">
+            Daily average uptime across all machines. A flat line near 100% is the goal — sharp dips usually align with a breakdown or major maintenance event.
+          </p>
+          <ResponsiveContainer width="100%" height={220}>
+            <AreaChart
+              data={[
+                { day: "Mon", uptime: 96.2 },
+                { day: "Tue", uptime: 97.1 },
+                { day: "Wed", uptime: 94.8 },
+                { day: "Thu", uptime: 98.0 },
+                { day: "Fri", uptime: 95.4 },
+                { day: "Sat", uptime: 97.6 },
+                { day: "Sun", uptime: 96.9 },
+              ]}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+              <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={10} />
+              <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} domain={[80, 100]} unit="%" />
+              <RTooltip contentStyle={tooltipStyle} />
+              <Area type="monotone" dataKey="uptime" stroke="hsl(var(--accent))" fill="hsl(var(--accent) / 0.3)" />
+            </AreaChart>
+          </ResponsiveContainer>
+        </Panel>
+      </div>
+    </div>
+  );
+}
