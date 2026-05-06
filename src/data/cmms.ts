@@ -224,8 +224,8 @@ export let machines: Machine[] = [
     temp: 68.1,
     vibration: 0.02,
     uptime: 97.2,
-    lastService: "2026-02-01",
-    nextService: "2026-05-01",
+    lastService: "2026-03-01",
+    nextService: "2026-06-01",
     runtimeHours: 3420,
   },
   {
@@ -299,8 +299,8 @@ export let machines: Machine[] = [
     temp: 51.2,
     pressure: 3100,
     uptime: 99.5,
-    lastService: "2026-02-05",
-    nextService: "2026-05-05",
+    lastService: "2026-03-05",
+    nextService: "2026-06-05",
     runtimeHours: 11200,
   },
   {
