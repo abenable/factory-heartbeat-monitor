@@ -150,6 +150,20 @@ export default function PerformanceReports() {
           </div>
         </div>
 
+        {/* Visual Performance Graphs */}
+        <PerformanceGraphs
+          machines={machines}
+          workOrders={workOrders}
+          completedWO={completedWO}
+          delayedWO={delayedWO}
+          openWO={openWO}
+          inProgressWO={inProgressWO}
+          suspendedWO={suspendedWO}
+          sev={sev}
+          mttrHours={mttrHours}
+          mtbfHours={mtbfHours}
+        />
+
         {/* Work Order Status Breakdown */}
         <div>
           <SectionHeading>Work Order Status</SectionHeading>
