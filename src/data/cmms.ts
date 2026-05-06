@@ -335,7 +335,7 @@ export let machines: Machine[] = [
 export const alerts: AlertEvent[] = [
   {
     id: "A-1042",
-    timestamp: "2026-04-24T14:02:41Z",
+    timestamp: "2026-05-06T14:02:41Z",
     machineId: "LATH-AX-09",
     severity: "crit",
     description: "Spindle bearing thermal threshold exceeded (>110°C). Auto-shutdown engaged.",
@@ -343,7 +343,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1041",
-    timestamp: "2026-04-24T13:45:12Z",
+    timestamp: "2026-05-06T13:45:12Z",
     machineId: "MILL-CN-04",
     severity: "warn",
     description: "Coolant pressure variance detected. Deviation: -4.2%.",
@@ -351,7 +351,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1040",
-    timestamp: "2026-04-24T13:18:09Z",
+    timestamp: "2026-05-06T13:18:09Z",
     machineId: "WELD-RB-06",
     severity: "warn",
     description: "Vibration spike on axis Z (0.08 mm/s). Inspect spindle bearing.",
@@ -359,7 +359,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1039",
-    timestamp: "2026-04-24T11:10:05Z",
+    timestamp: "2026-05-06T11:10:05Z",
     machineId: "STAMP-PR-01",
     severity: "info",
     description: "Routine calibration cycle completed successfully. Offset adjusted.",
@@ -367,7 +367,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1038",
-    timestamp: "2026-04-24T09:42:00Z",
+    timestamp: "2026-05-06T09:42:00Z",
     machineId: "OVEN-CR-08",
     severity: "info",
     description: "Setpoint reached 185°C. Cure cycle nominal.",
@@ -375,7 +375,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1037",
-    timestamp: "2026-04-24T08:30:00Z",
+    timestamp: "2026-05-06T08:30:00Z",
     machineId: "CONV-MN-02",
     severity: "info",
     description: "Shift change logged. Operator 04 session initiated.",
@@ -383,7 +383,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1036",
-    timestamp: "2026-04-23T22:14:55Z",
+    timestamp: "2026-05-05T22:14:55Z",
     machineId: "INJ-MD-11",
     severity: "warn",
     description: "Hydraulic pressure dropped below 2800 PSI. Operator paused machine.",
@@ -391,7 +391,7 @@ export const alerts: AlertEvent[] = [
   },
   {
     id: "A-1035",
-    timestamp: "2026-04-23T18:02:18Z",
+    timestamp: "2026-05-05T18:02:18Z",
     machineId: "PUMP-HY-03",
     severity: "info",
     description: "Filter change reminder due in 5 days.",
