@@ -409,8 +409,8 @@ export const workOrders: WorkOrder[] = [
     type: "corrective",
     assignee: "Mukisa",
     department: "Electrical Maintenance",
-    createdAt: "2026-04-24T14:05:00Z",
-    dueAt: "2026-04-24T20:00:00Z",
+    createdAt: "2026-05-05T14:05:00Z",
+    dueAt: "2026-05-07T20:00:00Z",
     problemDescription: "Spindle bearing thermal threshold exceeded (>110°C). Auto-shutdown engaged. Abnormal noise observed.",
     tasks: [
       { description: "Inspect cooling system (fan and vents)", completed: true },
@@ -419,8 +419,8 @@ export const workOrders: WorkOrder[] = [
       { description: "Test run and verify temperature < 90°C", completed: false },
     ],
     schedule: {
-      startDate: "2026-04-24T14:05:00Z",
-      expectedCompletion: "2026-04-24T20:00:00Z",
+      startDate: "2026-05-05T14:05:00Z",
+      expectedCompletion: "2026-05-07T20:00:00Z",
     },
     resources: {
       tools: ["Bearing puller set", "Torque wrench", "Dial indicator"],
@@ -429,7 +429,7 @@ export const workOrders: WorkOrder[] = [
     },
     authorizedBy: "Nakimbugwe",
     workLog: {
-      actualStartTime: "2026-04-24T14:30:00Z",
+      actualStartTime: "2026-05-05T14:30:00Z",
     },
   },
   {
@@ -441,8 +441,8 @@ export const workOrders: WorkOrder[] = [
     type: "corrective",
     assignee: "Suubi",
     department: "Mechanical Maintenance",
-    createdAt: "2026-04-24T13:50:00Z",
-    dueAt: "2026-04-25T17:00:00Z",
+    createdAt: "2026-05-04T13:50:00Z",
+    dueAt: "2026-05-09T17:00:00Z",
     problemDescription: "Coolant pressure variance detected. Deviation: -4.2%. Potential leak in supply line.",
     tasks: [
       { description: "Inspect coolant supply line for leaks" },
@@ -451,8 +451,8 @@ export const workOrders: WorkOrder[] = [
       { description: "Top up coolant and verify flow rate" },
     ],
     schedule: {
-      startDate: "2026-04-25T08:00:00Z",
-      expectedCompletion: "2026-04-25T17:00:00Z",
+      startDate: "2026-05-07T08:00:00Z",
+      expectedCompletion: "2026-05-09T17:00:00Z",
     },
     resources: {
       tools: ["Pressure gauge", "Coolant test kit"],
@@ -470,8 +470,8 @@ export const workOrders: WorkOrder[] = [
     type: "preventive",
     assignee: "Wagoli",
     department: "Predictive Maintenance",
-    createdAt: "2026-04-24T13:25:00Z",
-    dueAt: "2026-04-26T17:00:00Z",
+    createdAt: "2026-05-04T13:25:00Z",
+    dueAt: "2026-05-12T17:00:00Z",
     problemDescription: "Vibration spike on axis Z (0.08 mm/s). Exceeds baseline by 60%.",
     tasks: [
       { description: "Acquire vibration spectrum on Z-axis" },
@@ -480,8 +480,8 @@ export const workOrders: WorkOrder[] = [
       { description: "Lubricate and re-test" },
     ],
     schedule: {
-      startDate: "2026-04-26T08:00:00Z",
-      expectedCompletion: "2026-04-26T14:00:00Z",
+      startDate: "2026-05-11T08:00:00Z",
+      expectedCompletion: "2026-05-12T14:00:00Z",
     },
     resources: {
       tools: ["Vibration analyzer", "Strobe light"],
@@ -499,8 +499,8 @@ export const workOrders: WorkOrder[] = [
     type: "preventive",
     assignee: "Odeke",
     department: "Mechanical Maintenance",
-    createdAt: "2026-04-23T08:00:00Z",
-    dueAt: "2026-04-24T18:00:00Z",
+    createdAt: "2026-05-04T08:00:00Z",
+    dueAt: "2026-05-08T18:00:00Z",
     problemDescription: "Scheduled quarterly preventive maintenance per OEM checklist.",
     tasks: [
       { description: "Replace hydraulic filter element", completed: true },
@@ -509,8 +509,8 @@ export const workOrders: WorkOrder[] = [
       { description: "Verify clamp force", completed: false },
     ],
     schedule: {
-      startDate: "2026-04-23T08:00:00Z",
-      expectedCompletion: "2026-04-24T18:00:00Z",
+      startDate: "2026-05-04T08:00:00Z",
+      expectedCompletion: "2026-05-08T18:00:00Z",
     },
     resources: {
       tools: ["Multimeter", "Torque wrench", "Calipers"],
@@ -519,7 +519,7 @@ export const workOrders: WorkOrder[] = [
     },
     authorizedBy: "Nakimbugwe",
     workLog: {
-      actualStartTime: "2026-04-23T08:15:00Z",
+      actualStartTime: "2026-05-04T08:15:00Z",
     },
   },
   {
@@ -531,8 +531,8 @@ export const workOrders: WorkOrder[] = [
     type: "preventive",
     assignee: "Oumo",
     department: "Instrumentation & Control",
-    createdAt: "2026-04-22T10:00:00Z",
-    dueAt: "2026-04-29T17:00:00Z",
+    createdAt: "2026-05-02T10:00:00Z",
+    dueAt: "2026-05-14T17:00:00Z",
     tasks: [
       { description: "Isolate and drain hydraulic reservoir" },
       { description: "Remove old filter element and inspect" },
@@ -540,8 +540,8 @@ export const workOrders: WorkOrder[] = [
       { description: "Refill, bleed, and leak-test" },
     ],
     schedule: {
-      startDate: "2026-04-29T08:00:00Z",
-      expectedCompletion: "2026-04-29T12:00:00Z",
+      startDate: "2026-05-14T08:00:00Z",
+      expectedCompletion: "2026-05-14T12:00:00Z",
     },
     resources: {
       tools: ["Filter wrench", "Drain pan"],
@@ -559,8 +559,8 @@ export const workOrders: WorkOrder[] = [
     type: "condition-based",
     assignee: "Tabalaata",
     department: "Workshop & Fabrication",
-    createdAt: "2026-04-21T14:00:00Z",
-    dueAt: "2026-04-28T17:00:00Z",
+    createdAt: "2026-05-01T14:00:00Z",
+    dueAt: "2026-05-13T17:00:00Z",
     problemDescription: "Belt slippage detected during high-load shifts. Tension gauge reads 2.1 kN (target 2.5–3.0 kN).",
     tasks: [
       { description: "Measure belt tension across all spans" },
@@ -569,8 +569,8 @@ export const workOrders: WorkOrder[] = [
       { description: "Run 30-min load test and record vibration" },
     ],
     schedule: {
-      startDate: "2026-04-28T08:00:00Z",
-      expectedCompletion: "2026-04-28T14:00:00Z",
+      startDate: "2026-05-13T08:00:00Z",
+      expectedCompletion: "2026-05-13T14:00:00Z",
     },
     resources: {
       tools: ["Belt tension gauge", "Vibration meter"],
