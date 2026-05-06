@@ -225,8 +225,6 @@ function Metric({
   );
 }
 
-import { StatusDot } from "@/components/StatusDot";
-
 export function SeverityBadge({ severity }: { severity: "crit" | "warn" | "info" }) {
   const map = {
     crit: { label: "Critical", tone: "crit" as const },

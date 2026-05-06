@@ -51,8 +51,10 @@ export const crafts: Craft[] = [
   { workerUsername: "Nakimbugwe", skill: "electrical", level: "senior", costPerHourUSD: 16 },
   { workerUsername: "Mutebi", skill: "electrical", level: "junior", costPerHourUSD: 5 },
   // Instrumentation
+  { workerUsername: "Oumo", skill: "instrumentation", level: "intermediate", costPerHourUSD: 10 },
   { workerUsername: "Ahereza", skill: "instrumentation", level: "intermediate", costPerHourUSD: 10 },
   { workerUsername: "Nakimbugwe", skill: "instrumentation", level: "senior", costPerHourUSD: 16 },
+  { workerUsername: "Owembabazi", skill: "instrumentation", level: "intermediate", costPerHourUSD: 10 },
   // Welding
   { workerUsername: "Tabalaata", skill: "welding", level: "intermediate", costPerHourUSD: 8 },
   { workerUsername: "Odeke", skill: "welding", level: "junior", costPerHourUSD: 4 },
