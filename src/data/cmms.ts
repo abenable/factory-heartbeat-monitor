@@ -588,8 +588,8 @@ export const workOrders: WorkOrder[] = [
     type: "predictive",
     assignee: "Suubi",
     department: "Mechanical Maintenance",
-    createdAt: "2026-04-20T09:00:00Z",
-    dueAt: "2026-04-24T11:00:00Z",
+    createdAt: "2026-04-30T09:00:00Z",
+    dueAt: "2026-05-04T11:00:00Z",
     problemDescription: "Predictive calibration based on force-drift trend observed over last 90 days.",
     tasks: [
       { description: "Baseline force measurement", completed: true },
@@ -598,10 +598,10 @@ export const workOrders: WorkOrder[] = [
       { description: "Record calibration certificate", completed: true },
     ],
     schedule: {
-      startDate: "2026-04-24T08:00:00Z",
-      expectedCompletion: "2026-04-24T11:00:00Z",
-      actualStart: "2026-04-24T08:00:00Z",
-      actualCompletion: "2026-04-24T10:45:00Z",
+      startDate: "2026-05-04T08:00:00Z",
+      expectedCompletion: "2026-05-04T11:00:00Z",
+      actualStart: "2026-05-04T08:00:00Z",
+      actualCompletion: "2026-05-04T10:45:00Z",
     },
     resources: {
       tools: ["Force transducer", "Digital caliper"],
@@ -610,8 +610,8 @@ export const workOrders: WorkOrder[] = [
     },
     authorizedBy: "Nakimbugwe",
     workLog: {
-      actualStartTime: "2026-04-24T08:00:00Z",
-      actualCompletionTime: "2026-04-24T10:45:00Z",
+      actualStartTime: "2026-05-04T08:00:00Z",
+      actualCompletionTime: "2026-05-04T10:45:00Z",
       partsUsed: "Calibration shim set",
       observations: "Force drift corrected from +1.8% to +0.1%.",
       rootCause: "Hydraulic compensator wear",
