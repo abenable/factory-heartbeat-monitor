@@ -13,6 +13,23 @@ import {
 } from "@/data/cmms";
 import { crafts, getCostFor, SKILL_LABELS, LEVEL_LABELS } from "@/data/crafts";
 import { getWorker } from "@/data/workers";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip as RTooltip,
+  CartesianGrid,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell,
+  Legend,
+  AreaChart,
+  Area,
+} from "recharts";
 
 export default function PerformanceReports() {
   const backlog = getBacklog();
