@@ -69,7 +69,6 @@ function shortDate(iso: string) {
 }
 
 export default function SupervisorDashboard() {
-  const navigate = useNavigate();
   const [site, setSite] = useState<string>("All");
   const [requestFilter, setRequestFilter] = useState<"all" | JobRequestStatus>("all");
 
