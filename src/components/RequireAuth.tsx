@@ -5,7 +5,8 @@ import { isAuthed } from "@/lib/auth";
 export function RequireAuth({ children }: { children: ReactNode }) {
   const location = useLocation();
   if (!isAuthed()) {
-    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+    const from = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/welcome?from=${from}`} replace />;
   }
   return <>{children}</>;
 }

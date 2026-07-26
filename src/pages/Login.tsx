@@ -1,41 +1,57 @@
-import { useState, FormEvent } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
-import { login } from "@/lib/auth";
-import logoRed from "@/assets/kmc-logo-red.svg";
+import { useState, FormEvent, useEffect } from "react";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { login, isAuthed } from "@/lib/auth";
 import logoWhite from "@/assets/kmc-logo-white.svg";
-
-const kmcRed = "#C8102E";
-const kmcRedHover = "#A30D24";
-const kmcRedLight = "rgba(200, 16, 46, 0.12)";
+import logoRed from "@/assets/kmc-logo-red.svg";
 
 const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const from = (location.state as { from?: string } | null)?.from ?? "/";
+  const [searchParams] = useSearchParams();
+
+  const stateFrom = (location.state as { from?: string } | null)?.from;
+  const queryFromRaw = searchParams.get("from");
+  const from =
+    stateFrom ?? (queryFromRaw ? decodeURIComponent(queryFromRaw) : undefined) ?? "/";
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    if (isAuthed()) {
+      navigate(from, { replace: true });
+    }
+  }, [navigate, from]);
 
   const onSubmit = (e: FormEvent) => {
     e.preventDefault();
+    setError(null);
+    setSubmitting(true);
+
     if (login(username, password)) {
       navigate(from, { replace: true });
     } else {
       setError("Invalid username or password.");
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="min-h-screen w-full flex relative overflow-hidden bg-[#f8f8f8] lg:bg-white">
-      {/* Left side — KMC brand panel (desktop) */}
+    <div className="min-h-screen w-full flex relative overflow-hidden bg-background lg:bg-white">
+      {/* Left — brand panel */}
       <div
         aria-hidden
-        className="hidden lg:flex lg:w-3/5 relative"
+        className="hidden lg:flex lg:w-3/5 relative flex-col justify-between p-12 pb-16"
         style={{
-          background: `linear-gradient(135deg, ${kmcRed} 0%, #9B0B20 55%, #6E0716 100%)`,
+          background: "linear-gradient(135deg, #C8102E 0%, #9B0B20 55%, #6E0716 100%)",
         }}
       >
-        {/* Subtle geometric texture */}
         <div
           className="absolute inset-0 opacity-10"
           style={{
@@ -45,87 +61,60 @@ const Login = () => {
           }}
         />
 
-        <div className="relative z-10 flex flex-col justify-between w-full p-12 pb-16">
-          {/* Top brand */}
-          <div className="flex items-center gap-4">
-            <img
-              src={logoWhite}
-              alt="KMC"
-              width={48}
-              height={48}
-              className="size-12 object-contain"
-            />
-            <div className="flex flex-col">
-              <span
-                className="font-semibold text-white text-xl tracking-tight"
-                style={{ fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
-              >
-                Kiira Motors Corporation
-              </span>
-              <span
-                className="text-white/70 text-xs font-mono-data uppercase tracking-widest"
-              >
-                Industrial Maintenance Systems
-              </span>
-            </div>
+        <div className="relative z-10 flex items-center gap-4">
+          <img
+            src={logoWhite}
+            alt="KMC"
+            width={48}
+            height={48}
+            className="size-12 object-contain"
+          />
+          <div className="flex flex-col">
+            <span className="font-semibold text-white text-xl tracking-tight">
+              Kiira Motors Corporation
+            </span>
+            <span className="text-white/70 text-xs font-mono-data uppercase tracking-widest">
+              Industrial Maintenance Systems
+            </span>
           </div>
-
-          {/* Center value prop */}
-          <div className="max-w-lg">
-            <h2
-              className="text-white text-3xl font-semibold leading-tight mb-4"
-              style={{ fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
-            >
-              Factory Heartbeat Monitor
-            </h2>
-            <p
-              className="text-white/75 text-base leading-relaxed"
-              style={{ fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
-            >
-              Computerised Maintenance Management System. Monitor factory
-              machines, alerts, work orders, and preventive maintenance in real
-              time.
-            </p>
-
-            <div className="flex items-center gap-8 mt-10">
-              <div>
-                <div
-                  className="text-white text-2xl font-semibold"
-                  style={{ fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
-                >
-                  CMMS
-                </div>
-                <div className="text-white/60 text-xs font-mono-data uppercase tracking-wider">
-                  Maintenance Operations
-                </div>
-              </div>
-              <div className="w-px h-10 bg-white/25" />
-              <div>
-                <div
-                  className="text-white text-2xl font-semibold"
-                  style={{ fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
-                >
-                  KMC
-                </div>
-                <div className="text-white/60 text-xs font-mono-data uppercase tracking-wider">
-                  Uganda
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom tagline */}
-          <p className="text-white/50 text-xs font-mono-data uppercase tracking-widest">
-            Drive the future. Maintain the present.
-          </p>
         </div>
+
+        <div className="relative z-10 max-w-lg">
+          <h2 className="text-white text-3xl font-semibold leading-tight mb-4">
+            Factory Heartbeat Monitor
+          </h2>
+          <p className="text-white/75 text-base leading-relaxed">
+            Computerised Maintenance Management System. Monitor factory machines,
+            alerts, work orders, and preventive maintenance in real time.
+          </p>
+
+          <div className="flex items-center gap-8 mt-10">
+            <div>
+              <div className="text-white text-2xl font-semibold">CMMS</div>
+              <div className="text-white/60 text-xs font-mono-data uppercase tracking-wider">
+                Maintenance Operations
+              </div>
+            </div>
+            <div className="w-px h-10 bg-white/25" />
+            <div>
+              <div className="text-white text-2xl font-semibold">KMC</div>
+              <div className="text-white/60 text-xs font-mono-data uppercase tracking-wider">
+                Uganda
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p className="relative z-10 text-white/50 text-xs font-mono-data uppercase tracking-widest">
+          Drive the future. Maintain the present.
+        </p>
       </div>
 
       {/* Mobile branded header */}
       <div
         className="lg:hidden absolute top-0 left-0 right-0 h-48 z-0"
         style={{
-          background: `linear-gradient(135deg, ${kmcRed} 0%, #9B0B20 100%)`,
+          background: "linear-gradient(135deg, #C8102E 0%, #9B0B20 100%)",
         }}
       >
         <div
@@ -137,10 +126,10 @@ const Login = () => {
         />
       </div>
 
-      {/* Right side — sign-in form */}
+      {/* Right — sign-in form */}
       <div className="relative z-10 flex-1 flex items-center justify-center p-6 lg:p-12">
         <div className="w-full max-w-[420px]">
-          {/* Logo visible on mobile */}
+          {/* Mobile logo */}
           <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
             <img
               src={logoWhite}
@@ -150,10 +139,7 @@ const Login = () => {
               className="size-11 object-contain"
             />
             <div className="flex flex-col">
-              <span
-                className="font-semibold text-white text-lg tracking-tight"
-                style={{ fontFamily: "'Geist', Arial, system-ui, sans-serif" }}
-              >
+              <span className="font-semibold text-white text-lg tracking-tight">
                 Kiira Motors Corporation
               </span>
               <span className="text-white/70 text-xs font-mono-data uppercase tracking-widest">
@@ -162,13 +148,8 @@ const Login = () => {
             </div>
           </div>
 
-          {/* Form card */}
-          <div
-            className="rounded-2xl p-6 sm:p-8 shadow-sm border"
-            style={{ background: "#fff", borderColor: "#f0f0f0" }}
-          >
-            {/* Desktop heading */}
-            <div className="hidden lg:block mb-8">
+          <Card className="border-border/60 shadow-sm">
+            <CardHeader className="hidden lg:block pb-4">
               <div className="flex items-center gap-3 mb-5">
                 <img
                   src={logoRed}
@@ -177,174 +158,76 @@ const Login = () => {
                   height={36}
                   className="size-9 object-contain"
                 />
-                <span
-                  className="font-semibold text-lg tracking-tight"
-                  style={{
-                    color: "#111",
-                    fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  }}
-                >
+                <span className="font-semibold text-lg tracking-tight text-[#111]">
                   KMC CMMS
                 </span>
               </div>
-              <h1
-                className="font-semibold tracking-tight"
-                style={{
-                  fontSize: "26px",
-                  lineHeight: 1.2,
-                  letterSpacing: "-0.5px",
-                  color: "#111",
-                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                }}
-              >
+              <CardTitle className="text-2xl tracking-tight text-[#111]">
                 Welcome back
-              </h1>
-              <p
-                className="mt-1.5"
-                style={{
-                  fontSize: "14px",
-                  lineHeight: 1.5,
-                  color: "#666",
-                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                }}
-              >
+              </CardTitle>
+              <CardDescription>
                 Sign in to your maintenance operations console
-              </p>
-            </div>
+              </CardDescription>
+            </CardHeader>
 
-            <form onSubmit={onSubmit} className="flex flex-col gap-5">
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="username"
-                  className="text-sm font-semibold"
-                  style={{
-                    color: "#333",
-                    fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  }}
+            <CardContent>
+              <form onSubmit={onSubmit} className="flex flex-col gap-5">
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="username">User name</Label>
+                  <Input
+                    id="username"
+                    autoFocus
+                    autoComplete="username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    placeholder="Enter your username"
+                    className="h-11 rounded-lg"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    placeholder="Enter your password"
+                    className="h-11 rounded-lg"
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-sm font-medium text-destructive">
+                    {error}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="h-11 w-full rounded-lg bg-primary text-primary-foreground hover:bg-primary/90"
                 >
-                  User name
-                </label>
-                <input
-                  id="username"
-                  autoFocus
-                  autoComplete="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                  className="w-full outline-none transition-shadow"
-                  style={{
-                    height: "46px",
-                    padding: "0 14px",
-                    fontSize: "14px",
-                    lineHeight: 1.43,
-                    color: "#111",
-                    background: "#fff",
-                    borderRadius: "10px",
-                    border: "1.5px solid #e5e5e5",
-                    fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = kmcRed;
-                    e.currentTarget.style.boxShadow = `0 0 0 3px ${kmcRedLight}`;
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#e5e5e5";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-              </div>
+                  {submitting ? "Signing in..." : "Sign In"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
 
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-semibold"
-                  style={{
-                    color: "#333",
-                    fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  }}
-                >
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  className="w-full outline-none transition-shadow"
-                  style={{
-                    height: "46px",
-                    padding: "0 14px",
-                    fontSize: "14px",
-                    lineHeight: 1.43,
-                    color: "#111",
-                    background: "#fff",
-                    borderRadius: "10px",
-                    border: "1.5px solid #e5e5e5",
-                    fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  }}
-                  onFocus={(e) => {
-                    e.currentTarget.style.borderColor = kmcRed;
-                    e.currentTarget.style.boxShadow = `0 0 0 3px ${kmcRedLight}`;
-                  }}
-                  onBlur={(e) => {
-                    e.currentTarget.style.borderColor = "#e5e5e5";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                />
-              </div>
-
-              {error && (
-                <p
-                  className="text-sm font-mono-data"
-                  style={{ color: kmcRed }}
-                >
-                  {error}
-                </p>
-              )}
-
-              <button
-                type="submit"
-                className="w-full cursor-pointer transition-all"
-                style={{
-                  height: "46px",
-                  padding: "0 16px",
-                  fontSize: "14px",
-                  fontWeight: 600,
-                  lineHeight: 1.43,
-                  color: "#ffffff",
-                  background: kmcRed,
-                  borderRadius: "10px",
-                  border: "none",
-                  fontFamily: "'Geist', Arial, system-ui, sans-serif",
-                  letterSpacing: "normal",
-                  boxShadow: "0 4px 14px rgba(200, 16, 46, 0.28)",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = kmcRedHover;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = kmcRed;
-                }}
-              >
-                Sign In
-              </button>
-            </form>
+          <div className="mt-6 flex flex-col items-center gap-2 text-center">
+            <Link
+              to="/welcome"
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ← Back to corporate welcome
+            </Link>
+            <p className="text-[11px] text-muted-foreground font-mono-data">
+              © Kiira Motors Corporation · CMMS
+            </p>
           </div>
-
-          <p
-            className="text-center mt-8"
-            style={{
-              fontSize: "12px",
-              lineHeight: 1.33,
-              color: "#999",
-              fontFamily: "'Geist Mono', ui-monospace, monospace",
-              fontVariantNumeric: "tabular-nums",
-            }}
-          >
-            © Kiira Motors Corporation · CMMS
-          </p>
         </div>
       </div>
     </div>

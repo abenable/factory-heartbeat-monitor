@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { Activity, PauseCircle, AlertOctagon, Wrench } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { StatusDot } from "@/components/StatusDot";
@@ -9,6 +10,7 @@ import {
   statusLabel,
   workOrders,
   getBacklog,
+  MachineStatus,
 } from "@/data/cmms";
 
 const Dashboard = () => {
@@ -45,6 +47,9 @@ const Dashboard = () => {
             tone={critical > 0 ? "crit" : "ok"}
           />
         </div>
+
+        {/* Fleet status strip */}
+        <FleetStatus />
 
         {/* Machine grid */}
         <div>
@@ -249,6 +254,62 @@ export function formatTs(iso: string) {
   const date = d.toISOString().slice(5, 10).replace("-", "/");
   const time = d.toISOString().slice(11, 19);
   return `${date} ${time}`;
+}
+
+const statusConfig: Record<
+  MachineStatus,
+  { label: string; icon: React.ComponentType<{ className?: string }>; color: string; bar: string }
+> = {
+  running: { label: "Running", icon: Activity, color: "text-led-ok", bar: "bg-led-ok" },
+  idle: { label: "Idle", icon: PauseCircle, color: "text-led-warn", bar: "bg-led-warn" },
+  down: { label: "Down", icon: AlertOctagon, color: "text-led-crit", bar: "bg-led-crit" },
+  maintenance: { label: "Maintenance", icon: Wrench, color: "text-led-info", bar: "bg-led-info" },
+};
+
+function FleetStatus() {
+  const total = machines.length || 1;
+  const counts = {
+    running: machines.filter((m) => m.status === "running").length,
+    idle: machines.filter((m) => m.status === "idle").length,
+    down: machines.filter((m) => m.status === "down").length,
+    maintenance: machines.filter((m) => m.status === "maintenance").length,
+  };
+
+  return (
+    <div>
+      <SectionHeading>
+        Fleet Status
+      </SectionHeading>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        {(Object.keys(statusConfig) as MachineStatus[]).map((key) => {
+          const cfg = statusConfig[key];
+          const count = counts[key];
+          const percent = Math.round((count / total) * 100);
+          return (
+            <Panel key={key} className="p-5 flex flex-col gap-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`size-8 rounded-lg ${cfg.bar}/10 flex items-center justify-center ${cfg.color}`}>
+                    <cfg.icon className="size-4" />
+                  </div>
+                  <span className="text-sm font-medium text-muted-foreground">{cfg.label}</span>
+                </div>
+                <span className={`text-2xl font-bold tracking-tight ${cfg.color}`}>{count}</span>
+              </div>
+              <div>
+                <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
+                  <div className={`h-full rounded-full ${cfg.bar}`} style={{ width: `${percent}%` }} />
+                </div>
+                <div className="mt-1 text-xs text-muted-foreground font-mono-data">
+                  {percent}% of fleet
+                </div>
+              </div>
+            </Panel>
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 export default Dashboard;

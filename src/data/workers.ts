@@ -11,9 +11,8 @@ export interface WorkerProfile {
   phone: string;
   email: string;
   certifications: string[];
-  /** Viewers can browse the CMMS but cannot create, edit or delete records.
-   *  They may still update their own contact details on their profile. */
-  viewer?: boolean;
+  /** Workforce role used to route the user to the right interface. */
+  role?: "supervisor" | "technician" | "viewer";
 }
 
 // All workers share the same demo password: "Angel"
@@ -29,8 +28,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2018-02-12",
     shift: "Day · 06:00 – 14:00",
     phone: "+256 772 100 001",
-    email: "suubi@group6.co.ug",
+    email: "suubi@kiiramotors.com",
     certifications: ["ISO 55001 Asset Mgmt", "Vibration Analysis Cat II"],
+    role: "supervisor",
   },
   Mukisa: {
     username: "Mukisa",
@@ -43,7 +43,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2020-06-01",
     shift: "Day · 06:00 – 14:00",
     phone: "+256 772 100 002",
-    email: "mukisa@group6.co.ug",
+    email: "mukisa@kiiramotors.com",
     certifications: ["LV/HV Switching", "PLC Siemens S7"],
   },
   Ahaisibwe: {
@@ -57,8 +57,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2019-09-09",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 003",
-    email: "ahaisibwe@group6.co.ug",
+    email: "ahaisibwe@kiiramotors.com",
     certifications: ["CMRP", "Root Cause Analysis Lvl 3"],
+    role: "supervisor",
   },
   Odeke: {
     username: "Odeke",
@@ -71,7 +72,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2017-04-18",
     shift: "Night · 22:00 – 06:00",
     phone: "+256 772 100 004",
-    email: "odeke@group6.co.ug",
+    email: "odeke@kiiramotors.com",
     certifications: ["Confined Space Entry", "Rigging & Slinging"],
   },
   Oumo: {
@@ -85,7 +86,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2021-01-25",
     shift: "Swing · 14:00 – 22:00",
     phone: "+256 772 100 005",
-    email: "oumo@group6.co.ug",
+    email: "oumo@kiiramotors.com",
     certifications: ["HART Field Comm", "Loop Tuning"],
   },
   Ahereza: {
@@ -99,8 +100,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2022-03-14",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 006",
-    email: "ahereza@group6.co.ug",
+    email: "ahereza@kiiramotors.com",
     certifications: ["SAP PM Power User", "Lean Six Sigma Green Belt"],
+    role: "supervisor",
   },
   Owembabazi: {
     username: "Owembabazi",
@@ -113,8 +115,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2019-05-20",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 007",
-    email: "owembabazi@group6.co.ug",
+    email: "owembabazi@kiiramotors.com",
     certifications: ["NEBOSH IGC", "First Aid Lvl 3"],
+    role: "supervisor",
   },
   Nakimbugwe: {
     username: "Nakimbugwe",
@@ -127,8 +130,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2016-11-03",
     shift: "Day · 06:00 – 14:00",
     phone: "+256 772 100 008",
-    email: "nakimbugwe@group6.co.ug",
+    email: "nakimbugwe@kiiramotors.com",
     certifications: ["CMMS Admin", "ISO 45001 Lead Auditor"],
+    role: "supervisor",
   },
   Tabalaata: {
     username: "Tabalaata",
@@ -141,7 +145,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2015-08-12",
     shift: "Day · 07:00 – 16:00",
     phone: "+256 772 100 009",
-    email: "tabalaata@group6.co.ug",
+    email: "tabalaata@kiiramotors.com",
     certifications: ["AWS D1.1 SMAW", "Hot Work Permit Issuer"],
   },
   Wagoli: {
@@ -155,7 +159,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2020-10-01",
     shift: "Swing · 14:00 – 22:00",
     phone: "+256 772 100 010",
-    email: "wagoli@group6.co.ug",
+    email: "wagoli@kiiramotors.com",
     certifications: ["MLT-I", "Oil Analysis Interpretation"],
   },
   Mutebi: {
@@ -169,7 +173,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2024-01-15",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 011",
-    email: "mutebi@alma.co.ug",
+    email: "mutebi@kiiramotors.com",
     certifications: ["Basic Electrical Safety"],
   },
   Tumusiime: {
@@ -183,9 +187,9 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2015-01-10",
     shift: "Off-site · By appointment",
     phone: "+256 772 100 012",
-    email: "edmund.tumusiime@alma.co.ug",
+    email: "edmund.tumusiime@kiiramotors.com",
     certifications: ["Board Member"],
-    viewer: true,
+    role: "viewer",
   },
   Atuhebwa: {
     username: "Atuhebwa",
@@ -198,7 +202,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2026-02-01",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 013",
-    email: "atuhebwa@alma.co.ug",
+    email: "atuhebwa@kiiramotors.com",
     certifications: ["Workshop Safety Induction"],
   },
   Sserwada: {
@@ -212,7 +216,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     joined: "2026-02-01",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 014",
-    email: "sserwada@alma.co.ug",
+    email: "sserwada@kiiramotors.com",
     certifications: ["Workshop Safety Induction"],
   },
 };

@@ -21,7 +21,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { getUser, logout } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
-import logo from "@/assets/kmc-logo-red.svg";
+import logoAsset from "@/assets/kmc-logo.webp.asset.json";
+const logo = logoAsset.url;
 
 const nav = [
   { to: "/", label: "Live Dashboard", icon: LayoutDashboard, end: true },
@@ -77,7 +78,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
             Kiira Motors Corporation
           </span>
           <span className="font-mono-data text-[9px] tracking-widest text-muted-foreground uppercase">
-            CMMS
+            KMC · Fleet CMMS
           </span>
         </div>
       </div>

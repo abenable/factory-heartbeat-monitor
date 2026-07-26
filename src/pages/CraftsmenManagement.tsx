@@ -96,7 +96,7 @@ export default function CraftsmenManagement() {
           <Panel className="p-5">
             <div className="flex flex-wrap gap-2">
               {ALLOWED_USERNAMES.filter(
-                (u) => !crafts.some((c) => c.workerUsername === u) && !getWorker(u)?.viewer,
+                (u) => !crafts.some((c) => c.workerUsername === u) && getWorker(u)?.role !== "viewer",
               ).map((u) => {
                 const worker = getWorker(u);
                 return (

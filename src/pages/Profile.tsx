@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
 import { Printer, BadgeCheck, Mail, Phone, CalendarDays, Clock, Building2, IdCard, Award, Save, Pencil } from "lucide-react";
-import logo from "@/assets/kmc-logo-red.svg";
+import logoAsset from "@/assets/kmc-logo.webp.asset.json";
+const logo = logoAsset.url;
 
 const overridesKey = (username: string) => `g6-profile-overrides:${username}`;
 
@@ -185,7 +186,7 @@ const Profile = () => {
                     value={emailDraft}
                     maxLength={255}
                     onChange={(e) => setEmailDraft(e.target.value)}
-                    placeholder="name@group6.co.ug"
+                    placeholder="name@kiiramotors.com"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 py-3">

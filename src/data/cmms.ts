@@ -132,6 +132,13 @@ export function addWorkOrder(wo: WorkOrder) {
   workOrders.unshift(wo);
 }
 
+export function updateWorkOrder(id: string, updates: Partial<WorkOrder>) {
+  const idx = workOrders.findIndex((w) => w.id === id);
+  if (idx !== -1) {
+    workOrders[idx] = { ...workOrders[idx], ...updates };
+  }
+}
+
 export interface PMTask {
   id: string;
   machineId: string;
@@ -146,7 +153,7 @@ export interface PMTask {
   personInCharge?: string; // worker username
 }
 
-export let machines: Machine[] = [
+export const machines: Machine[] = [
   {
     id: "STAMP-PR-01",
     name: "Hydraulic Press T5",

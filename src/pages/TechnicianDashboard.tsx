@@ -1,0 +1,519 @@
+import { useMemo, useState } from "react";
+import {
+  AlertTriangle,
+  CalendarClock,
+  CheckCircle2,
+  ChevronRight,
+  Circle,
+  Clock,
+  ClipboardList,
+  Hourglass,
+  Loader2,
+  PauseCircle,
+  Wrench,
+} from "lucide-react";
+import { TechnicianLayout } from "@/components/TechnicianLayout";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { toast } from "sonner";
+import { getUser } from "@/lib/auth";
+import { getWorker } from "@/data/workers";
+import {
+  workOrders as allWorkOrders,
+  getMachine,
+  updateWorkOrder,
+  WorkOrder,
+  WorkOrderStatus,
+  WorkOrderPriority,
+} from "@/data/cmms";
+
+const filters: { key: WorkOrderStatus | "all" | "active"; label: string }[] = [
+  { key: "active", label: "Active" },
+  { key: "open", label: "Open" },
+  { key: "in_progress", label: "In Progress" },
+  { key: "blocked", label: "Blocked" },
+  { key: "done", label: "Done" },
+  { key: "all", label: "All" },
+];
+
+const priorityTone: Record<WorkOrderPriority, string> = {
+  critical: "bg-led-crit text-white",
+  high: "bg-led-warn text-white",
+  medium: "bg-primary text-primary-foreground",
+  low: "bg-secondary text-secondary-foreground",
+};
+
+const statusMeta: Record<
+  WorkOrderStatus,
+  { label: string; icon: React.ComponentType<{ className?: string }>; color: string }
+> = {
+  open: { label: "Open", icon: Circle, color: "text-muted-foreground" },
+  in_progress: { label: "In Progress", icon: Loader2, color: "text-primary" },
+  blocked: { label: "Blocked", icon: PauseCircle, color: "text-led-warn" },
+  done: { label: "Done", icon: CheckCircle2, color: "text-led-ok" },
+};
+
+function nowIso() {
+  return new Date().toISOString();
+}
+
+function woProgress(wo: WorkOrder) {
+  const total = wo.tasks.length || 1;
+  const done = wo.tasks.filter((t) => t.completed).length;
+  return { done, total, percent: Math.round((done / total) * 100) };
+}
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString(undefined, { month: "short", day: "2-digit", year: "numeric" });
+}
+
+const TechnicianDashboard = () => {
+  const username = getUser() ?? "";
+  const worker = getWorker(username);
+  const [filter, setFilter] = useState<WorkOrderStatus | "all" | "active">("active");
+  const [selected, setSelected] = useState<WorkOrder | null>(null);
+  const [refresh, setRefresh] = useState(0);
+
+  const mine = allWorkOrders.filter(
+    (w) => w.assignee.toLowerCase() === username.toLowerCase(),
+  );
+
+  const filtered =
+    filter === "all"
+      ? mine
+      : filter === "active"
+      ? mine.filter((w) => w.status !== "done")
+      : mine.filter((w) => w.status === filter);
+
+  const activeCount = mine.filter((w) => w.status !== "done").length;
+  const doneCount = mine.filter((w) => w.status === "done").length;
+  const overdueCount = mine.filter(
+    (w) => w.status !== "done" && new Date(w.dueAt).getTime() < Date.now(),
+  ).length;
+
+  return (
+    <TechnicianLayout pageTitle={worker?.name ? `Assigned Work — ${worker.name}` : "My Work Orders"}>
+      {/* KPI strip */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+        <SummaryCard
+          label="Active Work Orders"
+          value={activeCount}
+          icon={Clock}
+          tone="default"
+        />
+        <SummaryCard
+          label="Completed"
+          value={doneCount}
+          icon={CheckCircle2}
+          tone="ok"
+        />
+        <SummaryCard
+          label="Overdue"
+          value={overdueCount}
+          icon={AlertTriangle}
+          tone={overdueCount > 0 ? "warn" : "default"}
+        />
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {filters.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => setFilter(f.key)}
+            className={`px-3 py-1.5 rounded-full text-xs font-mono-data uppercase tracking-widest border transition-colors ${
+              filter === f.key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {filtered.length === 0 && (
+          <Card className="col-span-full p-8 text-center border-dashed">
+            <p className="text-muted-foreground">No work orders in this view.</p>
+          </Card>
+        )}
+        {filtered.map((wo) => (
+          <WorkOrderCard key={wo.id} wo={wo} onClick={() => setSelected(wo)} />
+        ))}
+      </div>
+
+      {selected && (
+        <WorkOrderDetailDialog
+          wo={selected}
+          onClose={() => setSelected(null)}
+          onUpdated={() => setRefresh((n) => n + 1)}
+        />
+      )}
+    </TechnicianLayout>
+  );
+};
+
+function WorkOrderCard({
+  wo,
+  onClick,
+}: {
+  wo: WorkOrder;
+  onClick: () => void;
+}) {
+  const machine = getMachine(wo.machineId);
+  const meta = statusMeta[wo.status];
+  const progress = woProgress(wo);
+  const overdue = wo.status !== "done" && new Date(wo.dueAt).getTime() < Date.now();
+
+  return (
+    <Card
+      onClick={onClick}
+      className="cursor-pointer border-border/60 transition-shadow hover:shadow-md hover:border-primary/40"
+    >
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+                {wo.id}
+              </span>
+              <Badge className={`text-[10px] ${priorityTone[wo.priority]}`}>
+                {wo.priority}
+              </Badge>
+            </div>
+            <CardTitle className="text-base leading-tight">{wo.title}</CardTitle>
+          </div>
+          <meta.icon className={`size-5 shrink-0 ${meta.color}`} />
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground flex items-center gap-1.5">
+              <Wrench className="size-3.5" />
+              {machine?.name ?? wo.machineId}
+            </span>
+            <span className={`font-mono-data text-xs ${meta.color} flex items-center gap-1`}>
+              {meta.label}
+            </span>
+          </div>
+
+          <div className="flex items-center justify-between text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <CalendarClock className="size-3.5" />
+              Due {formatDate(wo.dueAt)}
+            </span>
+            {overdue && (
+              <span className="text-led-crit font-medium flex items-center gap-1">
+                <AlertTriangle className="size-3" /> Overdue
+              </span>
+            )}
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between text-xs mb-1.5">
+              <span className="text-muted-foreground font-mono-data uppercase tracking-widest">
+                Task Progress
+              </span>
+              <span className="font-medium">{progress.percent}%</span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-secondary overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${progress.percent}%` }}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center text-xs text-primary font-medium">
+            Update work log <ChevronRight className="size-3.5 ml-1" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function WorkOrderDetailDialog({
+  wo,
+  onClose,
+  onUpdated,
+}: {
+  wo: WorkOrder;
+  onClose: () => void;
+  onUpdated: () => void;
+}) {
+  const [draft, setDraft] = useState<WorkOrder>(() => ({ ...wo }));
+
+  const machine = getMachine(draft.machineId);
+  const progress = useMemo(() => woProgress(draft), [draft]);
+
+  const setStatus = (status: WorkOrderStatus) => {
+    setDraft((d) => {
+      const next: WorkOrder = { ...d, status };
+      if (status === "in_progress" && !next.workLog?.actualStartTime) {
+        next.workLog = { ...next.workLog, actualStartTime: nowIso() };
+      }
+      if (status === "done") {
+        next.workLog = { ...next.workLog, actualCompletionTime: nowIso() };
+        next.tasks = next.tasks.map((t) => ({ ...t, completed: true }));
+      }
+      return next;
+    });
+  };
+
+  const toggleTask = (idx: number) => {
+    setDraft((d) => {
+      const nextTasks = d.tasks.map((t, i) => (i === idx ? { ...t, completed: !t.completed } : t));
+      return { ...d, tasks: nextTasks };
+    });
+  };
+
+  const updateWorkLog = (field: keyof NonNullable<WorkOrder["workLog"]>, value: string) => {
+    setDraft((d) => ({
+      ...d,
+      workLog: { ...d.workLog, [field]: value },
+    }));
+  };
+
+  const save = () => {
+    updateWorkOrder(draft.id, draft);
+    toast.success("Work order updated", { description: draft.id });
+    onUpdated();
+    onClose();
+  };
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+              {draft.id}
+            </span>
+            <Badge className={`text-[10px] ${priorityTone[draft.priority]}`}>{draft.priority}</Badge>
+          </div>
+          <DialogTitle className="text-left text-xl leading-tight">{draft.title}</DialogTitle>
+          <DialogDescription className="text-left">
+            {machine?.name ?? draft.machineId} · {machine?.type ?? ""}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6 py-2">
+          {/* Status stepper */}
+          <div className="grid grid-cols-4 gap-1 rounded-lg bg-panel p-1">
+            {(["open", "in_progress", "blocked", "done"] as WorkOrderStatus[]).map((s, i, arr) => {
+              const active = draft.status === s;
+              const passed =
+                arr.indexOf(draft.status) > i || (draft.status === "done" && s !== "done");
+              return (
+                <button
+                  key={s}
+                  onClick={() => setStatus(s)}
+                  className={`flex flex-col items-center gap-1 rounded-md py-2 text-[10px] font-mono-data uppercase tracking-wider transition-colors ${
+                    active
+                      ? "bg-primary text-primary-foreground"
+                      : passed
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-panel-elevated"
+                  }`}
+                >
+                  {statusMeta[s].label}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Progress */}
+          <div>
+            <div className="flex items-center justify-between text-xs mb-1.5">
+              <span className="text-muted-foreground font-mono-data uppercase tracking-widest">
+                Task Progress
+              </span>
+              <span className="font-medium">{progress.percent}%</span>
+            </div>
+            <div className="h-2.5 w-full rounded-full bg-secondary overflow-hidden">
+              <div
+                className="h-full rounded-full bg-primary transition-all"
+                style={{ width: `${progress.percent}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Meta */}
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <Meta label="Due Date" value={formatDate(draft.dueAt)} icon={CalendarClock} />
+            <Meta label="Department" value={draft.department ?? "—"} icon={ClipboardList} />
+            <Meta label="Type" value={draft.type.replace("-", " ")} icon={Hourglass} />
+            <Meta label="Authorized By" value={draft.authorizedBy ?? "—"} icon={CheckCircle2} />
+          </div>
+
+          {/* Problem */}
+          {draft.problemDescription && (
+            <div className="rounded-lg bg-panel p-3 text-sm">
+              <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary block mb-1">
+                Problem Description
+              </span>
+              <p className="text-muted-foreground leading-relaxed">{draft.problemDescription}</p>
+            </div>
+          )}
+
+          {/* Resources */}
+          {draft.resources && (
+            <div className="space-y-2">
+              <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+                Required Resources
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {draft.resources.tools.map((t) => (
+                  <Badge key={t} variant="outline" className="text-xs">{t}</Badge>
+                ))}
+                {draft.resources.spareParts.map((p) => (
+                  <Badge key={p} variant="outline" className="text-xs">{p}</Badge>
+                ))}
+                {draft.resources.ppe.map((p) => (
+                  <Badge key={p} variant="outline" className="text-xs">{p}</Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Tasks */}
+          <div className="space-y-3">
+            <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+              Task Checklist
+            </span>
+            <div className="space-y-2">
+              {draft.tasks.map((t, i) => (
+                <label
+                  key={i}
+                  className="flex items-start gap-3 rounded-lg border border-border/60 bg-panel p-3 cursor-pointer hover:bg-panel-elevated transition-colors"
+                >
+                  <Checkbox
+                    checked={!!t.completed}
+                    onCheckedChange={() => toggleTask(i)}
+                    className="mt-0.5"
+                  />
+                  <span className={`text-sm ${t.completed ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                    {t.description}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Work log */}
+          <div className="space-y-3">
+            <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+              Work Log
+            </span>
+            <div className="grid gap-3">
+              <div className="grid gap-1.5">
+                <Label htmlFor="observations" className="text-xs text-muted-foreground">
+                  Observations / Findings
+                </Label>
+                <Textarea
+                  id="observations"
+                  value={draft.workLog?.observations ?? ""}
+                  onChange={(e) => updateWorkLog("observations", e.target.value)}
+                  placeholder="Describe what you found or fixed..."
+                  rows={3}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="partsUsed" className="text-xs text-muted-foreground">
+                  Parts Used
+                </Label>
+                <Textarea
+                  id="partsUsed"
+                  value={draft.workLog?.partsUsed ?? ""}
+                  onChange={(e) => updateWorkLog("partsUsed", e.target.value)}
+                  placeholder="List spare parts consumed during the job..."
+                  rows={2}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button onClick={save} className="bg-primary text-primary-foreground hover:bg-primary/90">
+            Save Update
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function SummaryCard({
+  label,
+  value,
+  icon: Icon,
+  tone,
+}: {
+  label: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+  tone: "default" | "ok" | "warn";
+}) {
+  const toneClass =
+    tone === "ok" ? "text-led-ok" : tone === "warn" ? "text-led-warn" : "text-foreground";
+  const barColor =
+    tone === "ok" ? "bg-led-ok" : tone === "warn" ? "bg-led-warn" : "bg-primary";
+
+  return (
+    <Card className="border-border/60 overflow-hidden">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <span className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground block mb-1">
+              {label}
+            </span>
+            <span className={`text-3xl font-bold tracking-tight ${toneClass}`}>
+              {String(value).padStart(2, "0")}
+            </span>
+          </div>
+          <div className={`size-10 rounded-lg ${barColor}/10 flex items-center justify-center ${toneClass}`}>
+            <Icon className="size-5" />
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function Meta({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string;
+  value: string;
+  icon: React.ComponentType<{ className?: string }>;
+}) {
+  return (
+    <div className="flex items-center gap-2 rounded-lg bg-panel p-2.5">
+      <Icon className="size-4 text-primary shrink-0" />
+      <div className="min-w-0">
+        <div className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground">
+          {label}
+        </div>
+        <div className="text-sm font-medium truncate">{value}</div>
+      </div>
+    </div>
+  );
+}
+
+export default TechnicianDashboard;
