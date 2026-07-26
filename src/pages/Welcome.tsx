@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { isAuthed } from "@/lib/auth";
 import { alerts, machines, workOrders } from "@/data/cmms";
 import logoRed from "@/assets/kmc-logo-red.svg";
@@ -83,7 +84,7 @@ const Welcome = () => {
   return (
     <div className="min-h-screen w-full flex flex-col bg-background text-foreground">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             to="/welcome"
@@ -97,7 +98,7 @@ const Welcome = () => {
               height={36}
             />
             <div className="hidden sm:flex flex-col">
-              <span className="text-sm font-semibold tracking-tight text-[#171717]">
+              <span className="text-sm font-semibold tracking-tight text-foreground">
                 Kiira Motors Corporation
               </span>
               <span className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground">
@@ -119,6 +120,7 @@ const Welcome = () => {
           </nav>
 
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link to={signInLink.to} state={signInLink.state}>
               <Button className="rounded-md bg-primary px-5 text-primary-foreground hover:bg-primary/90">
                 {authed ? "Open Dashboard" : "Sign In"}
@@ -142,7 +144,7 @@ const Welcome = () => {
               </div>
 
               <h1
-                className="text-4xl font-semibold tracking-tight text-[#171717] sm:text-5xl lg:text-6xl"
+                className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-6xl"
                 style={{ letterSpacing: "-0.04em", lineHeight: 1.05 }}
               >
                 Drive the future.
@@ -199,7 +201,7 @@ const Welcome = () => {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 max-w-2xl">
               <h2
-                className="text-3xl font-semibold tracking-tight text-[#171717]"
+                className="text-3xl font-semibold tracking-tight text-foreground"
                 style={{ letterSpacing: "-0.03em" }}
               >
                 Everything your maintenance team needs
@@ -232,7 +234,7 @@ const Welcome = () => {
         <section className="border-t border-border py-20 lg:py-28">
           <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
             <h2
-              className="text-3xl font-semibold tracking-tight text-[#171717]"
+              className="text-3xl font-semibold tracking-tight text-foreground"
               style={{ letterSpacing: "-0.03em" }}
             >
               Ready to keep the fleet running?

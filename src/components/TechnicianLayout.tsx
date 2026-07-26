@@ -2,6 +2,7 @@ import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { ClipboardList, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { getUser, logout } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
 import logoRed from "@/assets/kmc-logo-red.svg";
@@ -28,7 +29,7 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
-      <header className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
+      <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link to="/technician" className="flex items-center gap-3 transition-opacity hover:opacity-80">
             <img
@@ -39,7 +40,7 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
               height={36}
             />
             <div className="flex flex-col">
-              <span className="text-sm font-semibold tracking-tight text-[#171717]">
+              <span className="text-sm font-semibold tracking-tight text-foreground">
                 Kiira Motors Corporation
               </span>
               <span className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground">
@@ -78,6 +79,7 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
               </span>
             </div>
 
+            <ThemeToggle />
             <Button variant="ghost" size="icon" onClick={onLogout} title="Sign out" aria-label="Sign out">
               <LogOut className="size-4" />
             </Button>
@@ -88,7 +90,7 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
       <main className="flex-1">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="mb-6">
-            <h1 className="text-2xl font-semibold tracking-tight text-[#171717]">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               {pageTitle}
             </h1>
           </div>

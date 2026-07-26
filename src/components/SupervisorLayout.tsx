@@ -1,9 +1,11 @@
-import { ReactNode } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { LogOut, Shield } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { getUser, logout } from "@/lib/auth";
-import { getWorker } from "@/data/workers";
+import { ReactNode, useEffect, useState } from "react";
+import { Menu } from "lucide-react";
+import { jobRequests } from "@/data/jobRequests";
+import { StatusDot } from "@/components/StatusDot";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { Sidebar } from "@/components/Sidebar";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { useLocation, useNavigate } from "react-router-dom";
 import logoRed from "@/assets/kmc-logo-red.svg";
 
 interface SupervisorLayoutProps {
@@ -12,57 +14,100 @@ interface SupervisorLayoutProps {
 
 export function SupervisorLayout({ children }: SupervisorLayoutProps) {
   const navigate = useNavigate();
-  const username = getUser() ?? "Supervisor";
-  const worker = getWorker(username);
+  const location = useLocation();
+  const openJR = jobRequests.filter((r) => r.status !== "converted").length;
+  const hasUrgent = jobRequests.some((r) => r.status !== "converted" && r.priority === "urgent");
+  const [mobileOpen, setMobileOpen] = useState(false);
 
-  const onLogout = () => {
-    logout();
-    navigate("/welcome", { replace: true });
-  };
+  // Close mobile drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  const sidebar = (
+    <Sidebar
+      logo={logoRed}
+      subtitle={
+        <span className="flex items-center gap-1">
+          Supervisor View
+        </span>
+      }
+      onLogout={() => navigate("/welcome", { replace: true })}
+    />
+  );
 
   return (
-    <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
-      <header className="sticky top-0 z-50 border-b border-border bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
-        <div className="mx-auto flex h-16 max-w-[1600px] items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/" className="flex items-center gap-3 transition-opacity hover:opacity-80">
-            <img
-              src={logoRed}
-              alt="Kiira Motors Corporation"
-              className="h-9 w-auto object-contain"
-              width={36}
-              height={36}
-            />
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold tracking-tight text-[#171717]">
-                Kiira Motors Corporation
-              </span>
-              <span className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground flex items-center gap-1">
-                <Shield className="size-3 text-primary" /> Supervisor View
-              </span>
-            </div>
-          </Link>
+    <div className="min-h-screen w-full bg-background text-foreground flex">
+      {/* Desktop sidebar — stays visible on sm screens and up */}
+      <aside className="hidden sm:flex w-56 md:w-60 shrink-0 border-r border-border bg-panel flex-col">
+        {sidebar}
+      </aside>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col items-end leading-tight">
-              <span className="text-sm font-medium truncate max-w-[180px]">
-                {worker?.name ?? username}
-              </span>
-              <span className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground">
-                {worker?.jobTitle ?? "Supervisor"}
+      {/* Mobile sidebar (Sheet) */}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent
+          side="left"
+          className="p-0 w-64 bg-panel border-border flex flex-col"
+        >
+          {sidebar}
+        </SheetContent>
+      </Sheet>
+
+      {/* Main */}
+      <div className="flex-1 flex flex-col min-w-0">
+        <header className="h-14 md:h-16 px-4 md:px-8 border-b border-border flex items-center justify-between gap-3 shrink-0 bg-panel">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="sm:hidden p-1.5 -ml-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Open navigation"
+            >
+              <Menu className="size-5" />
+            </button>
+            <div className="flex items-center gap-2">
+              <StatusDot tone={openJR > 0 ? (hasUrgent ? "crit" : "warn") : "ok"} />
+              <span className="font-mono-data text-xs text-muted-foreground tracking-wide uppercase">
+                {openJR > 0 ? `${openJR} Open Job Request${openJR === 1 ? "" : "s"}` : "All Caught Up"}
               </span>
             </div>
-            <Button variant="ghost" size="icon" onClick={onLogout} title="Sign out" aria-label="Sign out">
-              <LogOut className="size-4" />
-            </Button>
           </div>
-        </div>
-      </header>
+          <div className="flex items-center gap-3 md:gap-6 shrink-0">
+            <LiveClock />
+            <ThemeToggle />
+          </div>
+        </header>
 
-      <main className="flex-1">
-        <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
-          {children}
-        </div>
-      </main>
+        <main className="flex-1 overflow-y-auto">
+          <div className="mx-auto max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
+            {children}
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+function LiveClock() {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
+  }, []);
+  const date = now.toLocaleDateString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
+  const time = now.toLocaleTimeString(undefined, { hour12: false });
+  return (
+    <div className="flex flex-col items-end leading-tight">
+      <span className="font-mono-data text-xs md:text-sm tracking-tight">
+        {time}
+      </span>
+      <span className="hidden sm:inline font-mono-data text-[10px] text-muted-foreground uppercase tracking-widest">
+        {date}
+      </span>
     </div>
   );
 }

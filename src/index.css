@@ -63,51 +63,51 @@
   }
 
   .dark {
-    /* === DARK — deep cyan control console === */
-    --background:  172  45%  6%;
-    --foreground:  175  30%  92%;
+    /* === DARK — clean black-and-white/professional theme === */
+    --background:  0  0%  0%;
+    --foreground:  0  0%  100%;
 
-    --panel:       172  35%  10%;
-    --panel-elevated:  172  30%  14%;
+    --panel:       0  0%  6%;
+    --panel-elevated:  0  0%  12%;
 
-    --card:        172  35%  10%;
-    --card-foreground:  175  30%  92%;
+    --card:        0  0%  6%;
+    --card-foreground:  0  0%  100%;
 
-    --popover:     172  30%  14%;
-    --popover-foreground:  175  30%  92%;
+    --popover:     0  0%  10%;
+    --popover-foreground:  0  0%  100%;
 
-    --primary:     350  100%  65%;
-    --primary-foreground:  350  45%  6%;
+    --primary:     0  0%  100%;
+    --primary-foreground:  0  0%  0%;
 
-    --secondary:   350  30%  18%;
-    --secondary-foreground:  350  30%  92%;
+    --secondary:   0  0%  14%;
+    --secondary-foreground:  0  0%  100%;
 
-    --muted:       350  30%  16%;
-    --muted-foreground:  350  18%  58%;
+    --muted:       0  0%  12%;
+    --muted-foreground:  0  0%  60%;
 
-    --accent:      350  100%  71%;
-    --accent-foreground:  350  45%  6%;
+    --accent:      0  0%  18%;
+    --accent-foreground:  0  0%  100%;
 
-    --destructive:  355  80%  58%;
-    --destructive-foreground:  350  30%  95%;
+    --destructive:  0  0%  100%;
+    --destructive-foreground:  0  0%  0%;
 
-    --border:      350  25%  18%;
-    --input:       350  25%  18%;
-    --ring:        350  100%  65%;
+    --border:      0  0%  18%;
+    --input:       0  0%  18%;
+    --ring:        0  0%  100%;
 
-    --led-ok:      156  90%  52%;
-    --led-warn:    38   95%  58%;
-    --led-crit:    355  80%  58%;
-    --led-info:    350  100%  65%;
+    --led-ok:      0  0%  100%;
+    --led-warn:    0  0%  70%;
+    --led-crit:    0  0%  45%;
+    --led-info:    0  0%  85%;
 
-    --sidebar-background:  350  35%  8%;
-    --sidebar-foreground:  350  18%  58%;
-    --sidebar-primary:     350  100%  65%;
-    --sidebar-primary-foreground:  350  45%  6%;
-    --sidebar-accent:      350  30%  14%;
-    --sidebar-accent-foreground:  350  30%  92%;
-    --sidebar-border:      350  25%  16%;
-    --sidebar-ring:        350  100%  65%;
+    --sidebar-background:  0  0%  4%;
+    --sidebar-foreground:  0  0%  60%;
+    --sidebar-primary:     0  0%  100%;
+    --sidebar-primary-foreground:  0  0%  0%;
+    --sidebar-accent:      0  0%  14%;
+    --sidebar-accent-foreground:  0  0%  100%;
+    --sidebar-border:      0  0%  16%;
+    --sidebar-ring:        0  0%  100%;
   }
 }
 

@@ -1,41 +1,13 @@
-import { NavLink } from "@/components/NavLink";
 import { ReactNode, useEffect, useState } from "react";
-import {
-  LayoutDashboard,
-  Cpu,
-  AlertTriangle,
-  ClipboardList,
-  CalendarClock,
-  Menu,
-  Inbox,
-  ClipboardCheck,
-  LogOut,
-  Wrench,
-  Package,
-  TrendingUp,
-} from "lucide-react";
-import { alerts, workOrders, getBacklog } from "@/data/cmms";
+import { Menu } from "lucide-react";
+import { jobRequests } from "@/data/jobRequests";
 import { StatusDot } from "@/components/StatusDot";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Sidebar } from "@/components/Sidebar";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { getUser, logout } from "@/lib/auth";
-import { getWorker } from "@/data/workers";
+import { useLocation, useNavigate } from "react-router-dom";
 import logoAsset from "@/assets/kmc-logo.webp.asset.json";
 const logo = logoAsset.url;
-
-const nav = [
-  { to: "/", label: "Live Dashboard", icon: LayoutDashboard, end: true },
-  { to: "/machines", label: "Machines", icon: Cpu },
-  { to: "/alerts", label: "Alerts", icon: AlertTriangle },
-  { to: "/work-orders", label: "Work Orders", icon: ClipboardList },
-  { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
-  { to: "/backlog", label: "Backlog", icon: Inbox },
-  { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
-  { to: "/material-control", label: "Material Control", icon: Package },
-  { to: "/craftsmen-management", label: "Craftsmen Management", icon: Wrench },
-  { to: "/performance-reports", label: "Performance Reports", icon: TrendingUp },
-];
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -44,106 +16,30 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
-  const openAlerts = alerts.filter((a) => !a.acknowledged).length;
-  const openWO = workOrders.filter((w) => w.status !== "done").length;
-  const backlogCount = getBacklog().length;
+  const openJR = jobRequests.filter((r) => r.status !== "converted").length;
+  const hasUrgent = jobRequests.some((r) => r.status !== "converted" && r.priority === "urgent");
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const user = getUser() ?? "Operator";
-  const worker = getWorker(getUser());
 
   // Close mobile drawer on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  const counts: Record<string, number | undefined> = {
-    "/alerts": openAlerts,
-    "/work-orders": openWO,
-    "/backlog": backlogCount,
-  };
-
-  const onLogout = () => {
-    logout();
-    navigate("/login", { replace: true });
-  };
-
-  const sidebarContent = (
-    <>
-      <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-        <img src={logo} alt="Kiira Motors Corporation" width={32} height={32} className="size-8 shrink-0 object-contain" loading="lazy" />
-        <div className="flex flex-col min-w-0">
-          <span className="font-bold text-sm leading-tight truncate">
-            Kiira Motors Corporation
-          </span>
-          <span className="font-mono-data text-[9px] tracking-widest text-muted-foreground uppercase">
-            KMC · Fleet CMMS
-          </span>
-        </div>
-      </div>
-
-      <nav className="flex-1 py-6 px-4 flex flex-col gap-1">
-        <div className="text-[10px] font-mono-data text-primary uppercase tracking-widest px-2 mb-2">
-          Telemetry
-        </div>
-        {nav.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            end={item.end}
-            className="flex items-center gap-3 px-2 py-2 border-l-2 border-transparent text-muted-foreground hover:text-foreground hover:bg-panel-elevated transition-colors text-sm font-medium"
-            activeClassName="bg-panel-elevated !border-primary !text-primary"
-          >
-            <item.icon className="size-4 shrink-0" />
-            <span className="truncate flex-1">{item.label}</span>
-            {counts[item.to] ? (
-              <span className="font-mono-data text-[10px] bg-secondary px-1.5 py-0.5">
-                {counts[item.to]}
-              </span>
-            ) : null}
-          </NavLink>
-        ))}
-      </nav>
-
-      <div className="p-4 border-t border-border">
-        <Link
-          to="/profile"
-          className="flex items-center gap-3 px-2 py-2 hover:bg-panel-elevated transition-colors"
-          title="View profile"
-        >
-          <div className="size-9 bg-primary/10 border border-primary/30 text-primary flex items-center justify-center font-mono-data text-xs font-bold shrink-0">
-            {user.slice(0, 2).toUpperCase()}
-          </div>
-          <div className="flex flex-col min-w-0 flex-1">
-            <span className="text-xs font-medium truncate">
-              {worker?.name ?? user}
-            </span>
-            <span className="text-[10px] font-mono-data text-muted-foreground truncate uppercase">
-              {worker?.jobTitle ?? "Technician"}
-            </span>
-          </div>
-          <button
-            onClick={(e) => {
-              e.preventDefault();
-              onLogout();
-            }}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Sign out"
-            title="Sign out"
-          >
-            <LogOut className="size-4" />
-          </button>
-        </Link>
-      </div>
-    </>
+  const sidebar = (
+    <Sidebar
+      logo={logo}
+      subtitle="KMC · Fleet CMMS"
+      onLogout={() => navigate("/login", { replace: true })}
+    />
   );
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground flex">
-      {/* Desktop sidebar */}
-      <aside className="hidden md:flex w-60 shrink-0 border-r border-border bg-panel flex-col">
-        {sidebarContent}
+      {/* Desktop sidebar — stays visible on sm screens and up */}
+      <aside className="hidden sm:flex w-56 md:w-60 shrink-0 border-r border-border bg-panel flex-col">
+        {sidebar}
       </aside>
 
       {/* Mobile sidebar (Sheet) */}
@@ -152,7 +48,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
           side="left"
           className="p-0 w-64 bg-panel border-border flex flex-col"
         >
-          {sidebarContent}
+          {sidebar}
         </SheetContent>
       </Sheet>
 
@@ -162,7 +58,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <button
               onClick={() => setMobileOpen(true)}
-              className="md:hidden p-1.5 -ml-1.5 text-muted-foreground hover:text-foreground transition-colors"
+              className="sm:hidden p-1.5 -ml-1.5 text-muted-foreground hover:text-foreground transition-colors"
               aria-label="Open navigation"
             >
               <Menu className="size-5" />
@@ -180,9 +76,9 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
           </div>
           <div className="flex items-center gap-3 md:gap-6 shrink-0">
             <div className="flex items-center gap-2">
-              <StatusDot tone={openAlerts > 0 ? "crit" : "ok"} />
-              <span className="hidden sm:inline font-mono-data text-xs text-muted-foreground tracking-wide uppercase">
-                {openAlerts > 0 ? `${openAlerts} Active Alerts` : "System Nominal"}
+              <StatusDot tone={openJR > 0 ? (hasUrgent ? "crit" : "warn") : "ok"} />
+              <span className="font-mono-data text-xs text-muted-foreground tracking-wide uppercase">
+                {openJR > 0 ? `${openJR} Open Job Request${openJR === 1 ? "" : "s"}` : "All Caught Up"}
               </span>
             </div>
             <div className="hidden md:block h-4 w-px bg-border" />

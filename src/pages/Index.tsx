@@ -1,10 +1,9 @@
 import { Link } from "react-router-dom";
-import { Activity, PauseCircle, AlertOctagon, Wrench } from "lucide-react";
+import { Activity, PauseCircle, AlertOctagon, Wrench, Inbox } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { StatusDot } from "@/components/StatusDot";
 import {
-  alerts,
   machines,
   statusColor,
   statusLabel,
@@ -12,6 +11,7 @@ import {
   getBacklog,
   MachineStatus,
 } from "@/data/cmms";
+import { jobRequests } from "@/data/jobRequests";
 
 const Dashboard = () => {
   const running = machines.filter((m) => m.status === "running").length;
@@ -19,9 +19,8 @@ const Dashboard = () => {
     machines.reduce((s, m) => s + m.uptime, 0) / machines.length;
   const openWO = workOrders.filter((w) => w.status !== "done").length;
   const backlog = getBacklog().length;
-  const critical = alerts.filter((a) => a.severity === "crit" && !a.acknowledged)
-    .length;
-  const recentAlerts = alerts.slice(0, 5);
+  const openJR = jobRequests.filter((r) => r.status !== "converted").length;
+  const recentRequests = jobRequests.slice(0, 5);
 
   return (
     <AppLayout
@@ -41,10 +40,10 @@ const Dashboard = () => {
             tone={backlog > 0 ? "warn" : "ok"}
           />
           <Kpi
-            label="Critical Anomalies"
-            value={String(critical).padStart(2, "0")}
-            unit={critical > 0 ? "ACTION REQ" : "ALL CLEAR"}
-            tone={critical > 0 ? "crit" : "ok"}
+            label="Open Job Requests"
+            value={String(openJR).padStart(2, "0")}
+            unit={openJR > 0 ? "PENDING" : "ALL CLEAR"}
+            tone={openJR > 0 ? "warn" : "ok"}
           />
         </div>
 
@@ -107,54 +106,75 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Event log */}
+        {/* Recent job requests */}
         <div>
           <SectionHeading
             right={
               <Link
-                to="/alerts"
+                to="/job-requests"
                 className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors"
               >
-                Open alerts page →
+                View all job requests →
               </Link>
             }
           >
-            Recent Event Log
+            Recent Job Requests
           </SectionHeading>
           <Panel className="overflow-x-auto">
             <table className="w-full text-left border-collapse min-w-[640px]">
               <thead>
                 <tr className="border-b border-border bg-panel-elevated">
-                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-44">
-                    Timestamp
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-28">
+                    ID
                   </th>
-                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-24">
-                    Severity
-                  </th>
-                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-36">
-                    Node ID
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-28">
+                    Status
                   </th>
                   <th className="p-3 font-mono-data text-[10px] text-primary uppercase">
                     Description
                   </th>
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-36">
+                    Equipment
+                  </th>
+                  <th className="p-3 font-mono-data text-[10px] text-primary uppercase w-28">
+                    Age
+                  </th>
                 </tr>
               </thead>
-              <tbody className="font-mono-data text-xs">
-                {recentAlerts.map((a) => (
+              <tbody className="text-sm">
+                {recentRequests.map((jr) => (
                   <tr
-                    key={a.id}
-                    className={`border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors ${
-                      a.severity === "crit" ? "bg-led-crit/5" : ""
-                    }`}
+                    key={jr.id}
+                    className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors"
                   >
-                    <td className="p-3 text-muted-foreground">
-                      {formatTs(a.timestamp)}
+                    <td className="p-3">
+                      <Link
+                        to={`/job-requests/${jr.id}`}
+                        className="font-mono-data text-xs font-bold text-primary hover:underline"
+                      >
+                        {jr.id}
+                      </Link>
                     </td>
                     <td className="p-3">
-                      <SeverityBadge severity={a.severity} />
+                      <span className="inline-flex items-center gap-1.5 text-xs">
+                        <Inbox className="size-3 text-primary" />
+                        <span className="capitalize">{jr.status.replace("_", " ")}</span>
+                      </span>
                     </td>
-                    <td className="p-3">{a.machineId}</td>
-                    <td className="p-3 text-foreground/90">{a.description}</td>
+                    <td className="p-3">
+                      <Link
+                        to={`/job-requests/${jr.id}`}
+                        className="block hover:underline text-foreground/90"
+                      >
+                        {jr.description}
+                      </Link>
+                    </td>
+                    <td className="p-3 font-mono-data text-xs text-muted-foreground">
+                      <Link to={`/machines/${jr.equipmentId}`} className="hover:text-primary">
+                        {jr.equipmentId}
+                      </Link>
+                    </td>
+                    <td className="p-3 text-xs text-muted-foreground">{formatTs(jr.requestedAt)}</td>
                   </tr>
                 ))}
               </tbody>

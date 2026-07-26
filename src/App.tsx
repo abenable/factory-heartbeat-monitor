@@ -14,6 +14,8 @@ import Machines from "./pages/Machines.tsx";
 import MachineDetail from "./pages/MachineDetail.tsx";
 import Alerts from "./pages/Alerts.tsx";
 import WorkOrders from "./pages/WorkOrders.tsx";
+import JobRequests from "./pages/JobRequests.tsx";
+import JobRequestDetail from "./pages/JobRequestDetail.tsx";
 import PMSchedule from "./pages/PMSchedule.tsx";
 import Backlog from "./pages/Backlog.tsx";
 import Login from "./pages/Login.tsx";
@@ -51,6 +53,8 @@ const App = () => (
             <Route path="/machines/:id/edit" element={<RequireSupervisor><MachineForm /></RequireSupervisor>} />
             <Route path="/machines/:id" element={<RequireSupervisor><MachineDetail /></RequireSupervisor>} />
             <Route path="/alerts" element={<RequireSupervisor><Alerts /></RequireSupervisor>} />
+            <Route path="/job-requests" element={<RequireSupervisor><JobRequests /></RequireSupervisor>} />
+            <Route path="/job-requests/:id" element={<RequireSupervisor><JobRequestDetail /></RequireSupervisor>} />
             <Route path="/work-orders" element={<RequireSupervisor><WorkOrders /></RequireSupervisor>} />
             <Route path="/work-orders/new" element={<RequireSupervisor><NewWorkOrder /></RequireSupervisor>} />
             <Route path="/rca" element={<RequireSupervisor><RCA /></RequireSupervisor>} />
