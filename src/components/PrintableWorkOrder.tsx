@@ -26,6 +26,7 @@ export function PrintableWorkOrder({ wo }: { wo: WorkOrder }) {
       </h2>
       <table>
         <tbody>
+          <Row label="Reference Number" value={wo.referenceNumber ?? "—"} />
           <Row label="Date Created" value={new Date(wo.createdAt).toLocaleString()} />
           <Row label="Priority" value={wo.priority.toUpperCase()} />
           <Row label="Type" value={woTypeLabel(wo.type)} />
@@ -166,6 +167,7 @@ export function printSingleWorkOrder(wo: WorkOrder) {
   const tasks = wo.tasks ?? [];
 
   const rows = [
+    pRow("Reference Number", wo.referenceNumber ?? "—"),
     pRow("Date Created", new Date(wo.createdAt).toLocaleString()),
     pRow("Priority", wo.priority.toUpperCase()),
     pRow("Type", woTypeLabel(wo.type)),

@@ -93,6 +93,7 @@ const WorkOrders = () => {
             <thead>
               <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
                 <th className="p-3 w-24">ID</th>
+                <th className="p-3 w-24">Ref</th>
                 <th className="p-3">Title</th>
                 <th className="p-3 w-32">Node</th>
                 <th className="p-3 w-24">Priority</th>
@@ -110,6 +111,7 @@ const WorkOrders = () => {
                   className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors"
                 >
                   <td className="p-3 font-bold">{w.id}</td>
+                  <td className="p-3 font-mono-data text-primary">{w.referenceNumber ?? "—"}</td>
                   <td className="p-3">{w.title}</td>
                   <td className="p-3">
                     <Link to={`/machines/${w.machineId}`} className="text-muted-foreground hover:text-primary">
@@ -156,7 +158,7 @@ const WorkOrders = () => {
           <table>
             <thead>
               <tr>
-                <th>ID</th><th>Title</th><th>Machine</th><th>Priority</th>
+                <th>ID</th><th>Ref</th><th>Title</th><th>Machine</th><th>Priority</th>
                 <th>Status</th><th>Assignee</th><th>Due</th>
               </tr>
             </thead>
@@ -164,6 +166,7 @@ const WorkOrders = () => {
               {list.map((w) => (
                 <tr key={w.id}>
                   <td>{w.id}</td>
+                  <td>{w.referenceNumber ?? "—"}</td>
                   <td>{w.title}</td>
                   <td>{w.machineId} — {getMachine(w.machineId)?.name ?? ""}</td>
                   <td>{w.priority.toUpperCase()}</td>

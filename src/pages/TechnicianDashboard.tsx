@@ -9,14 +9,28 @@ import {
   ClipboardList,
   Hourglass,
   Loader2,
+  MessageSquare,
   PauseCircle,
+  Timer,
+  TrendingUp,
   Wrench,
 } from "lucide-react";
+import {
+  Bar,
+  BarChart,
+  Cell,
+  ReferenceLine,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 import { TechnicianLayout } from "@/components/TechnicianLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
@@ -73,6 +87,33 @@ function formatDate(iso: string) {
   return d.toLocaleDateString(undefined, { month: "short", day: "2-digit", year: "numeric" });
 }
 
+function toDatetimeLocal(iso?: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+  return d.toISOString().slice(0, 16);
+}
+
+function fromDatetimeLocal(local?: string): string | undefined {
+  if (!local) return undefined;
+  const d = new Date(local);
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+}
+
+function durationHours(start?: string, end?: string): number | null {
+  if (!start || !end) return null;
+  const s = new Date(start).getTime();
+  const e = new Date(end).getTime();
+  if (Number.isNaN(s) || Number.isNaN(e) || e <= s) return null;
+  return (e - s) / 36e5;
+}
+
+function formatDurationHours(start?: string, end?: string): string {
+  const hours = durationHours(start, end);
+  return hours === null ? "—" : `${hours.toFixed(1)} h`;
+}
+
 const TechnicianDashboard = () => {
   const username = getUser() ?? "";
   const worker = getWorker(username);
@@ -97,10 +138,39 @@ const TechnicianDashboard = () => {
     (w) => w.status !== "done" && new Date(w.dueAt).getTime() < Date.now(),
   ).length;
 
+  const repairedWithTimes = useMemo(
+    () =>
+      mine.filter(
+        (w) =>
+          w.status === "done" &&
+          Boolean(w.workLog?.actualStartTime) &&
+          Boolean(w.workLog?.actualCompletionTime),
+      ),
+    [mine],
+  );
+
+  const avgRepairHours = useMemo(() => {
+    if (repairedWithTimes.length === 0) return 0;
+    const total = repairedWithTimes.reduce((sum, w) => {
+      const h = durationHours(w.workLog!.actualStartTime, w.workLog!.actualCompletionTime);
+      return sum + (h ?? 0);
+    }, 0);
+    return total / repairedWithTimes.length;
+  }, [repairedWithTimes]);
+
+  const performanceChartData = useMemo(
+    () =>
+      repairedWithTimes.map((w) => ({
+        name: w.referenceNumber || w.id,
+        hours: durationHours(w.workLog!.actualStartTime, w.workLog!.actualCompletionTime) ?? 0,
+      })),
+    [repairedWithTimes],
+  );
+
   return (
     <TechnicianLayout pageTitle={worker?.name ? `Assigned Work — ${worker.name}` : "My Work Orders"}>
       {/* KPI strip */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <SummaryCard
           label="Active Work Orders"
           value={activeCount}
@@ -119,7 +189,64 @@ const TechnicianDashboard = () => {
           icon={AlertTriangle}
           tone={overdueCount > 0 ? "warn" : "default"}
         />
+        <SummaryCard
+          label="Avg Repair Time"
+          value={avgRepairHours > 0 ? Number(avgRepairHours.toFixed(1)) : 0}
+          unit={avgRepairHours > 0 ? "h" : ""}
+          icon={Timer}
+          tone="default"
+        />
       </div>
+
+      {/* Performance chart */}
+      {performanceChartData.length > 0 && (
+        <Card className="mb-6 border-border/60">
+          <CardHeader className="pb-2">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary block mb-1">
+                  Performance
+                </span>
+                <CardTitle className="text-base flex items-center gap-2">
+                  <TrendingUp className="size-4 text-primary" />
+                  Mean Time To Repair (MTTR)
+                </CardTitle>
+              </div>
+              <div className="text-right">
+                <span className="text-2xl font-bold tracking-tight">
+                  {avgRepairHours.toFixed(1)}h
+                </span>
+                <span className="font-mono-data text-[10px] uppercase tracking-widest text-muted-foreground block">
+                  Average
+                </span>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="h-56 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={performanceChartData} margin={{ top: 16, right: 16, left: 0, bottom: 16 }}>
+                  <XAxis dataKey="name" tick={{ fontSize: 10, fill: "currentColor" }} />
+                  <YAxis tick={{ fontSize: 10, fill: "currentColor" }} label={{ value: "Hours", angle: -90, position: "insideLeft", style: { fontSize: 10, fill: "currentColor" } }} />
+                  <Tooltip
+                    formatter={(value: number) => [`${value.toFixed(1)} h`, "Repair Time"]}
+                    cursor={{ fill: "hsl(var(--muted))", opacity: 0.2 }}
+                  />
+                  <ReferenceLine y={avgRepairHours} stroke="hsl(var(--primary))" strokeDasharray="3 3" />
+                  <Bar dataKey="hours" radius={[4, 4, 0, 0]}>
+                    {performanceChartData.map((_, i) => (
+                      <Cell key={i} fill="hsl(var(--primary))" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              Bars show repair time per completed work order. Dashed line is your average.
+            </p>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-6">
@@ -183,8 +310,13 @@ function WorkOrderCard({
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
-                {wo.id}
+                {wo.referenceNumber ?? wo.id}
               </span>
+              {wo.referenceNumber && (
+                <span className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
+                  {wo.id}
+                </span>
+              )}
               <Badge className={`text-[10px] ${priorityTone[wo.priority]}`}>
                 {wo.priority}
               </Badge>
@@ -262,7 +394,7 @@ function WorkOrderDetailDialog({
       if (status === "in_progress" && !next.workLog?.actualStartTime) {
         next.workLog = { ...next.workLog, actualStartTime: nowIso() };
       }
-      if (status === "done") {
+      if (status === "done" && !next.workLog?.actualCompletionTime) {
         next.workLog = { ...next.workLog, actualCompletionTime: nowIso() };
         next.tasks = next.tasks.map((t) => ({ ...t, completed: true }));
       }
@@ -297,8 +429,13 @@ function WorkOrderDetailDialog({
         <DialogHeader>
           <div className="flex items-center gap-2 mb-1">
             <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
-              {draft.id}
+              {draft.referenceNumber ?? draft.id}
             </span>
+            {draft.referenceNumber && (
+              <span className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
+                {draft.id}
+              </span>
+            )}
             <Badge className={`text-[10px] ${priorityTone[draft.priority]}`}>{draft.priority}</Badge>
           </div>
           <DialogTitle className="text-left text-xl leading-tight">{draft.title}</DialogTitle>
@@ -416,6 +553,40 @@ function WorkOrderDetailDialog({
               Work Log
             </span>
             <div className="grid gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid gap-1.5">
+                  <Label htmlFor="actualStart" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <Timer className="size-3" /> Actual Start
+                  </Label>
+                  <Input
+                    id="actualStart"
+                    type="datetime-local"
+                    value={toDatetimeLocal(draft.workLog?.actualStartTime)}
+                    onChange={(e) => updateWorkLog("actualStartTime", fromDatetimeLocal(e.target.value) ?? "")}
+                  />
+                </div>
+                <div className="grid gap-1.5">
+                  <Label htmlFor="actualCompletion" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <CheckCircle2 className="size-3" /> Actual Completion
+                  </Label>
+                  <Input
+                    id="actualCompletion"
+                    type="datetime-local"
+                    value={toDatetimeLocal(draft.workLog?.actualCompletionTime)}
+                    onChange={(e) => updateWorkLog("actualCompletionTime", fromDatetimeLocal(e.target.value) ?? "")}
+                  />
+                </div>
+              </div>
+
+              <div className="rounded-lg bg-panel p-3 flex items-center justify-between text-sm">
+                <span className="text-muted-foreground font-mono-data text-[10px] uppercase tracking-widest">
+                  Total Repair Time
+                </span>
+                <span className="font-semibold text-foreground">
+                  {formatDurationHours(draft.workLog?.actualStartTime, draft.workLog?.actualCompletionTime)}
+                </span>
+              </div>
+
               <div className="grid gap-1.5">
                 <Label htmlFor="observations" className="text-xs text-muted-foreground">
                   Observations / Findings
@@ -440,6 +611,30 @@ function WorkOrderDetailDialog({
                   rows={2}
                 />
               </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="challengesFaced" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <AlertTriangle className="size-3" /> Challenges / Blockers Faced
+                </Label>
+                <Textarea
+                  id="challengesFaced"
+                  value={draft.workLog?.challengesFaced ?? ""}
+                  onChange={(e) => updateWorkLog("challengesFaced", e.target.value)}
+                  placeholder="Record any problems, delays, safety issues or access constraints..."
+                  rows={2}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label htmlFor="workLogComments" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <MessageSquare className="size-3" /> Comments
+                </Label>
+                <Textarea
+                  id="workLogComments"
+                  value={draft.workLog?.comments ?? ""}
+                  onChange={(e) => updateWorkLog("comments", e.target.value)}
+                  placeholder="Any other comments or handover notes..."
+                  rows={2}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -460,11 +655,13 @@ function WorkOrderDetailDialog({
 function SummaryCard({
   label,
   value,
+  unit = "",
   icon: Icon,
   tone,
 }: {
   label: string;
   value: number;
+  unit?: string;
   icon: React.ComponentType<{ className?: string }>;
   tone: "default" | "ok" | "warn";
 }) {
@@ -482,7 +679,7 @@ function SummaryCard({
               {label}
             </span>
             <span className={`text-3xl font-bold tracking-tight ${toneClass}`}>
-              {String(value).padStart(2, "0")}
+              {String(value).padStart(2, "0")}{unit}
             </span>
           </div>
           <div className={`size-10 rounded-lg ${barColor}/10 flex items-center justify-center ${toneClass}`}>

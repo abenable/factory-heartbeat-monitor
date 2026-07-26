@@ -29,8 +29,10 @@ const statuses: WorkOrderStatus[] = ["open", "in_progress", "blocked", "done"];
 const woTypes: WorkOrderType[] = ["corrective", "preventive", "predictive", "condition-based"];
 
 function emptyForm() {
+  const idSuffix = Math.floor(2000 + Math.random() * 8000);
   return {
-    id: `WO-${Math.floor(2000 + Math.random() * 8000)}`,
+    id: `WO-${idSuffix}`,
+    referenceNumber: `KMC-WO-${String(Math.floor(1 + Math.random() * 999)).padStart(3, "0")}`,
     machineId: machines[0]?.id ?? "",
     title: "",
     priority: "medium" as WorkOrderPriority,
@@ -72,6 +74,7 @@ const NewWorkOrder = () => {
 
     return {
       id: form.id.trim(),
+      referenceNumber: form.referenceNumber.trim() || undefined,
       title: form.title.trim() || "Untitled work order",
       machineId: form.machineId,
       status: form.status,
@@ -157,6 +160,9 @@ const NewWorkOrder = () => {
         <Panel className="p-5 grid grid-cols-1 md:grid-cols-3 gap-4 no-print">
           <Field label="Work Order Number">
             <Input value={form.id} onChange={(e) => update("id", e.target.value)} required />
+          </Field>
+          <Field label="Reference Number">
+            <Input value={form.referenceNumber} onChange={(e) => update("referenceNumber", e.target.value)} placeholder="e.g. KMC-WO-001" />
           </Field>
           <Field label="Equipment">
             <select
@@ -455,6 +461,7 @@ function PrintView({
       </h2>
       <table>
         <tbody>
+          <PRow label="Reference Number" value={form.referenceNumber || "—"} />
           <PRow label="Date Created" value={new Date().toLocaleString()} />
           <PRow label="Priority" value={form.priority.toUpperCase()} />
           <PRow label="Type" value={form.type.replace("-", " ").replace(/^\w/, (c) => c.toUpperCase())} />
