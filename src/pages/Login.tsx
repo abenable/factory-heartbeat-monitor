@@ -1,7 +1,7 @@
 import { useState, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "@/lib/auth";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/kmc-logo.webp.asset.json";
 import loginBg from "@/assets/login-bg.jpeg";
 
 const focusRing = "#27ae9c";
@@ -49,7 +49,7 @@ const Login = () => {
           <div className="flex items-center gap-3 mb-4">
             <img
               src={logo}
-              alt="Alpha Industry Limited"
+              alt="Kiira Motors Corporation"
               width={40}
               height={40}
               className="size-10 object-contain"
@@ -62,7 +62,7 @@ const Login = () => {
                   textShadow: "0 2px 12px rgba(0,0,0,0.4)",
                 }}
               >
-                Alpha Industry Limited
+                Kiira Motors Corporation
               </span>
               <span
                 className="text-white/60 text-xs font-mono-data uppercase tracking-widest"
@@ -104,14 +104,14 @@ const Login = () => {
           <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
             <img
               src={logo}
-              alt="Alpha Industry Limited"
+              alt="Kiira Motors Corporation"
               width={36}
               height={36}
               className="size-9 object-contain"
             />
             <div className="flex flex-col">
               <span className="font-semibold text-lg tracking-tight">
-                Alpha Industry Limited
+                Kiira Motors Corporation
               </span>
               <span className="text-muted-foreground text-xs font-mono-data uppercase tracking-widest">
                 Maintenance Operations
@@ -277,7 +277,7 @@ const Login = () => {
               fontVariantNumeric: "tabular-nums",
             }}
           >
-            © Alpha Industry Limited · CMMS
+            © Kiira Motors Corporation · CMMS
           </p>
         </div>
       </div>

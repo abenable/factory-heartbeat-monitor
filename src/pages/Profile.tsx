@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
 import { Printer, BadgeCheck, Mail, Phone, CalendarDays, Clock, Building2, IdCard, Award, Save, Pencil } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/kmc-logo.webp.asset.json";
 
 const overridesKey = (username: string) => `g6-profile-overrides:${username}`;
 
@@ -114,11 +114,11 @@ const Profile = () => {
         {/* Header card */}
         <Panel className="p-6 flex flex-col sm:flex-row gap-6 items-center sm:items-start">
           <div className="size-24 sm:size-28 shrink-0 bg-panel-elevated border border-border flex items-center justify-center overflow-hidden">
-            <img src={logo} alt="Alpha Industry Limited" width={112} height={112} loading="lazy" className="size-full object-contain p-2" />
+            <img src={logo} alt="Kiira Motors Corporation" width={112} height={112} loading="lazy" className="size-full object-contain p-2" />
           </div>
           <div className="flex-1 flex flex-col gap-1.5 text-center sm:text-left">
             <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
-              Alpha Industry Limited
+              Kiira Motors Corporation
             </span>
             <h2 className="text-2xl font-bold leading-tight">{worker.name}</h2>
             <p className="text-sm text-primary font-medium">{worker.jobTitle}</p>
@@ -185,7 +185,7 @@ const Profile = () => {
                     value={emailDraft}
                     maxLength={255}
                     onChange={(e) => setEmailDraft(e.target.value)}
-                    placeholder="name@group6.co.ug"
+                    placeholder="name@kiiramotors.com"
                   />
                 </div>
                 <div className="flex flex-col gap-1.5 py-3">

@@ -15,7 +15,7 @@ export function PrintableWorkOrder({ wo }: { wo: WorkOrder }) {
   return (
     <div className="print-only print-block" data-print-wo={wo.id}>
       <h1 style={{ fontSize: 22, marginBottom: 4 }}>
-        Alpha Industry Limited — Work Order
+        Kiira Motors Corporation — Work Order
       </h1>
       <p style={{ marginBottom: 16, color: "#444" }}>
         Printed {new Date().toLocaleString()}
@@ -209,7 +209,7 @@ export function printSingleWorkOrder(wo: WorkOrder) {
 
   container.innerHTML = `
     <div class="print-block">
-      <h1 style="font-size:22px;margin-bottom:4px">Alpha Industry Limited — Work Order</h1>
+      <h1 style="font-size:22px;margin-bottom:4px">Kiira Motors Corporation — Work Order</h1>
       <p style="margin-bottom:16px;color:#444">Printed ${new Date().toLocaleString()}</p>
       <h2 style="font-size:14px;border-bottom:1px solid #000;padding-bottom:4px;margin-bottom:8px">Work Order ${esc(wo.id)}</h2>
       <table><tbody>${rows}</tbody></table>
