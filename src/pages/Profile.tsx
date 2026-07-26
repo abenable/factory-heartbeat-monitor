@@ -9,7 +9,8 @@ import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
 import { Printer, BadgeCheck, Mail, Phone, CalendarDays, Clock, Building2, IdCard, Award, Save, Pencil } from "lucide-react";
-import logo from "@/assets/kmc-logo.webp.asset.json";
+import logoAsset from "@/assets/kmc-logo.webp.asset.json";
+const logo = logoAsset.url;
 
 const overridesKey = (username: string) => `g6-profile-overrides:${username}`;
 

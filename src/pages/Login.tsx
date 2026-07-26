@@ -1,7 +1,8 @@
 import { useState, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "@/lib/auth";
-import logo from "@/assets/kmc-logo.webp.asset.json";
+import logoAsset from "@/assets/kmc-logo.webp.asset.json";
+const logo = logoAsset.url;
 import loginBg from "@/assets/login-bg.jpeg";
 
 const focusRing = "#27ae9c";

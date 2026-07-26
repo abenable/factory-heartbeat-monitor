@@ -21,7 +21,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { getUser, logout } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
-import logo from "@/assets/kmc-logo.webp.asset.json";
+import logoAsset from "@/assets/kmc-logo.webp.asset.json";
+const logo = logoAsset.url;
 
 const nav = [
   { to: "/", label: "Live Dashboard", icon: LayoutDashboard, end: true },
