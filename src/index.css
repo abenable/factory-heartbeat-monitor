@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 /* Industrial CMMS — light + dark. All colors HSL.
-   Light = clean white with cyan accents.
-   Dark  = deep cyan control console. */
+   Light = clean white with KMC red accents.
+   Dark  = deep red control console. */
 
 @layer base {
   :root {
@@ -21,19 +21,19 @@
     --popover:     0  0%  100%;
     --popover-foreground:  220  20%  18%;
 
-    /* Primary: #27ae9c cyan */
-    --primary:     172  63%  42%;
+    /* Primary: KMC red #C8102E */
+    --primary:     350  85%  42%;
     --primary-foreground:  0  0%  100%;
 
-    /* Secondary: pale gray-blue */
-    --secondary:   220  20%  94%;
+    /* Secondary: pale gray-red */
+    --secondary:   350  20%  94%;
     --secondary-foreground:  220  20%  20%;
 
-    --muted:       220  15%  95%;
+    --muted:       350  15%  95%;
     --muted-foreground:  220  12%  45%;
 
-    /* Accent: #27ae9c cyan */
-    --accent:      172  63%  42%;
+    /* Accent: KMC red #C8102E */
+    --accent:      350  85%  42%;
     --accent-foreground:  0  0%  100%;
 
     --destructive:  355  75%  48%;
@@ -41,25 +41,25 @@
 
     --border:      220  15%  90%;
     --input:       220  15%  90%;
-    --ring:        172  63%  42%;
+    --ring:        350  85%  42%;
 
     /* Status LEDs */
     --led-ok:      155  70%  36%;
     --led-warn:    38   95%  50%;
     --led-crit:    0    78%  48%;
-    --led-info:    172  63%  42%;
+    --led-info:    350  85%  42%;
 
     --radius: 0.375rem;
 
     /* Sidebar */
     --sidebar-background:  0  0%  99%;
     --sidebar-foreground:  220  15%  32%;
-    --sidebar-primary:     172  63%  42%;
+    --sidebar-primary:     350  85%  42%;
     --sidebar-primary-foreground:  0  0%  100%;
     --sidebar-accent:      220  15%  94%;
     --sidebar-accent-foreground:  220  20%  18%;
     --sidebar-border:      220  15%  90%;
-    --sidebar-ring:        172  63%  42%;
+    --sidebar-ring:        350  85%  42%;
   }
 
   .dark {
@@ -76,38 +76,38 @@
     --popover:     172  30%  14%;
     --popover-foreground:  175  30%  92%;
 
-    --primary:     172  63%  55%;
-    --primary-foreground:  172  45%  6%;
+    --primary:     350  100%  65%;
+    --primary-foreground:  350  45%  6%;
 
-    --secondary:   172  30%  18%;
-    --secondary-foreground:  175  30%  92%;
+    --secondary:   350  30%  18%;
+    --secondary-foreground:  350  30%  92%;
 
-    --muted:       172  30%  16%;
-    --muted-foreground:  172  18%  58%;
+    --muted:       350  30%  16%;
+    --muted-foreground:  350  18%  58%;
 
-    --accent:      172  63%  58%;
-    --accent-foreground:  172  45%  6%;
+    --accent:      350  100%  71%;
+    --accent-foreground:  350  45%  6%;
 
     --destructive:  355  80%  58%;
-    --destructive-foreground:  175  30%  95%;
+    --destructive-foreground:  350  30%  95%;
 
-    --border:      172  25%  18%;
-    --input:       172  25%  18%;
-    --ring:        172  63%  55%;
+    --border:      350  25%  18%;
+    --input:       350  25%  18%;
+    --ring:        350  100%  65%;
 
     --led-ok:      156  90%  52%;
     --led-warn:    38   95%  58%;
     --led-crit:    355  80%  58%;
-    --led-info:    172  63%  58%;
+    --led-info:    350  100%  65%;
 
-    --sidebar-background:  172  35%  8%;
-    --sidebar-foreground:  172  18%  58%;
-    --sidebar-primary:     172  63%  55%;
-    --sidebar-primary-foreground:  172  45%  6%;
-    --sidebar-accent:      172  30%  14%;
-    --sidebar-accent-foreground:  175  30%  92%;
-    --sidebar-border:      172  25%  16%;
-    --sidebar-ring:        172  63%  55%;
+    --sidebar-background:  350  35%  8%;
+    --sidebar-foreground:  350  18%  58%;
+    --sidebar-primary:     350  100%  65%;
+    --sidebar-primary-foreground:  350  45%  6%;
+    --sidebar-accent:      350  30%  14%;
+    --sidebar-accent-foreground:  350  30%  92%;
+    --sidebar-border:      350  25%  16%;
+    --sidebar-ring:        350  100%  65%;
   }
 }
 
@@ -146,7 +146,7 @@
   .bg-panel  { background-color: hsl(var(--panel)); }
   .bg-panel-elevated { background-color: hsl(var(--panel-elevated)); }
 
-  /* Cyan status badge — solid #27ae9c */
+  /* KMC red status badge — solid #C8102E */
   .badge-cyan {
     display: inline-flex;
     align-items: center;
@@ -155,7 +155,7 @@
     font-size: 12px;
     font-weight: 500;
     line-height: 1.33;
-    background: hsl(172 63% 42%);
+    background: hsl(350 85% 42%);
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -163,9 +163,9 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Cyan text #27ae9c */
+  /* KMC red text #C8102E */
   .text-cyan {
-    color: hsl(172 63% 42%);
+    color: hsl(350 85% 42%);
   }
 
   /* Theme-aware subtle gradient */
