@@ -1,10 +1,11 @@
 import { useState, FormEvent } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { login } from "@/lib/auth";
-import logo from "@/assets/logo.png";
+import logoAsset from "@/assets/kmc-logo.webp.asset.json";
+const logo = logoAsset.url;
 import loginBg from "@/assets/login-bg.jpeg";
 
-const focusRing = "#27ae9c";
+const focusRing = "#0F7A3D";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ const Login = () => {
           <div className="flex items-center gap-3 mb-4">
             <img
               src={logo}
-              alt="Alpha Industry Limited"
+              alt="Kiira Motors Corporation"
               width={40}
               height={40}
               className="size-10 object-contain"
@@ -62,13 +63,13 @@ const Login = () => {
                   textShadow: "0 2px 12px rgba(0,0,0,0.4)",
                 }}
               >
-                Alpha Industry Limited
+                Kiira Motors Corporation
               </span>
               <span
                 className="text-white/60 text-xs font-mono-data uppercase tracking-widest"
                 style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}
               >
-                Industrial Maintenance Systems
+                Sustainable Mobility · Fleet CMMS
               </span>
             </div>
           </div>
@@ -76,9 +77,9 @@ const Login = () => {
             className="text-white/50 text-sm font-mono-data max-w-md leading-relaxed"
             style={{ textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}
           >
-            Computerised Maintenance Management System.
-            Monitor factory machines, alerts, work orders, and
-            preventive maintenance in real time.
+            Fleet Computerised Maintenance Management System.
+            Monitor Kayoola EVS coaches, chargers and plant equipment,
+            alerts, work orders and preventive maintenance in real time.
           </p>
         </div>
       </div>
@@ -104,17 +105,17 @@ const Login = () => {
           <div className="lg:hidden flex items-center justify-center gap-3 mb-10">
             <img
               src={logo}
-              alt="Alpha Industry Limited"
+              alt="Kiira Motors Corporation"
               width={36}
               height={36}
               className="size-9 object-contain"
             />
             <div className="flex flex-col">
               <span className="font-semibold text-lg tracking-tight">
-                Alpha Industry Limited
+                Kiira Motors Corporation
               </span>
               <span className="text-muted-foreground text-xs font-mono-data uppercase tracking-widest">
-                Maintenance Operations
+                Fleet CMMS
               </span>
             </div>
           </div>
@@ -180,7 +181,7 @@ const Login = () => {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = focusRing;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(39,174,156,0.15)`;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(15,122,61,0.15)`;
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#e5e5e5";
@@ -221,7 +222,7 @@ const Login = () => {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = focusRing;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(39,174,156,0.15)`;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(15,122,61,0.15)`;
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#e5e5e5";
@@ -249,18 +250,18 @@ const Login = () => {
                 fontWeight: 500,
                 lineHeight: 1.43,
                 color: "#ffffff",
-                background: "#27ae9c",
+                background: "#0F7A3D",
                 borderRadius: "8px",
                 border: "none",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
                 letterSpacing: "normal",
-                boxShadow: "0 4px 14px rgba(39,174,156,0.25)",
+                boxShadow: "0 4px 14px rgba(15,122,61,0.25)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#219a8a";
+                e.currentTarget.style.background = "#0C6432";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#27ae9c";
+                e.currentTarget.style.background = "#0F7A3D";
               }}
             >
               Sign In
@@ -277,7 +278,7 @@ const Login = () => {
               fontVariantNumeric: "tabular-nums",
             }}
           >
-            © Alpha Industry Limited · CMMS
+            © Kiira Motors Corporation · CMMS
           </p>
         </div>
       </div>

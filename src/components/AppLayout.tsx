@@ -21,7 +21,8 @@ import { Sheet, SheetContent } from "@/components/ui/sheet";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { getUser, logout } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
-import logo from "@/assets/logo.png";
+import logoAsset from "@/assets/kmc-logo.webp.asset.json";
+const logo = logoAsset.url;
 
 const nav = [
   { to: "/", label: "Live Dashboard", icon: LayoutDashboard, end: true },
@@ -71,13 +72,13 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const sidebarContent = (
     <>
       <div className="px-6 py-4 border-b border-border flex items-center gap-3">
-        <img src={logo} alt="Alpha Industry Limited" width={32} height={32} className="size-8 shrink-0 object-contain" loading="lazy" />
+        <img src={logo} alt="Kiira Motors Corporation" width={32} height={32} className="size-8 shrink-0 object-contain" loading="lazy" />
         <div className="flex flex-col min-w-0">
           <span className="font-bold text-sm leading-tight truncate">
-            Alpha Industry Limited
+            Kiira Motors Corporation
           </span>
           <span className="font-mono-data text-[9px] tracking-widest text-muted-foreground uppercase">
-            Limited · CMMS
+            KMC · Fleet CMMS
           </span>
         </div>
       </div>

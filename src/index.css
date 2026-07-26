@@ -2,112 +2,112 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Industrial CMMS — light + dark. All colors HSL.
-   Light = clean white with cyan accents.
-   Dark  = deep cyan control console. */
+/* Kiira Motors Corporation — Fleet CMMS. All colors HSL.
+   Light = clean paper white with KMC green + amber accents.
+   Dark  = deep graphite console with KMC green LEDs. */
 
 @layer base {
   :root {
-    /* === LIGHT — clean white with cyan accents === */
-    --background:  0  0%  98%;
-    --foreground:  220  20%  18%;
+    /* === LIGHT — KMC clean white with green accents === */
+    --background:  150  20%  98%;
+    --foreground:  215  30%  14%;
 
-    --panel:       0  0%  100%;
-    --panel-elevated:  220  15%  96%;
+    --panel:       0    0%   100%;
+    --panel-elevated:  150  15%  96%;
 
-    --card:        0  0%  100%;
-    --card-foreground:  220  20%  18%;
+    --card:        0    0%   100%;
+    --card-foreground:  215  30%  14%;
 
-    --popover:     0  0%  100%;
-    --popover-foreground:  220  20%  18%;
+    --popover:     0    0%   100%;
+    --popover-foreground:  215  30%  14%;
 
-    /* Primary: #27ae9c cyan */
-    --primary:     172  63%  42%;
+    /* Primary: KMC forest green */
+    --primary:     150  70%  28%;
     --primary-foreground:  0  0%  100%;
 
-    /* Secondary: pale gray-blue */
-    --secondary:   220  20%  94%;
-    --secondary-foreground:  220  20%  20%;
+    /* Secondary: pale sage */
+    --secondary:   150  20%  94%;
+    --secondary-foreground:  215  30%  16%;
 
-    --muted:       220  15%  95%;
-    --muted-foreground:  220  12%  45%;
+    --muted:       150  15%  95%;
+    --muted-foreground:  215  12%  42%;
 
-    /* Accent: #27ae9c cyan */
-    --accent:      172  63%  42%;
+    /* Accent: KMC amber/orange */
+    --accent:      22   92%  52%;
     --accent-foreground:  0  0%  100%;
 
     --destructive:  355  75%  48%;
     --destructive-foreground:  0  0%  100%;
 
-    --border:      220  15%  90%;
-    --input:       220  15%  90%;
-    --ring:        172  63%  42%;
+    --border:      150  15%  88%;
+    --input:       150  15%  88%;
+    --ring:        150  70%  28%;
 
     /* Status LEDs */
-    --led-ok:      155  70%  36%;
+    --led-ok:      150  70%  32%;
     --led-warn:    38   95%  50%;
     --led-crit:    0    78%  48%;
-    --led-info:    172  63%  42%;
+    --led-info:    200  70%  42%;
 
     --radius: 0.375rem;
 
     /* Sidebar */
-    --sidebar-background:  0  0%  99%;
-    --sidebar-foreground:  220  15%  32%;
-    --sidebar-primary:     172  63%  42%;
-    --sidebar-primary-foreground:  0  0%  100%;
-    --sidebar-accent:      220  15%  94%;
-    --sidebar-accent-foreground:  220  20%  18%;
-    --sidebar-border:      220  15%  90%;
-    --sidebar-ring:        172  63%  42%;
+    --sidebar-background:  215  35%  12%;
+    --sidebar-foreground:  150  15%  80%;
+    --sidebar-primary:     150  65%  48%;
+    --sidebar-primary-foreground:  215  35%  10%;
+    --sidebar-accent:      215  30%  18%;
+    --sidebar-accent-foreground:  0  0%  100%;
+    --sidebar-border:      215  30%  20%;
+    --sidebar-ring:        150  65%  48%;
   }
 
   .dark {
-    /* === DARK — deep cyan control console === */
-    --background:  172  45%  6%;
-    --foreground:  175  30%  92%;
+    /* === DARK — graphite console with KMC green === */
+    --background:  215  35%  7%;
+    --foreground:  150  15%  92%;
 
-    --panel:       172  35%  10%;
-    --panel-elevated:  172  30%  14%;
+    --panel:       215  30%  11%;
+    --panel-elevated:  215  25%  15%;
 
-    --card:        172  35%  10%;
-    --card-foreground:  175  30%  92%;
+    --card:        215  30%  11%;
+    --card-foreground:  150  15%  92%;
 
-    --popover:     172  30%  14%;
-    --popover-foreground:  175  30%  92%;
+    --popover:     215  25%  15%;
+    --popover-foreground:  150  15%  92%;
 
-    --primary:     172  63%  55%;
-    --primary-foreground:  172  45%  6%;
+    --primary:     150  65%  48%;
+    --primary-foreground:  215  35%  8%;
 
-    --secondary:   172  30%  18%;
-    --secondary-foreground:  175  30%  92%;
+    --secondary:   215  25%  18%;
+    --secondary-foreground:  150  15%  92%;
 
-    --muted:       172  30%  16%;
-    --muted-foreground:  172  18%  58%;
+    --muted:       215  25%  16%;
+    --muted-foreground:  215  12%  60%;
 
-    --accent:      172  63%  58%;
-    --accent-foreground:  172  45%  6%;
+    --accent:      22   92%  58%;
+    --accent-foreground:  215  35%  8%;
 
     --destructive:  355  80%  58%;
-    --destructive-foreground:  175  30%  95%;
+    --destructive-foreground:  150  15%  95%;
 
-    --border:      172  25%  18%;
-    --input:       172  25%  18%;
-    --ring:        172  63%  55%;
+    --border:      215  25%  18%;
+    --input:       215  25%  18%;
+    --ring:        150  65%  48%;
 
-    --led-ok:      156  90%  52%;
+    --led-ok:      150  75%  52%;
     --led-warn:    38   95%  58%;
     --led-crit:    355  80%  58%;
-    --led-info:    172  63%  58%;
+    --led-info:    200  75%  60%;
 
-    --sidebar-background:  172  35%  8%;
-    --sidebar-foreground:  172  18%  58%;
-    --sidebar-primary:     172  63%  55%;
-    --sidebar-primary-foreground:  172  45%  6%;
-    --sidebar-accent:      172  30%  14%;
-    --sidebar-accent-foreground:  175  30%  92%;
-    --sidebar-border:      172  25%  16%;
-    --sidebar-ring:        172  63%  55%;
+    --sidebar-background:  215  40%  6%;
+    --sidebar-foreground:  150  15%  70%;
+    --sidebar-primary:     150  65%  52%;
+    --sidebar-primary-foreground:  215  40%  6%;
+    --sidebar-accent:      215  30%  14%;
+    --sidebar-accent-foreground:  150  15%  92%;
+    --sidebar-border:      215  30%  16%;
+    --sidebar-ring:        150  65%  52%;
   }
 }
 
@@ -146,7 +146,7 @@
   .bg-panel  { background-color: hsl(var(--panel)); }
   .bg-panel-elevated { background-color: hsl(var(--panel-elevated)); }
 
-  /* Cyan status badge — solid #27ae9c */
+  /* KMC green status badge */
   .badge-cyan {
     display: inline-flex;
     align-items: center;
@@ -155,7 +155,7 @@
     font-size: 12px;
     font-weight: 500;
     line-height: 1.33;
-    background: hsl(172 63% 42%);
+    background: hsl(150 70% 28%);
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -163,9 +163,8 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Cyan text #27ae9c */
   .text-cyan {
-    color: hsl(172 63% 42%);
+    color: hsl(150 70% 28%);
   }
 
   /* Theme-aware subtle gradient */
