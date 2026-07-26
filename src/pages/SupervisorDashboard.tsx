@@ -10,6 +10,9 @@ import {
   ArrowRight,
   AlertTriangle,
   Clock,
+  Activity,
+  TrendingUp,
+  Wrench,
 } from "lucide-react";
 import { SupervisorLayout } from "@/components/SupervisorLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -22,13 +25,27 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { jobRequests, JobRequestStatus } from "@/data/jobRequests";
-import { machines, workOrders, getMachine, pmTasks } from "@/data/cmms";
+import { machines, workOrders, getMachine, pmTasks, SECTORS } from "@/data/cmms";
 import { WORKERS, onLeaveUsernames } from "@/data/workers";
+import {
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip as ReTooltip,
+  LineChart,
+  Line,
+} from "recharts";
 
 const PLANTS = ["All", "Jinja North", "Jinja South"] as const;
 const SITE_SECTOR: Record<string, string[]> = {
-  "Jinja North": ["North Wing"],
-  "Jinja South": ["South Wing"],
+  "Jinja North": ["Machine Shop", "Welding Line", "Paint Shop", "Chassis Line 1"],
+  "Jinja South": ["Trim Shop", "Chassis Line 2", "QIT"],
 };
 
 const STATUS_LABEL: Record<JobRequestStatus, string> = {
@@ -53,6 +70,13 @@ const requestFilters: { key: "all" | JobRequestStatus; label: string }[] = [
   { key: "converted", label: "Converted" },
 ];
 
+const statusChart = [
+  { key: "running", label: "Running" },
+  { key: "idle", label: "Idle" },
+  { key: "down", label: "Down" },
+  { key: "maintenance", label: "PM" },
+];
+
 function relativeTime(iso: string) {
   const diff = Date.now() - new Date(iso).getTime();
   const min = Math.floor(diff / 60_000);
@@ -73,8 +97,7 @@ export default function SupervisorDashboard() {
   const [requestFilter, setRequestFilter] = useState<"all" | JobRequestStatus>("all");
 
   const filteredRequests = useMemo(
-    () =>
-      jobRequests.filter((r) => site === "All" || r.plant === site),
+    () => jobRequests.filter((r) => site === "All" || r.plant === site),
     [site],
   );
 
@@ -86,7 +109,7 @@ export default function SupervisorDashboard() {
   const filteredMachines = useMemo(
     () =>
       machines.filter(
-        (m) => site === "All" || SITE_SECTOR[site].some((w) => m.sector.includes(w)),
+        (m) => site === "All" || SITE_SECTOR[site].some((s) => m.sector === s),
       ),
     [site],
   );
@@ -97,7 +120,7 @@ export default function SupervisorDashboard() {
         if (site === "All") return true;
         const m = getMachine(w.machineId ?? "");
         if (!m) return false;
-        return SITE_SECTOR[site].some((wng) => m.sector.includes(wng));
+        return SITE_SECTOR[site].some((s) => m.sector === s);
       }),
     [site],
   );
@@ -117,6 +140,12 @@ export default function SupervisorDashboard() {
     [filteredMachines],
   );
 
+  const availability = useMemo(() => {
+    if (filteredMachines.length === 0) return 0;
+    const up = filteredMachines.filter((m) => m.status === "running" || m.status === "idle").length;
+    return Math.round((up / filteredMachines.length) * 100);
+  }, [filteredMachines]);
+
   const craftsmen = useMemo(() => {
     const total = Object.values(WORKERS).filter(
       (w) => w.role === "technician" || w.role === "supervisor",
@@ -134,27 +163,51 @@ export default function SupervisorDashboard() {
           if (site === "All") return true;
           const m = getMachine(p.machineId);
           if (!m) return false;
-          return SITE_SECTOR[site].some((w) => m.sector.includes(w));
+          return SITE_SECTOR[site].some((s) => m.sector === s);
         })
         .sort((a, b) => new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime())
         .slice(0, 5),
     [site],
   );
 
+  const statusData = useMemo(
+    () =>
+      statusChart.map((s) => ({
+        name: s.label,
+        value: filteredMachines.filter((m) => m.status === s.key).length,
+      })),
+    [filteredMachines],
+  );
+
+  const woBySector = useMemo(
+    () =>
+      SECTORS.map((sector) => ({
+        name: sector,
+        value: filteredWorkOrders.filter((w) => {
+          const m = getMachine(w.machineId);
+          return m?.sector === sector && w.status !== "done";
+        }).length,
+      })).filter((d) => d.value > 0 || site === "All"),
+    [filteredWorkOrders, site],
+  );
+
+  const uptimeTrend = useMemo(
+    () => [
+      { name: "Jan", value: 92 },
+      { name: "Feb", value: 94 },
+      { name: "Mar", value: 91 },
+      { name: "Apr", value: 95 },
+      { name: "May", value: availability },
+    ],
+    [availability],
+  );
+
   return (
     <SupervisorLayout>
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-5">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-              Live Dashboard
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Overview of requests, equipment and crew
-            </p>
-          </div>
-
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Live Dashboard</h1>
           <Select value={site} onValueChange={setSite}>
             <SelectTrigger className="w-[170px] h-9 text-xs self-start sm:self-auto">
               <MapPin className="size-3.5 mr-2 text-primary" />
@@ -172,49 +225,89 @@ export default function SupervisorDashboard() {
 
         {/* Top stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard
-            label="Open Job Requests"
-            value={openJR}
-            icon={Inbox}
-            to="/job-requests"
-            highlight={openJR > 0}
-          />
-          <StatCard
-            label="Open Work Orders"
-            value={openWO}
-            icon={ClipboardList}
-            to="/work-orders"
-            highlight={openWO > 0}
-          />
-          <StatCard
-            label="Craftsmen Available"
-            value={craftsmen.available}
-            icon={Users}
-            to="/craftsmen-management"
-            highlight={false}
-          />
-          <StatCard
-            label="Equipment Down"
-            value={equipmentDown}
-            icon={Cpu}
-            to="/machines"
-            highlight={equipmentDown > 0}
-          />
+          <StatCard label="Open Requests" value={openJR} icon={Inbox} to="/job-requests" />
+          <StatCard label="Open Work Orders" value={openWO} icon={ClipboardList} to="/work-orders" />
+          <PercentCard label="Availability" value={availability} icon={Activity} to="/machines" />
+          <PercentCard label="Equipment Down" value={equipmentDown} icon={Cpu} to="/machines" />
         </div>
 
-        {/* Job requests list */}
+        {/* Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <ChartCard title="Equipment Status" icon={Cpu}>
+            <ResponsiveContainer width="100%" height={180}>
+              <PieChart>
+                <Pie
+                  data={statusData}
+                  dataKey="value"
+                  nameKey="name"
+                  innerRadius={45}
+                  outerRadius={70}
+                  stroke="none"
+                  paddingAngle={2}
+                >
+                  {statusData.map((_, i) => (
+                    <Cell key={`cell-${i}`} fill={[`hsl(var(--foreground))`, "hsl(var(--muted-foreground))", "hsl(var(--border))", "hsl(var(--secondary))"][i % 4]} />
+                  ))}
+                </Pie>
+                <ReTooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="flex flex-wrap justify-center gap-3 mt-2">
+              {statusData.map((d, i) => (
+                <span key={d.name} className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <span
+                    className="size-2 rounded-full"
+                    style={{ background: [`hsl(var(--foreground))`, "hsl(var(--muted-foreground))", "hsl(var(--border))", "hsl(var(--secondary))"][i % 4] }}
+                  />
+                  {d.value} {d.name}
+                </span>
+              ))}
+            </div>
+          </ChartCard>
+
+          <ChartCard title="Open WO by Sector" icon={Wrench}>
+            <ResponsiveContainer width="100%" height={210}>
+              <BarChart data={woBySector} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <ReTooltip />
+                <Bar dataKey="value" fill="hsl(var(--foreground))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartCard>
+
+          <ChartCard title="Uptime Trend" icon={TrendingUp}>
+            <ResponsiveContainer width="100%" height={210}>
+              <LineChart data={uptimeTrend} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <YAxis domain={[80, 100]} tick={{ fontSize: 10 }} axisLine={false} tickLine={false} />
+                <ReTooltip />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="hsl(var(--foreground))"
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: "hsl(var(--foreground))" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </ChartCard>
+        </div>
+
+        {/* Job requests + side widgets */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <Card className="lg:col-span-2 border-border/60">
             <CardHeader className="pb-3">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div className="flex items-center gap-2">
                   <Inbox className="size-5 text-primary" />
-                  <CardTitle className="text-base">Incoming Job Requests</CardTitle>
+                  <CardTitle className="text-base">Job Requests</CardTitle>
                   <Badge className="bg-primary text-primary-foreground text-[10px]">
                     {filteredRequests.length}
                   </Badge>
                 </div>
-
                 <div className="flex flex-wrap items-center gap-2">
                   <Filter className="size-4 text-muted-foreground" />
                   {requestFilters.map((f) => (
@@ -236,19 +329,13 @@ export default function SupervisorDashboard() {
             <CardContent className="pt-0">
               <div className="space-y-2">
                 {visibleRequests.length === 0 && (
-                  <div className="text-center py-8 text-muted-foreground text-sm">
-                    No job requests match the current filter.
-                  </div>
+                  <div className="text-center py-8 text-muted-foreground text-sm">No requests.</div>
                 )}
                 {visibleRequests.map((jr) => (
                   <Link
                     key={jr.id}
                     to={`/job-requests/${jr.id}`}
-                    className={`group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border p-3 transition-colors ${
-                      jr.priority === "urgent"
-                        ? "border-border bg-panel hover:bg-panel-elevated"
-                        : "border-border bg-panel hover:bg-panel-elevated"
-                    }`}
+                    className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border bg-panel hover:bg-panel-elevated p-3 transition-colors"
                   >
                     <div className="flex items-start gap-3 min-w-0">
                       <div
@@ -258,32 +345,24 @@ export default function SupervisorDashboard() {
                       />
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
-                            {jr.id}
-                          </span>
-                          <Badge className={`text-[10px] ${STATUS_BADGE[jr.status]}`}>
-                            {STATUS_LABEL[jr.status]}
-                          </Badge>
+                          <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">{jr.id}</span>
+                          <Badge className={`text-[10px] ${STATUS_BADGE[jr.status]}`}>{STATUS_LABEL[jr.status]}</Badge>
                           {jr.priority === "urgent" && (
                             <Badge variant="destructive" className="text-[10px]">
                               <AlertTriangle className="size-3 mr-1" /> Urgent
                             </Badge>
                           )}
                         </div>
-                        <p className="text-sm font-medium truncate mt-0.5 group-hover:underline">
-                          {jr.description}
-                        </p>
+                        <p className="text-sm font-medium truncate mt-0.5 group-hover:underline">{jr.description}</p>
                         <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground mt-1">
-                          <span className="flex items-center gap-1">
-                            <Clock className="size-3" /> {relativeTime(jr.requestedAt)}
-                          </span>
-                          <span>by {jr.requester}</span>
+                          <span className="flex items-center gap-1"><Clock className="size-3" /> {relativeTime(jr.requestedAt)}</span>
+                          <span>{jr.requester}</span>
                           <span className="font-mono-data">{jr.equipmentId}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 text-xs text-muted-foreground shrink-0">
-                      <span className="hidden sm:inline">Open request</span>
+                      <span className="hidden sm:inline">Open</span>
                       <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                     </div>
                   </Link>
@@ -292,13 +371,12 @@ export default function SupervisorDashboard() {
             </CardContent>
           </Card>
 
-          {/* Side widgets */}
           <div className="flex flex-col gap-4">
             <Card className="border-border/60">
               <CardHeader className="pb-3">
                 <div className="flex items-center gap-2">
                   <Cpu className="size-5 text-primary" />
-                  <CardTitle className="text-base">Equipment Status</CardTitle>
+                  <CardTitle className="text-base">Equipment</CardTitle>
                 </div>
               </CardHeader>
               <CardContent className="pt-0">
@@ -314,7 +392,7 @@ export default function SupervisorDashboard() {
                     </Link>
                   ))}
                   {filteredMachines.length > 6 && (
-                    <ButtonLink to="/machines" label={`View all ${filteredMachines.length} machines`} />
+                    <ButtonLink to="/machines" label={`View all ${filteredMachines.length}`} />
                   )}
                 </div>
               </CardContent>
@@ -329,14 +407,9 @@ export default function SupervisorDashboard() {
               </CardHeader>
               <CardContent className="pt-0">
                 <div className="space-y-1.5">
-                  {upcomingPM.length === 0 && (
-                    <p className="text-sm text-muted-foreground">No upcoming PM.</p>
-                  )}
+                  {upcomingPM.length === 0 && <p className="text-sm text-muted-foreground">No upcoming PM.</p>}
                   {upcomingPM.map((p) => (
-                    <div
-                      key={p.id}
-                      className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm"
-                    >
+                    <div key={p.id} className="flex items-center justify-between rounded-md border border-border px-3 py-2 text-sm">
                       <span className="truncate flex-1 text-xs">{p.task}</span>
                       <span className="text-[10px] font-mono-data text-muted-foreground">{shortDate(p.nextDue)}</span>
                     </div>
@@ -356,29 +429,19 @@ function StatCard({
   value,
   icon: Icon,
   to,
-  highlight,
 }: {
   label: string;
   value: number;
   icon: React.ComponentType<{ className?: string }>;
   to: string;
-  highlight: boolean;
 }) {
   return (
     <Link to={to}>
       <Card className="border-border/60 hover:border-primary transition-colors h-full">
         <CardContent className="p-5 flex items-center justify-between">
           <div>
-            <div
-              className={`text-3xl font-bold tracking-tight ${
-                highlight ? "text-foreground" : "text-foreground"
-              }`}
-            >
-              {String(value).padStart(2, "0")}
-            </div>
-            <div className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground mt-1">
-              {label}
-            </div>
+            <div className="text-3xl font-bold tracking-tight">{String(value).padStart(2, "0")}</div>
+            <div className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground mt-1">{label}</div>
           </div>
           <div className="size-10 rounded-lg bg-secondary flex items-center justify-center text-foreground/70">
             <Icon className="size-5" />
@@ -386,6 +449,53 @@ function StatCard({
         </CardContent>
       </Card>
     </Link>
+  );
+}
+
+function PercentCard({
+  label,
+  value,
+  icon: Icon,
+  to,
+}: {
+  label: string;
+  value: number;
+  icon: React.ComponentType<{ className?: string }>;
+  to: string;
+}) {
+  return (
+    <Link to={to}>
+      <Card className="border-border/60 hover:border-primary transition-colors h-full">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="flex-1">
+            <div className="flex items-baseline gap-2">
+              <div className="text-3xl font-bold tracking-tight">{value}%</div>
+              <div className="flex-1 h-1.5 bg-secondary rounded-full overflow-hidden">
+                <div className="h-full bg-foreground rounded-full" style={{ width: `${Math.min(100, value)}%` }} />
+              </div>
+            </div>
+            <div className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground mt-1">{label}</div>
+          </div>
+          <div className="size-10 rounded-lg bg-secondary flex items-center justify-center text-foreground/70 ml-3">
+            <Icon className="size-5" />
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
+
+function ChartCard({ title, icon: Icon, children }: { title: string; icon: React.ComponentType<{ className?: string }>; children: React.ReactNode }) {
+  return (
+    <Card className="border-border/60">
+      <CardHeader className="pb-2">
+        <div className="flex items-center gap-2">
+          <Icon className="size-4 text-primary" />
+          <CardTitle className="text-sm">{title}</CardTitle>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0">{children}</CardContent>
+    </Card>
   );
 }
 

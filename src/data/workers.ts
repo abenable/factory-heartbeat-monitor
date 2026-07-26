@@ -1,3 +1,12 @@
+export interface WorkerPerformance {
+  completed: number;
+  avgDays: number;
+  availability: number;
+  quality: number;
+  safety: number;
+  monthly: number[];
+}
+
 export interface WorkerProfile {
   username: string;
   name: string;
@@ -13,6 +22,8 @@ export interface WorkerProfile {
   certifications: string[];
   /** Workforce role used to route the user to the right interface. */
   role?: "supervisor" | "technician" | "viewer";
+  /** Supervisor-only performance metrics. */
+  performance?: WorkerPerformance;
 }
 
 // All workers share the same demo password: "Angel"
@@ -31,6 +42,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     email: "suubi@kiiramotors.com",
     certifications: ["ISO 55001 Asset Mgmt", "Vibration Analysis Cat II"],
     role: "supervisor",
+    performance: { completed: 12, avgDays: 2.1, availability: 96, quality: 94, safety: 100, monthly: [10, 12, 11, 14, 12, 12] },
   },
   Mukisa: {
     username: "Mukisa",
@@ -45,6 +57,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 002",
     email: "mukisa@kiiramotors.com",
     certifications: ["LV/HV Switching", "PLC Siemens S7"],
+    performance: { completed: 14, avgDays: 1.8, availability: 92, quality: 96, safety: 98, monthly: [12, 13, 14, 15, 14, 14] },
   },
   Ahaisibwe: {
     username: "Ahaisibwe",
@@ -60,6 +73,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     email: "ahaisibwe@kiiramotors.com",
     certifications: ["CMRP", "Root Cause Analysis Lvl 3"],
     role: "supervisor",
+    performance: { completed: 9, avgDays: 2.8, availability: 95, quality: 97, safety: 100, monthly: [7, 8, 9, 8, 10, 9] },
   },
   Odeke: {
     username: "Odeke",
@@ -74,6 +88,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 004",
     email: "odeke@kiiramotors.com",
     certifications: ["Confined Space Entry", "Rigging & Slinging"],
+    performance: { completed: 16, avgDays: 2.5, availability: 94, quality: 92, safety: 96, monthly: [13, 14, 15, 16, 16, 16] },
   },
   Oumo: {
     username: "Oumo",
@@ -88,6 +103,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 005",
     email: "oumo@kiiramotors.com",
     certifications: ["HART Field Comm", "Loop Tuning"],
+    performance: { completed: 11, avgDays: 2.0, availability: 90, quality: 95, safety: 100, monthly: [10, 11, 10, 12, 11, 11] },
   },
   Ahereza: {
     username: "Ahereza",
@@ -103,6 +119,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     email: "ahereza@kiiramotors.com",
     certifications: ["SAP PM Power User", "Lean Six Sigma Green Belt"],
     role: "supervisor",
+    performance: { completed: 8, avgDays: 3.2, availability: 98, quality: 93, safety: 100, monthly: [6, 8, 7, 8, 9, 8] },
   },
   Owembabazi: {
     username: "Owembabazi",
@@ -118,6 +135,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     email: "owembabazi@kiiramotors.com",
     certifications: ["NEBOSH IGC", "First Aid Lvl 3"],
     role: "supervisor",
+    performance: { completed: 6, avgDays: 3.5, availability: 97, quality: 95, safety: 100, monthly: [5, 6, 6, 7, 6, 6] },
   },
   Nakimbugwe: {
     username: "Nakimbugwe",
@@ -133,6 +151,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     email: "nakimbugwe@kiiramotors.com",
     certifications: ["CMMS Admin", "ISO 45001 Lead Auditor"],
     role: "supervisor",
+    performance: { completed: 10, avgDays: 2.3, availability: 95, quality: 94, safety: 98, monthly: [8, 9, 10, 10, 11, 10] },
   },
   Tabalaata: {
     username: "Tabalaata",
@@ -147,6 +166,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 009",
     email: "tabalaata@kiiramotors.com",
     certifications: ["AWS D1.1 SMAW", "Hot Work Permit Issuer"],
+    performance: { completed: 13, avgDays: 2.6, availability: 93, quality: 91, safety: 94, monthly: [11, 12, 13, 13, 13, 13] },
   },
   Wagoli: {
     username: "Wagoli",
@@ -161,6 +181,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 010",
     email: "wagoli@kiiramotors.com",
     certifications: ["MLT-I", "Oil Analysis Interpretation"],
+    performance: { completed: 15, avgDays: 1.9, availability: 95, quality: 95, safety: 100, monthly: [12, 13, 14, 15, 15, 15] },
   },
   Mutebi: {
     username: "Mutebi",
@@ -175,6 +196,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 011",
     email: "mutebi@kiiramotors.com",
     certifications: ["Basic Electrical Safety"],
+    performance: { completed: 7, avgDays: 4.1, availability: 88, quality: 89, safety: 96, monthly: [4, 5, 6, 7, 7, 7] },
   },
   Tumusiime: {
     username: "Tumusiime",
@@ -204,6 +226,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 013",
     email: "atuhebwa@kiiramotors.com",
     certifications: ["Workshop Safety Induction"],
+    performance: { completed: 5, avgDays: 4.5, availability: 90, quality: 88, safety: 95, monthly: [3, 4, 4, 5, 5, 5] },
   },
   Sserwada: {
     username: "Sserwada",
@@ -218,6 +241,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 014",
     email: "sserwada@kiiramotors.com",
     certifications: ["Workshop Safety Induction"],
+    performance: { completed: 4, avgDays: 5.0, availability: 89, quality: 87, safety: 94, monthly: [2, 3, 3, 4, 4, 4] },
   },
 };
 
