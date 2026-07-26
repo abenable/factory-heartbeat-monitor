@@ -77,9 +77,9 @@ const Login = () => {
             className="text-white/50 text-sm font-mono-data max-w-md leading-relaxed"
             style={{ textShadow: "0 1px 4px rgba(0,0,0,0.3)" }}
           >
-            Computerised Maintenance Management System.
-            Monitor factory machines, alerts, work orders, and
-            preventive maintenance in real time.
+            Fleet Computerised Maintenance Management System.
+            Monitor Kayoola EVS coaches, chargers and plant equipment,
+            alerts, work orders and preventive maintenance in real time.
           </p>
         </div>
       </div>
