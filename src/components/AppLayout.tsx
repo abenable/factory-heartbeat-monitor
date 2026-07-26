@@ -78,7 +78,7 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
             Kiira Motors Corporation
           </span>
           <span className="font-mono-data text-[9px] tracking-widest text-muted-foreground uppercase">
-            Limited · CMMS
+            KMC · Fleet CMMS
           </span>
         </div>
       </div>

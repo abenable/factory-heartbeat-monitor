@@ -5,7 +5,7 @@ import logoAsset from "@/assets/kmc-logo.webp.asset.json";
 const logo = logoAsset.url;
 import loginBg from "@/assets/login-bg.jpeg";
 
-const focusRing = "#27ae9c";
+const focusRing = "#0F7A3D";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -69,7 +69,7 @@ const Login = () => {
                 className="text-white/60 text-xs font-mono-data uppercase tracking-widest"
                 style={{ textShadow: "0 1px 6px rgba(0,0,0,0.3)" }}
               >
-                Industrial Maintenance Systems
+                Sustainable Mobility · Fleet CMMS
               </span>
             </div>
           </div>
@@ -115,7 +115,7 @@ const Login = () => {
                 Kiira Motors Corporation
               </span>
               <span className="text-muted-foreground text-xs font-mono-data uppercase tracking-widest">
-                Maintenance Operations
+                Fleet CMMS
               </span>
             </div>
           </div>
@@ -181,7 +181,7 @@ const Login = () => {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = focusRing;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(39,174,156,0.15)`;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(15,122,61,0.15)`;
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#e5e5e5";
@@ -222,7 +222,7 @@ const Login = () => {
                 }}
                 onFocus={(e) => {
                   e.currentTarget.style.borderColor = focusRing;
-                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(39,174,156,0.15)`;
+                  e.currentTarget.style.boxShadow = `0 0 0 3px rgba(15,122,61,0.15)`;
                 }}
                 onBlur={(e) => {
                   e.currentTarget.style.borderColor = "#e5e5e5";
@@ -250,18 +250,18 @@ const Login = () => {
                 fontWeight: 500,
                 lineHeight: 1.43,
                 color: "#ffffff",
-                background: "#27ae9c",
+                background: "#0F7A3D",
                 borderRadius: "8px",
                 border: "none",
                 fontFamily: "'Geist', Arial, system-ui, sans-serif",
                 letterSpacing: "normal",
-                boxShadow: "0 4px 14px rgba(39,174,156,0.25)",
+                boxShadow: "0 4px 14px rgba(15,122,61,0.25)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "#219a8a";
+                e.currentTarget.style.background = "#0C6432";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "#27ae9c";
+                e.currentTarget.style.background = "#0F7A3D";
               }}
             >
               Sign In
