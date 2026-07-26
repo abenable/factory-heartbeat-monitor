@@ -13,6 +13,7 @@ export interface PurchaseOrder {
   deliveryDeadline: string;
   receivedQty?: number;
   costUSD: number;
+  plant?: string;
 }
 
 export interface MaterialDraw {
@@ -47,13 +48,22 @@ export interface InventoryItem {
   status: "ok" | "low" | "critical";
 }
 
+export interface MaterialAlert {
+  id: string;
+  type: "delivery" | "stock" | "return";
+  message: string;
+  severity: "urgent" | "normal";
+  timestamp: string;
+  plant?: string;
+}
+
 export const purchaseOrders: PurchaseOrder[] = [
-  { id: "PO-2026-041", supplier: "Hydraulics UG Ltd", item: "Hydraulic seal kit (STAMP-PR-01)", qty: 4, unit: "set", status: "open", orderDate: "2026-04-28", deliveryDeadline: "2026-05-18", costUSD: 320 },
-  { id: "PO-2026-042", supplier: "Bearing World", item: "Spindle bearing 7208", qty: 10, unit: "pc", status: "open", orderDate: "2026-05-01", deliveryDeadline: "2026-05-14", costUSD: 450 },
-  { id: "PO-2026-043", supplier: "Siemens Parts", item: "Conveyor drive belt B-section", qty: 20, unit: "m", status: "closed", orderDate: "2026-04-12", deliveryDeadline: "2026-04-28", receivedQty: 20, costUSD: 180 },
-  { id: "PO-2026-044", supplier: "Coolant Solutions", item: "Coolant concentrate (20L)", qty: 6, unit: "drum", status: "overdue", orderDate: "2026-04-15", deliveryDeadline: "2026-04-28", costUSD: 540 },
-  { id: "PO-2026-045", supplier: "LubeTech Supplies", item: "High-temp bearing grease", qty: 12, unit: "cartridge", status: "open", orderDate: "2026-05-02", deliveryDeadline: "2026-05-18", costUSD: 96 },
-  { id: "PO-2026-046", supplier: "FilterMax", item: "Hydraulic filter HF-220", qty: 8, unit: "pc", status: "open", orderDate: "2026-05-02", deliveryDeadline: "2026-05-18", costUSD: 120 },
+  { id: "PO-2026-041", supplier: "Hydraulics UG Ltd", item: "Hydraulic seal kit (STAMP-PR-01)", qty: 4, unit: "set", status: "open", orderDate: "2026-04-28", deliveryDeadline: "2026-05-18", costUSD: 320, plant: "Jinja North" },
+  { id: "PO-2026-042", supplier: "Bearing World", item: "Spindle bearing 7208", qty: 10, unit: "pc", status: "open", orderDate: "2026-05-01", deliveryDeadline: "2026-05-14", costUSD: 450, plant: "Jinja North" },
+  { id: "PO-2026-043", supplier: "Siemens Parts", item: "Conveyor drive belt B-section", qty: 20, unit: "m", status: "closed", orderDate: "2026-04-12", deliveryDeadline: "2026-04-28", receivedQty: 20, costUSD: 180, plant: "Jinja South" },
+  { id: "PO-2026-044", supplier: "Coolant Solutions", item: "Coolant concentrate (20L)", qty: 6, unit: "drum", status: "overdue", orderDate: "2026-04-15", deliveryDeadline: "2026-04-28", costUSD: 540, plant: "Jinja South" },
+  { id: "PO-2026-045", supplier: "LubeTech Supplies", item: "High-temp bearing grease", qty: 12, unit: "cartridge", status: "open", orderDate: "2026-05-02", deliveryDeadline: "2026-05-18", costUSD: 96, plant: "Jinja North" },
+  { id: "PO-2026-046", supplier: "FilterMax", item: "Hydraulic filter HF-220", qty: 8, unit: "pc", status: "open", orderDate: "2026-05-02", deliveryDeadline: "2026-05-18", costUSD: 120, plant: "Jinja North" },
 ];
 
 export const materialDraws: MaterialDraw[] = [
@@ -75,6 +85,12 @@ export const inventory: InventoryItem[] = [
   { id: "INV-004", name: "Coolant concentrate (20L)", partNumber: "SP-CNC-015", qtyOnHand: 3, unit: "drum", minStock: 4, location: "Store A-04", status: "low" },
   { id: "INV-005", name: "Hydraulic filter HF-220", partNumber: "SP-INJ-002", qtyOnHand: 5, unit: "pc", minStock: 3, location: "Store B-07", status: "ok" },
   { id: "INV-006", name: "High-temp bearing grease", partNumber: "SP-LUB-001", qtyOnHand: 3, unit: "cartridge", minStock: 6, location: "Store A-09", status: "low" },
+];
+
+export const materialAlerts: MaterialAlert[] = [
+  { id: "MA-01", type: "delivery", message: "PO-2026-044 coolant shipment is 4 days overdue.", severity: "urgent", timestamp: new Date(Date.now() - 4 * 24 * 60 * 60 * 1000).toISOString(), plant: "Jinja South" },
+  { id: "MA-02", type: "stock", message: "Hydraulic filter HF-220 stock below min (2 pcs left).", severity: "normal", timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() },
+  { id: "MA-03", type: "return", message: "Return issued (4) spindle bearings back to stores.", severity: "normal", timestamp: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString() },
 ];
 
 export function getInventoryStatus(item: InventoryItem): InventoryItem["status"] {

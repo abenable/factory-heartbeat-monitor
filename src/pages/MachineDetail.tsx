@@ -14,7 +14,7 @@ import {
   getBacklog,
 } from "@/data/cmms";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
-import { SeverityBadge, formatTs } from "./Index";
+import { SeverityBadge, formatTs } from "@/components/SeverityBadge";
 import { getWorker } from "@/data/workers";
 import { isViewer } from "@/lib/auth";
 import { Wrench, HardHat, Package, ClipboardList, Users, MapPin, Gauge, Battery, History, AlertOctagon } from "lucide-react";

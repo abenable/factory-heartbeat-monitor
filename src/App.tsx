@@ -8,6 +8,7 @@ import { RequireAuth, RequireSupervisor, RequireTechnician } from "@/components/
 import { isSupervisor, isTechnician } from "@/lib/auth";
 import Welcome from "./pages/Welcome.tsx";
 import Index from "./pages/Index.tsx";
+import SupervisorDashboard from "./pages/SupervisorDashboard.tsx";
 import NotFound from "./pages/NotFound.tsx";
 import Machines from "./pages/Machines.tsx";
 import MachineDetail from "./pages/MachineDetail.tsx";
@@ -29,8 +30,8 @@ const queryClient = new QueryClient();
 
 function RoleHome() {
   if (isTechnician()) return <Navigate to="/technician" replace />;
-  if (isSupervisor()) return <Index />;
-  return <Index />; // viewers / fallback still land on the dashboard (read-only)
+  if (isSupervisor()) return <SupervisorDashboard />;
+  return <Index />; // viewers / fallback still land on the legacy dashboard (read-only)
 }
 
 const App = () => (

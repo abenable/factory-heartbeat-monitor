@@ -4,7 +4,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
 import { alerts as initialAlerts, AlertSeverity } from "@/data/cmms";
-import { SeverityBadge, formatTs } from "./Index";
+import { SeverityBadge, formatTs } from "@/components/SeverityBadge";
 import { toast } from "sonner";
 
 const filters: { key: AlertSeverity | "all" | "open"; label: string }[] = [

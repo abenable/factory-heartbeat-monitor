@@ -227,3 +227,6 @@ export function getWorker(username: string | null): WorkerProfile | null {
 }
 
 export const ALLOWED_USERNAMES = Object.keys(WORKERS);
+
+/** Technicians currently on leave (demo data). Used by supervisor dashboards. */
+export const onLeaveUsernames = ["Oumo", "Mutebi"];
