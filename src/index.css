@@ -146,7 +146,7 @@
   .bg-panel  { background-color: hsl(var(--panel)); }
   .bg-panel-elevated { background-color: hsl(var(--panel-elevated)); }
 
-  /* Cyan status badge — solid #27ae9c */
+  /* KMC green status badge */
   .badge-cyan {
     display: inline-flex;
     align-items: center;
@@ -155,7 +155,7 @@
     font-size: 12px;
     font-weight: 500;
     line-height: 1.33;
-    background: hsl(172 63% 42%);
+    background: hsl(150 70% 28%);
     color: #fff;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -163,9 +163,8 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Cyan text #27ae9c */
   .text-cyan {
-    color: hsl(172 63% 42%);
+    color: hsl(150 70% 28%);
   }
 
   /* Theme-aware subtle gradient */
