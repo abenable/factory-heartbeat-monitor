@@ -14,6 +14,10 @@ import {
 import { crafts, getCostFor, SKILL_LABELS, LEVEL_LABELS } from "@/data/crafts";
 import { getWorker } from "@/data/workers";
 import {
+  DOWNTIME_COST_PER_HOUR,
+  getDowntimeCostAnalysis,
+} from "@/data/performance";
+import {
   ResponsiveContainer,
   BarChart,
   Bar,
@@ -30,6 +34,13 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+
+const chartTooltipStyle = {
+  backgroundColor: "hsl(var(--popover))",
+  border: "1px solid hsl(var(--border))",
+  borderRadius: 8,
+  fontSize: 12,
+};
 
 export default function PerformanceReports() {
   const backlog = getBacklog();
@@ -76,6 +87,9 @@ export default function PerformanceReports() {
   const mttrHours = 1.23; // mock
   const mtbfHours = 412; // mock
   const totalDowntime = machines.reduce((s, m) => s + (100 - m.uptime) * 7.2, 0);
+
+  // Downtime cost analysis
+  const downtime = getDowntimeCostAnalysis();
   const byMachine = [...machines]
     .map((m) => ({ id: m.id, name: m.name, downtime: (100 - m.uptime) * 7.2 }))
     .sort((a, b) => b.downtime - a.downtime)
@@ -115,6 +129,110 @@ export default function PerformanceReports() {
           <Kpi label="MTBF" value={`${mtbfHours}h`} />
           <Kpi label="Total Downtime" value={`${totalDowntime.toFixed(1)}h`} />
           <Kpi label="Fleet Uptime" value={`${avgUptime.toFixed(2)}%`} />
+        </div>
+
+        {/* Downtime Cost Analysis */}
+        <div className="flex flex-col gap-6">
+          <SectionHeading>Downtime Cost Analysis</SectionHeading>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Kpi
+              label="Total Downtime Cost"
+              value={`$${Math.round(downtime.totalCost).toLocaleString()}`}
+              tone="crit"
+            />
+            <Kpi
+              label="Lost Production Hours"
+              value={`${downtime.totalDowntimeHours.toFixed(1)}h`}
+            />
+            <Kpi
+              label="Costliest Machine"
+              value={downtime.topMachine.id}
+              unit={`$${Math.round(downtime.topMachine.cost).toLocaleString()}`}
+              tone="crit"
+            />
+            <Kpi
+              label="Avg Cost / Machine"
+              value={`$${Math.round(downtime.avgCost).toLocaleString()}`}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <Panel className="p-5">
+              <h3 className="font-mono-data text-xs text-primary uppercase tracking-widest mb-1">
+                Downtime Cost by Machine
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                Estimated lost production value per machine over the last 30 days, sorted by highest cost impact.
+              </p>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart
+                  data={downtime.byCost.map((m) => ({
+                    name: m.id,
+                    cost: Math.round(m.cost),
+                  }))}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis
+                    dataKey="name"
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={10}
+                    interval={0}
+                    angle={-20}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={10}
+                    tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                  />
+                  <RTooltip
+                    formatter={(value) => [`$${Number(value).toLocaleString()}`, "Cost"]}
+                    contentStyle={chartTooltipStyle}
+                  />
+                  <Bar dataKey="cost" fill="hsl(var(--led-crit))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </Panel>
+
+            <Panel className="p-5">
+              <h3 className="font-mono-data text-xs text-primary uppercase tracking-widest mb-1">
+                Downtime Cost by Sector
+              </h3>
+              <p className="text-xs text-muted-foreground mb-4">
+                Lost production value grouped by production sector, based on a rate of ${DOWNTIME_COST_PER_HOUR}/hour.
+              </p>
+              <ResponsiveContainer width="100%" height={240}>
+                <BarChart
+                  data={downtime.bySector.map((s) => ({
+                    name: s.name,
+                    cost: Math.round(s.cost),
+                  }))}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <XAxis
+                    dataKey="name"
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={10}
+                    interval={0}
+                    angle={-20}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={10}
+                    tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                  />
+                  <RTooltip
+                    formatter={(value) => [`$${Number(value).toLocaleString()}`, "Cost"]}
+                    contentStyle={chartTooltipStyle}
+                  />
+                  <Bar dataKey="cost" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </Panel>
+          </div>
         </div>
 
         {/* Charts row */}
@@ -395,6 +513,9 @@ export default function PerformanceReports() {
               <tr><th style={{ textAlign: "left" }}>MTTR</th><td>{mttrHours.toFixed(2)}h</td></tr>
               <tr><th style={{ textAlign: "left" }}>MTBF</th><td>{mtbfHours}h</td></tr>
               <tr><th style={{ textAlign: "left" }}>Total Downtime</th><td>{totalDowntime.toFixed(1)}h</td></tr>
+              <tr><th style={{ textAlign: "left" }}>Total Downtime Cost</th><td>${Math.round(downtime.totalCost).toLocaleString()}</td></tr>
+              <tr><th style={{ textAlign: "left" }}>Costliest Machine</th><td>{downtime.topMachine.id} (${Math.round(downtime.topMachine.cost).toLocaleString()})</td></tr>
+              <tr><th style={{ textAlign: "left" }}>Downtime Cost Rate</th><td>${DOWNTIME_COST_PER_HOUR}/h</td></tr>
               <tr><th style={{ textAlign: "left" }}>Avg Fleet Uptime</th><td>{avgUptime.toFixed(2)}%</td></tr>
               <tr><th style={{ textAlign: "left" }}>Running Machines</th><td>{runningCount}</td></tr>
               <tr><th style={{ textAlign: "left" }}>Down Machines</th><td>{downCount}</td></tr>
@@ -424,7 +545,7 @@ export default function PerformanceReports() {
   );
 }
 
-function Kpi({ label, value, tone }: { label: string; value: string | number; tone?: "ok" | "warn" | "crit" }) {
+function Kpi({ label, value, tone, unit }: { label: string; value: string | number; tone?: "ok" | "warn" | "crit"; unit?: string }) {
   const colorClass =
     tone === "crit"
       ? "text-led-crit"
@@ -438,7 +559,10 @@ function Kpi({ label, value, tone }: { label: string; value: string | number; to
       <span className="font-mono-data text-[10px] text-primary uppercase tracking-widest">
         {label}
       </span>
-      <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>{value}</span>
+      <div className="flex items-baseline gap-2">
+        <span className={`font-mono-data text-3xl font-bold ${colorClass}`}>{value}</span>
+        {unit && <span className="font-mono-data text-sm text-muted-foreground">{unit}</span>}
+      </div>
     </Panel>
   );
 }
@@ -535,13 +659,6 @@ function PerformanceGraphs({
     { name: "Info", value: sev.info, color: "hsl(var(--muted-foreground))" },
   ].filter((d) => d.value > 0);
 
-  const tooltipStyle = {
-    backgroundColor: "hsl(var(--popover))",
-    border: "1px solid hsl(var(--border))",
-    borderRadius: 8,
-    fontSize: 12,
-  };
-
   return (
     <div className="flex flex-col gap-6">
       <SectionHeading>Performance Graphs</SectionHeading>
@@ -560,7 +677,7 @@ function PerformanceGraphs({
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="name" stroke="hsl(var(--muted-foreground))" fontSize={10} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} unit="%" />
-              <RTooltip contentStyle={tooltipStyle} />
+              <RTooltip contentStyle={chartTooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Bar dataKey="uptime" stackId="a" fill="hsl(var(--led-ok))" name="Uptime %" />
               <Bar dataKey="downtime" stackId="a" fill="hsl(var(--led-crit))" name="Downtime %" />
@@ -583,7 +700,7 @@ function PerformanceGraphs({
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
-              <RTooltip contentStyle={tooltipStyle} />
+              <RTooltip contentStyle={chartTooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
             </PieChart>
           </ResponsiveContainer>
@@ -602,7 +719,7 @@ function PerformanceGraphs({
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="week" stroke="hsl(var(--muted-foreground))" fontSize={10} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} />
-              <RTooltip contentStyle={tooltipStyle} />
+              <RTooltip contentStyle={chartTooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
               <Line type="monotone" dataKey="created" stroke="hsl(var(--primary))" strokeWidth={2} />
               <Line type="monotone" dataKey="completed" stroke="hsl(var(--led-ok))" strokeWidth={2} />
@@ -625,7 +742,7 @@ function PerformanceGraphs({
                   <Cell key={i} fill={entry.color} />
                 ))}
               </Pie>
-              <RTooltip contentStyle={tooltipStyle} />
+              <RTooltip contentStyle={chartTooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 11 }} />
             </PieChart>
           </ResponsiveContainer>
@@ -654,7 +771,7 @@ function PerformanceGraphs({
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
               <XAxis dataKey="day" stroke="hsl(var(--muted-foreground))" fontSize={10} />
               <YAxis stroke="hsl(var(--muted-foreground))" fontSize={10} domain={[80, 100]} unit="%" />
-              <RTooltip contentStyle={tooltipStyle} />
+              <RTooltip contentStyle={chartTooltipStyle} />
               <Area type="monotone" dataKey="uptime" stroke="hsl(var(--accent))" fill="hsl(var(--accent) / 0.3)" />
             </AreaChart>
           </ResponsiveContainer>

@@ -7,19 +7,16 @@ import {
   machines,
   statusColor,
   statusLabel,
-  workOrders,
-  getBacklog,
   MachineStatus,
 } from "@/data/cmms";
 import { jobRequests } from "@/data/jobRequests";
+import {
+  DOWNTIME_COST_PER_HOUR,
+  getDowntimeCostAnalysis,
+} from "@/data/performance";
 
 const Dashboard = () => {
-  const running = machines.filter((m) => m.status === "running").length;
-  const fleetUptime =
-    machines.reduce((s, m) => s + m.uptime, 0) / machines.length;
-  const openWO = workOrders.filter((w) => w.status !== "done").length;
-  const backlog = getBacklog().length;
-  const openJR = jobRequests.filter((r) => r.status !== "converted").length;
+  const downtime = getDowntimeCostAnalysis();
   const recentRequests = jobRequests.slice(0, 5);
 
   return (
@@ -28,23 +25,38 @@ const Dashboard = () => {
       breadcrumb="ALL SECTORS"
     >
       <div className="flex flex-col gap-8">
-        {/* KPI row */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-          <Kpi label="Fleet Uptime (30d)" value={`${fleetUptime.toFixed(2)}`} unit="%" />
-          <Kpi label="Active Machines" value={`${running}`} unit={`/ ${machines.length}`} />
-          <Kpi label="Open Work Orders" value={`${openWO}`} unit="OPEN" />
-          <Kpi
-            label="Backlog"
-            value={String(backlog).padStart(2, "0")}
-            unit={backlog > 0 ? "OVERDUE/AGING" : "CLEAR"}
-            tone={backlog > 0 ? "warn" : "ok"}
-          />
-          <Kpi
-            label="Open Job Requests"
-            value={String(openJR).padStart(2, "0")}
-            unit={openJR > 0 ? "PENDING" : "ALL CLEAR"}
-            tone={openJR > 0 ? "warn" : "ok"}
-          />
+        {/* Downtime cost analysis summary */}
+        <div>
+          <SectionHeading>Downtime Cost Analysis</SectionHeading>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <Kpi
+              label="Total Downtime Cost"
+              value={`$${Math.round(downtime.totalCost).toLocaleString()}`}
+              unit="30D"
+              tone="crit"
+            />
+            <Kpi
+              label="Lost Production Hours"
+              value={`${downtime.totalDowntimeHours.toFixed(1)}`}
+              unit="HOURS"
+            />
+            <Kpi
+              label="Costliest Asset"
+              value={downtime.topMachine.id}
+              unit={`$${Math.round(downtime.topMachine.cost).toLocaleString()}`}
+              tone="crit"
+            />
+            <Kpi
+              label="Avg Cost / Machine"
+              value={`$${Math.round(downtime.avgCost).toLocaleString()}`}
+              unit="AVG"
+            />
+            <Kpi
+              label="Cost Rate"
+              value={`$${DOWNTIME_COST_PER_HOUR}`}
+              unit="/ HOUR"
+            />
+          </div>
         </div>
 
         {/* Fleet status strip */}
