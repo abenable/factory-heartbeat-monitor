@@ -10,6 +10,8 @@ export interface JobRequest {
   status: JobRequestStatus;
   priority: "normal" | "urgent";
   plant: string;
+  /** Optional photos attached by the line worker. */
+  images?: string[];
 }
 
 export const jobRequests: JobRequest[] = [

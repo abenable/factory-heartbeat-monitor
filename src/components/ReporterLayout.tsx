@@ -1,21 +1,21 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { BarChart3, ClipboardList, LogOut } from "lucide-react";
+import { ClipboardList, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getUser, logout } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
 import logoRed from "@/assets/kmc-logo-red.svg";
 
-interface TechnicianLayoutProps {
+interface ReporterLayoutProps {
   children: ReactNode;
   pageTitle: string;
 }
 
-export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps) {
+export function ReporterLayout({ children, pageTitle }: ReporterLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const username = getUser() ?? "Technician";
+  const username = getUser() ?? "Operator";
   const worker = getWorker(username);
 
   const onLogout = () => {
@@ -23,16 +23,13 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
     navigate("/welcome", { replace: true });
   };
 
-  const nav = [
-    { to: "/technician", label: "My Work", icon: ClipboardList },
-    { to: "/technician/performance", label: "Performance", icon: BarChart3 },
-  ];
+  const nav = [{ to: "/report", label: "Raise Request", icon: ClipboardList }];
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground flex flex-col">
       <header className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-          <Link to="/technician" className="flex items-center gap-3 transition-opacity hover:opacity-80">
+          <Link to="/report" className="flex items-center gap-3 transition-opacity hover:opacity-80">
             <img
               src={logoRed}
               alt="Kiira Motors Corporation"
@@ -45,7 +42,7 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
                 Kiira Motors Corporation
               </span>
               <span className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground">
-                Technician Console
+                Line Operator Console
               </span>
             </div>
           </Link>
@@ -54,8 +51,7 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
             <nav className="hidden sm:flex items-center gap-1">
               {nav.map((item) => {
                 const active =
-                  location.pathname === item.to ||
-                  location.pathname.startsWith(`${item.to}/`);
+                  location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
                 return (
                   <Link
                     key={item.to}
@@ -78,7 +74,7 @@ export function TechnicianLayout({ children, pageTitle }: TechnicianLayoutProps)
                 {worker?.name ?? username}
               </span>
               <span className="text-[10px] font-mono-data uppercase tracking-widest text-muted-foreground">
-                {worker?.jobTitle ?? "Technician"}
+                {worker?.jobTitle ?? "Line Operator"}
               </span>
             </div>
 

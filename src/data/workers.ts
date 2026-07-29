@@ -21,7 +21,7 @@ export interface WorkerProfile {
   email: string;
   certifications: string[];
   /** Workforce role used to route the user to the right interface. */
-  role?: "supervisor" | "technician" | "viewer";
+  role?: "supervisor" | "technician" | "viewer" | "reporter";
   /** Supervisor-only performance metrics. */
   performance?: WorkerPerformance;
 }
@@ -241,7 +241,22 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 014",
     email: "sserwada@kiiramotors.com",
     certifications: ["Workshop Safety Induction"],
-    performance: { completed: 4, avgDays: 5.0, availability: 89, quality: 87, safety: 94, monthly: [2, 3, 3, 4, 4, 4] },
+    performance: { completed: 4, avgDays: 5.0, availability: 89, quality: 87, safety: 94 },
+  },
+  Asiimwe: {
+    username: "Asiimwe",
+    name: "Asiimwe Ritah",
+    jobTitle: "Production Line Operator",
+    workerId: "24/U/0212",
+    department: "Production Line",
+    license: "N/A · Operational reporting role",
+    licenseExpiry: "—",
+    joined: "2026-02-01",
+    shift: "Day · 08:00 – 17:00",
+    phone: "+256 772 100 015",
+    email: "asiimwe@kiiramotors.com",
+    certifications: ["Production Safety Induction"],
+    role: "reporter",
   },
 };
 

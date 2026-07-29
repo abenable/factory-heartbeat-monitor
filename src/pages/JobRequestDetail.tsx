@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, CheckCircle2, Plus, Wrench, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Camera, CheckCircle2, Plus, Wrench, AlertTriangle } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
@@ -165,6 +165,33 @@ export default function JobRequestDetail() {
             </div>
           </Panel>
         </div>
+
+        {request.images && request.images.length > 0 && (
+          <Panel className="p-5">
+            <SectionHeading>
+              <span className="flex items-center gap-2">
+                <Camera className="size-4 text-primary" /> Attached Photos
+              </span>
+            </SectionHeading>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mt-3">
+              {request.images.map((src, idx) => (
+                <a
+                  key={idx}
+                  href={src}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="aspect-square rounded-lg border border-border bg-panel overflow-hidden hover:opacity-90 transition-opacity"
+                >
+                  <img
+                    src={src}
+                    alt={`Attachment ${idx + 1}`}
+                    className="size-full object-cover"
+                  />
+                </a>
+              ))}
+            </div>
+          </Panel>
+        )}
       </div>
     </AppLayout>
   );

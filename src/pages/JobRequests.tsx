@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Inbox, Filter, AlertTriangle } from "lucide-react";
+import { Camera, Inbox, Filter, AlertTriangle } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { Badge } from "@/components/ui/badge";
@@ -103,7 +103,12 @@ export default function JobRequests() {
                       to={`/job-requests/${jr.id}`}
                       className="block hover:underline font-medium line-clamp-1"
                     >
-                      {jr.description}
+                      <span className="flex items-center gap-2">
+                        {jr.description}
+                        {jr.images && jr.images.length > 0 && (
+                          <Camera className="size-3 text-muted-foreground shrink-0" />
+                        )}
+                      </span>
                     </Link>
                   </td>
                   <td className="p-3 font-mono-data text-xs text-muted-foreground">

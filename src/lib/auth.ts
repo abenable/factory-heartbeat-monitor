@@ -31,7 +31,7 @@ export function isAuthed(): boolean {
   return !!getUser();
 }
 
-export type UserRole = "supervisor" | "technician" | "viewer";
+export type UserRole = "supervisor" | "technician" | "viewer" | "reporter";
 
 export function getUserRole(): UserRole | null {
   const u = getUser();
@@ -49,6 +49,10 @@ export function isSupervisor(): boolean {
 
 export function isTechnician(): boolean {
   return getUserRole() === "technician";
+}
+
+export function isReporter(): boolean {
+  return getUserRole() === "reporter";
 }
 
 /** True when the signed-in user is a read-only viewer (e.g. shareholder).

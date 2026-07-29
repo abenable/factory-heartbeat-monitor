@@ -4,8 +4,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import { RequireAuth, RequireSupervisor, RequireTechnician } from "@/components/RoleGuard";
-import { isSupervisor, isTechnician } from "@/lib/auth";
+import { RequireAuth, RequireReporter, RequireSupervisor, RequireTechnician } from "@/components/RoleGuard";
+import { isReporter, isSupervisor, isTechnician } from "@/lib/auth";
 import Welcome from "./pages/Welcome.tsx";
 import Index from "./pages/Index.tsx";
 import SupervisorDashboard from "./pages/SupervisorDashboard.tsx";
@@ -27,10 +27,13 @@ import PerformanceReports from "./pages/PerformanceReports.tsx";
 import CraftsmenManagement from "./pages/CraftsmenManagement.tsx";
 import Profile from "./pages/Profile.tsx";
 import TechnicianDashboard from "./pages/TechnicianDashboard.tsx";
+import TechnicianPerformance from "./pages/TechnicianPerformance.tsx";
+import ReportRequest from "./pages/ReportRequest.tsx";
 
 const queryClient = new QueryClient();
 
 function RoleHome() {
+  if (isReporter()) return <Navigate to="/report" replace />;
   if (isTechnician()) return <Navigate to="/technician" replace />;
   if (isSupervisor()) return <SupervisorDashboard />;
   return <Index />; // viewers / fallback still land on the legacy dashboard (read-only)
@@ -48,6 +51,8 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/" element={<RequireAuth><RoleHome /></RequireAuth>} />
             <Route path="/technician" element={<RequireTechnician><TechnicianDashboard /></RequireTechnician>} />
+            <Route path="/technician/performance" element={<RequireTechnician><TechnicianPerformance /></RequireTechnician>} />
+            <Route path="/report" element={<RequireReporter><ReportRequest /></RequireReporter>} />
             <Route path="/machines" element={<RequireSupervisor><Machines /></RequireSupervisor>} />
             <Route path="/machines/new" element={<RequireSupervisor><MachineForm /></RequireSupervisor>} />
             <Route path="/machines/:id/edit" element={<RequireSupervisor><MachineForm /></RequireSupervisor>} />

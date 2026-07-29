@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import {
   AlertTriangle,
   CalendarClock,
+  Camera,
   CheckCircle2,
   ChevronRight,
   Circle,
@@ -26,6 +27,7 @@ import {
   YAxis,
 } from "recharts";
 import { TechnicianLayout } from "@/components/TechnicianLayout";
+import { ImageUpload, ImageAttachment } from "@/components/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -633,6 +635,23 @@ function WorkOrderDetailDialog({
                   onChange={(e) => updateWorkLog("comments", e.target.value)}
                   placeholder="Any other comments or handover notes..."
                   rows={2}
+                />
+              </div>
+              <div className="grid gap-1.5">
+                <Label className="text-xs text-muted-foreground flex items-center gap-1.5">
+                  <Camera className="size-3" /> Job Photos
+                </Label>
+                <ImageUpload
+                  value={draft.workLog?.images ?? []}
+                  onChange={(images: ImageAttachment[]) =>
+                    setDraft((d) => ({
+                      ...d,
+                      workLog: { ...d.workLog, images },
+                    }))
+                  }
+                  label="Upload job photos"
+                  description="Add photos of the work done or any challenges faced."
+                  maxCount={4}
                 />
               </div>
             </div>

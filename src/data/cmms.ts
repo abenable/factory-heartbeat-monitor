@@ -113,6 +113,8 @@ export interface WorkOrderWorkLog {
   challengesFaced?: string;
   /** Free-form technician comments for the work order. */
   comments?: string;
+  /** Photos taken by the technician to document the work or challenges. */
+  images?: { name: string; dataUrl: string }[];
 }
 
 export interface WorkOrder {
