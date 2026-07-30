@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { ClipboardList, LogOut } from "lucide-react";
+import { ClipboardList, FileText, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { getUser, logout } from "@/lib/auth";
@@ -23,7 +23,10 @@ export function ReporterLayout({ children, pageTitle }: ReporterLayoutProps) {
     navigate("/welcome", { replace: true });
   };
 
-  const nav = [{ to: "/report", label: "Raise Request", icon: ClipboardList }];
+  const nav = [
+    { to: "/job-requests/maintenance/new", label: "Maintenance Request", icon: FileText },
+    { to: "/report", label: "Quick Request", icon: ClipboardList },
+  ];
 
   return (
     <div className="min-h-screen w-full bg-background text-foreground flex flex-col">

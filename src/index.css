@@ -182,7 +182,7 @@
 @media print {
   @page { margin: 1.5cm; }
   html, body { background: #fff !important; color: #000 !important; }
-  .no-print, aside, header { display: none !important; }
+  .no-print, aside, header, .screen-only { display: none !important; }
   main { padding: 0 !important; overflow: visible !important; }
   .print-only { display: block !important; }
   .print-block { break-inside: avoid; }

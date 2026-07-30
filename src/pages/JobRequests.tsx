@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { Badge } from "@/components/ui/badge";
 import { jobRequests, JobRequestStatus } from "@/data/jobRequests";
+import { maintenanceRequests, urgencyLabel } from "@/data/maintenanceRequests";
 
 const STATUS_LABEL: Record<JobRequestStatus, string> = {
   new: "New",
@@ -124,6 +125,58 @@ export default function JobRequests() {
                 <tr>
                   <td colSpan={6} className="p-8 text-center text-muted-foreground text-sm">
                     No job requests match the selected filter.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </Panel>
+
+        <SectionHeading>Maintenance Request Forms</SectionHeading>
+        <Panel className="overflow-x-auto">
+          <table className="w-full text-left min-w-[640px]">
+            <thead>
+              <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
+                <th className="p-3 w-40">Job Number</th>
+                <th className="p-3 w-24">Status</th>
+                <th className="p-3 w-24">Urgency</th>
+                <th className="p-3">Equipment</th>
+                <th className="p-3 w-36">Requester</th>
+                <th className="p-3 w-28">Age</th>
+              </tr>
+            </thead>
+            <tbody className="text-sm">
+              {maintenanceRequests.map((m) => (
+                <tr key={m.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
+                  <td className="p-3">
+                    <Link
+                      to={`/job-requests/maintenance/${m.id}`}
+                      className="font-mono-data text-xs font-bold text-primary hover:underline"
+                    >
+                      {m.jobNumber}
+                    </Link>
+                  </td>
+                  <td className="p-3">
+                    <Badge className={`text-[10px] ${m.status === "submitted" ? "bg-muted text-muted-foreground" : m.status === "approved" || m.status === "converted" ? "bg-led-ok text-white" : "bg-destructive text-destructive-foreground"}`}>
+                      {m.status === "submitted" ? "New" : m.status.charAt(0).toUpperCase() + m.status.slice(1)}
+                    </Badge>
+                  </td>
+                  <td className="p-3">
+                    <span className="font-mono-data text-xs">{urgencyLabel(m.urgency)}</span>
+                  </td>
+                  <td className="p-3">
+                    <Link to={`/job-requests/maintenance/${m.id}`} className="block hover:underline line-clamp-1">
+                      {m.equipmentName}
+                    </Link>
+                  </td>
+                  <td className="p-3 text-muted-foreground">{m.requesterName}</td>
+                  <td className="p-3 text-muted-foreground text-xs">{relativeTime(m.submittedAt)}</td>
+                </tr>
+              ))}
+              {maintenanceRequests.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="p-8 text-center text-muted-foreground text-sm">
+                    No maintenance request forms yet.
                   </td>
                 </tr>
               )}
