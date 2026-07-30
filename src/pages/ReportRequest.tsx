@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
-import { Send, CheckCircle2, AlertTriangle, Inbox } from "lucide-react";
+import { Link } from "react-router-dom";
+import { Send, CheckCircle2, AlertTriangle, Inbox, FileText, ExternalLink } from "lucide-react";
 import { ReporterLayout } from "@/components/ReporterLayout";
 import { ImageUpload, ImageAttachment } from "@/components/ImageUpload";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
 import { addJobRequest, jobRequests, JobRequest } from "@/data/jobRequests";
+import { maintenanceRequests, MaintenanceRequest, urgencyLabel } from "@/data/maintenanceRequests";
 import { machines } from "@/data/cmms";
 
 function nextJobRequestId(): string {
@@ -47,6 +49,14 @@ export default function ReportRequest() {
   const sortedMachines = useMemo(
     () => [...machines].sort((a, b) => a.name.localeCompare(b.name)),
     [],
+  );
+
+  const recentMrf = useMemo(
+    () =>
+      maintenanceRequests
+        .filter((m) => m.submittedBy === username || m.requesterName === (worker?.name ?? username))
+        .slice(0, 5),
+    [username, worker?.name],
   );
 
   const [equipmentId, setEquipmentId] = useState("");
@@ -231,6 +241,54 @@ export default function ReportRequest() {
                   ))}
                 </div>
               )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/60">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="size-4 text-primary" />
+                Maintenance Request Forms
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              {recentMrf.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-2">
+                  You have not submitted any maintenance request forms yet.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {recentMrf.map((m) => (
+                    <Link
+                      key={m.id}
+                      to={`/report/maintenance/${m.id}`}
+                      className="block rounded-lg border border-border/60 bg-panel p-3 text-sm hover:bg-panel-elevated transition-colors"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="font-mono-data text-xs text-primary font-bold">
+                          {m.jobNumber}
+                        </span>
+                        <Badge
+                          variant={m.urgency === "critical" || m.urgency === "high" ? "destructive" : "secondary"}
+                          className="text-[10px]"
+                        >
+                          {urgencyLabel(m.urgency)}
+                        </Badge>
+                      </div>
+                      <p className="text-foreground line-clamp-2 mb-1">{m.problemDescription}</p>
+                      <div className="flex items-center justify-between text-xs text-muted-foreground">
+                        <span>{m.equipmentName}</span>
+                        <span>{relativeTime(m.submittedAt)}</span>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+              <Button asChild variant="outline" size="sm" className="w-full mt-4">
+                <Link to="/report/maintenance/new">
+                  <ExternalLink className="size-4 mr-2" /> Open Maintenance Request Form
+                </Link>
+              </Button>
             </CardContent>
           </Card>
 

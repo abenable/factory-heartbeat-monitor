@@ -24,7 +24,7 @@ export function ReporterLayout({ children, pageTitle }: ReporterLayoutProps) {
   };
 
   const nav = [
-    { to: "/job-requests/maintenance/new", label: "Maintenance Request", icon: FileText },
+    { to: "/report/maintenance/new", label: "Maintenance Request", icon: FileText },
     { to: "/report", label: "Quick Request", icon: ClipboardList },
   ];
 
@@ -54,7 +54,8 @@ export function ReporterLayout({ children, pageTitle }: ReporterLayoutProps) {
             <nav className="hidden sm:flex items-center gap-1">
               {nav.map((item) => {
                 const active =
-                  location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+                  location.pathname === item.to ||
+                  (item.to !== "/report" && location.pathname.startsWith(item.to));
                 return (
                   <Link
                     key={item.to}

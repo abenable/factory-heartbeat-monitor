@@ -54,13 +54,14 @@ const App = () => (
             <Route path="/technician" element={<RequireTechnician><TechnicianDashboard /></RequireTechnician>} />
             <Route path="/technician/performance" element={<RequireTechnician><TechnicianPerformance /></RequireTechnician>} />
             <Route path="/report" element={<RequireReporter><ReportRequest /></RequireReporter>} />
+            <Route path="/report/maintenance/new" element={<RequireReporter><MaintenanceRequestForm /></RequireReporter>} />
+            <Route path="/report/maintenance/:id" element={<RequireReporter><MaintenanceRequestForm /></RequireReporter>} />
             <Route path="/machines" element={<RequireSupervisor><Machines /></RequireSupervisor>} />
             <Route path="/machines/new" element={<RequireSupervisor><MachineForm /></RequireSupervisor>} />
             <Route path="/machines/:id/edit" element={<RequireSupervisor><MachineForm /></RequireSupervisor>} />
             <Route path="/machines/:id" element={<RequireSupervisor><MachineDetail /></RequireSupervisor>} />
             <Route path="/alerts" element={<RequireSupervisor><Alerts /></RequireSupervisor>} />
             <Route path="/job-requests" element={<RequireSupervisor><JobRequests /></RequireSupervisor>} />
-            <Route path="/job-requests/maintenance/new" element={<RequireReporter><MaintenanceRequestForm /></RequireReporter>} />
             <Route path="/job-requests/maintenance/:id" element={<RequireAuth><MaintenanceRequestForm /></RequireAuth>} />
             <Route path="/job-requests/:id" element={<RequireSupervisor><JobRequestDetail /></RequireSupervisor>} />
             <Route path="/work-orders" element={<RequireSupervisor><WorkOrders /></RequireSupervisor>} />
