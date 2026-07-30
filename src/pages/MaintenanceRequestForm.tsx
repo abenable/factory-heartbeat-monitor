@@ -58,6 +58,8 @@ export default function MaintenanceRequestForm() {
   const isReporterUser = role === "reporter";
   const isSupervisorUser = role === "supervisor";
 
+  const [tick, setTick] = useState(0);
+
   const mode: FormMode = id ? "view" : "create";
   const existing = useMemo(
     () => (id ? getMaintenanceRequest(id) : undefined),
@@ -86,7 +88,6 @@ export default function MaintenanceRequestForm() {
   const [workOrderNumber, setWorkOrderNumber] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
-  const [tick, setTick] = useState(0);
 
   // Load existing request
   useEffect(() => {
