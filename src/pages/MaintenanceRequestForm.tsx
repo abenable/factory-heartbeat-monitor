@@ -4,7 +4,7 @@ import { ArrowLeft, Printer, Save, Send, ShieldCheck, Undo2 } from "lucide-react
 import { AppLayout } from "@/components/AppLayout";
 import { ReporterLayout } from "@/components/ReporterLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
-import { SignaturePad } from "@/components/SignaturePad";
+import { SignaturePad, textToSignatureDataUrl } from "@/components/SignaturePad";
 import { PrintableMaintenanceRequest } from "@/components/PrintableMaintenanceRequest";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -81,6 +81,7 @@ export default function MaintenanceRequestForm() {
   const [requestDateTime, setRequestDateTime] = useState(formatDateTimeLocal(new Date()));
   const [problemDescription, setProblemDescription] = useState("");
   const [requesterSignature, setRequesterSignature] = useState("");
+  const [requesterSignatureText, setRequesterSignatureText] = useState("");
   const [urgency, setUrgency] = useState<MaintenanceUrgency>("medium");
 
   const [supervisorSignature, setSupervisorSignature] = useState("");
@@ -282,11 +283,32 @@ export default function MaintenanceRequestForm() {
           <Field label="Requester Signature" locked={requesterLocked}>
             <SignaturePad
               value={requesterSignature}
-              onChange={setRequesterSignature}
+              onChange={(val) => {
+                setRequesterSignature(val);
+                if (val) setRequesterSignatureText("");
+              }}
               disabled={requesterLocked}
-              label="Requester Signature"
+              label="Draw signature"
               placeholder={requesterLocked ? "Signature captured" : "Sign here"}
             />
+            <div className="mt-3">
+              <Label htmlFor="requester-sig-text" className="text-sm text-muted-foreground">
+                Or type your first name as signature
+              </Label>
+              <Input
+                id="requester-sig-text"
+                className="mt-1"
+                value={requesterSignatureText}
+                onChange={(e) => {
+                  const text = e.target.value;
+                  setRequesterSignatureText(text);
+                  setRequesterSignature(textToSignatureDataUrl(text.trim()));
+                }}
+                disabled={requesterLocked}
+                placeholder="e.g. Ritah"
+                maxLength={40}
+              />
+            </div>
           </Field>
         </div>
       </Panel>

@@ -11,6 +11,29 @@ interface SignaturePadProps {
   className?: string;
 }
 
+export function textToSignatureDataUrl(text: string): string {
+  if (!text.trim()) return "";
+  const canvas = document.createElement("canvas");
+  canvas.width = 400;
+  canvas.height = 120;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.font = "italic 36px 'Brush Script MT', 'Georgia', cursive";
+  ctx.fillStyle = "#000000";
+  ctx.textBaseline = "middle";
+
+  const measured = ctx.measureText(text);
+  const x = Math.max(16, (canvas.width - measured.width) / 2);
+  const y = canvas.height / 2;
+  ctx.fillText(text, x, y);
+
+  return canvas.toDataURL("image/png");
+}
+
 export function SignaturePad({
   value,
   onChange,
