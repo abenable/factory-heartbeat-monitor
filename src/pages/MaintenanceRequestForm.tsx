@@ -85,6 +85,7 @@ export default function MaintenanceRequestForm() {
   const [urgency, setUrgency] = useState<MaintenanceUrgency>("medium");
 
   const [supervisorSignature, setSupervisorSignature] = useState("");
+  const [supervisorSignatureText, setSupervisorSignatureText] = useState("");
   const [workOrderIssuedAt, setWorkOrderIssuedAt] = useState("");
   const [workOrderNumber, setWorkOrderNumber] = useState("");
 
@@ -369,11 +370,32 @@ export default function MaintenanceRequestForm() {
           <Field label="Supervisor Signature" locked={!isApprover}>
             <SignaturePad
               value={supervisorSignature}
-              onChange={setSupervisorSignature}
+              onChange={(val) => {
+                setSupervisorSignature(val);
+                if (val) setSupervisorSignatureText("");
+              }}
               disabled={!isApprover}
-              label="Supervisor Signature"
+              label="Draw signature"
               placeholder={!isApprover ? "Awaiting supervisor signature" : "Supervisor signs here"}
             />
+            <div className="mt-3">
+              <Label htmlFor="supervisor-sig-text" className="text-sm text-muted-foreground">
+                Or type your first name as signature
+              </Label>
+              <Input
+                id="supervisor-sig-text"
+                className="mt-1"
+                value={supervisorSignatureText}
+                onChange={(e) => {
+                  const text = e.target.value;
+                  setSupervisorSignatureText(text);
+                  setSupervisorSignature(textToSignatureDataUrl(text.trim()));
+                }}
+                disabled={!isApprover}
+                placeholder="e.g. Nakimbugwe"
+                maxLength={40}
+              />
+            </div>
           </Field>
         </div>
 
