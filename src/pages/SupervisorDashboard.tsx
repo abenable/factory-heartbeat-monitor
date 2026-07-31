@@ -25,6 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { jobRequests, JobRequestStatus } from "@/data/jobRequests";
+import { maintenanceRequests, MaintenanceRequestStatus, MaintenanceUrgency } from "@/data/maintenanceRequests";
 import { machines, workOrders, getMachine, pmTasks, SECTORS } from "@/data/cmms";
 import { WORKERS, onLeaveUsernames } from "@/data/workers";
 import {
@@ -62,6 +63,20 @@ const STATUS_BADGE: Record<JobRequestStatus, string> = {
   converted: "border border-border text-muted-foreground",
 };
 
+const MRF_STATUS_LABEL: Record<MaintenanceRequestStatus, string> = {
+  submitted: "New",
+  approved: "Approved",
+  rejected: "Rejected",
+  converted: "Converted",
+};
+
+const MRF_STATUS_BADGE: Record<MaintenanceRequestStatus, string> = {
+  submitted: "bg-foreground text-background",
+  approved: "bg-led-ok text-white",
+  rejected: "bg-destructive text-destructive-foreground",
+  converted: "border border-border text-muted-foreground",
+};
+
 const requestFilters: { key: "all" | JobRequestStatus; label: string }[] = [
   { key: "all", label: "All" },
   { key: "new", label: "New" },
@@ -92,19 +107,93 @@ function shortDate(iso: string) {
   return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "2-digit" });
 }
 
+interface DashboardRequestItem {
+  id: string;
+  linkTo: string;
+  status: JobRequestStatus;
+  priority: "normal" | "urgent";
+  description: string;
+  requestedAt: string;
+  requester: string;
+  equipmentId: string;
+  plant: string;
+  isMrf: boolean;
+  mrfStatus?: MaintenanceRequestStatus;
+  mrfUrgency?: MaintenanceUrgency;
+}
+
+function mrfPriority(urgency: MaintenanceUrgency): "normal" | "urgent" {
+  return urgency === "critical" || urgency === "high" ? "urgent" : "normal";
+}
+
+function mapMrfStatusToJobRequestStatus(status: MaintenanceRequestStatus): JobRequestStatus {
+  switch (status) {
+    case "submitted":
+      return "new";
+    case "approved":
+    case "converted":
+      return "converted";
+    case "rejected":
+      return "converted";
+    default:
+      return "new";
+  }
+}
+
 export default function SupervisorDashboard() {
   const [site, setSite] = useState<string>("All");
   const [requestFilter, setRequestFilter] = useState<"all" | JobRequestStatus>("all");
 
-  const filteredRequests = useMemo(
-    () => jobRequests.filter((r) => site === "All" || r.plant === site),
-    [site],
-  );
+  const dashboardRequests = useMemo<DashboardRequestItem[]>(() => {
+    const jrItems: DashboardRequestItem[] = jobRequests.map((r) => ({
+      id: r.id,
+      linkTo: `/job-requests/${r.id}`,
+      status: r.status,
+      priority: r.priority,
+      description: r.description,
+      requestedAt: r.requestedAt,
+      requester: r.requester,
+      equipmentId: r.equipmentId,
+      plant: r.plant,
+      isMrf: false,
+    }));
+
+    const mrfItems: DashboardRequestItem[] = maintenanceRequests
+      .filter((m) => m.status !== "rejected")
+      .map((m) => {
+        const machine = getMachine(m.equipmentId);
+        return {
+          id: m.jobNumber,
+          linkTo: `/job-requests/maintenance/${m.id}`,
+          status: mapMrfStatusToJobRequestStatus(m.status),
+          priority: mrfPriority(m.urgency),
+          description: m.problemDescription,
+          requestedAt: m.submittedAt,
+          requester: m.requesterName,
+          equipmentId: m.equipmentId,
+          plant: machine?.plant ?? "",
+          isMrf: true,
+          mrfStatus: m.status,
+          mrfUrgency: m.urgency,
+        };
+      });
+
+    return [...jrItems, ...mrfItems]
+      .filter((r) => site === "All" || r.plant === site)
+      .sort((a, b) => new Date(b.requestedAt).getTime() - new Date(a.requestedAt).getTime());
+  }, [site]);
+
+  const filteredRequests = dashboardRequests;
 
   const visibleRequests = useMemo(() => {
     if (requestFilter === "all") return filteredRequests;
     return filteredRequests.filter((r) => r.status === requestFilter);
   }, [filteredRequests, requestFilter]);
+
+  const openRequestCount = useMemo(
+    () => dashboardRequests.filter((r) => r.status !== "converted").length,
+    [dashboardRequests],
+  );
 
   const filteredMachines = useMemo(
     () =>
@@ -123,11 +212,6 @@ export default function SupervisorDashboard() {
         return SITE_SECTOR[site].some((s) => m.sector === s);
       }),
     [site],
-  );
-
-  const openJR = useMemo(
-    () => filteredRequests.filter((r) => r.status !== "converted").length,
-    [filteredRequests],
   );
 
   const openWO = useMemo(
@@ -225,7 +309,7 @@ export default function SupervisorDashboard() {
 
         {/* Top stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatCard label="Open Requests" value={openJR} icon={Inbox} to="/job-requests" />
+          <StatCard label="Open Requests" value={openRequestCount} icon={Inbox} to="/job-requests" />
           <StatCard label="Open Work Orders" value={openWO} icon={ClipboardList} to="/work-orders" />
           <PercentCard label="Availability" value={availability} icon={Activity} to="/machines" />
           <PercentCard label="Equipment Down" value={equipmentDown} icon={Cpu} to="/machines" />
@@ -334,7 +418,7 @@ export default function SupervisorDashboard() {
                 {visibleRequests.map((jr) => (
                   <Link
                     key={jr.id}
-                    to={`/job-requests/${jr.id}`}
+                    to={jr.linkTo}
                     className="group flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-lg border border-border bg-panel hover:bg-panel-elevated p-3 transition-colors"
                   >
                     <div className="flex items-start gap-3 min-w-0">
@@ -346,7 +430,16 @@ export default function SupervisorDashboard() {
                       <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">{jr.id}</span>
-                          <Badge className={`text-[10px] ${STATUS_BADGE[jr.status]}`}>{STATUS_LABEL[jr.status]}</Badge>
+                          {jr.isMrf ? (
+                            <>
+                              <Badge className={`text-[10px] ${MRF_STATUS_BADGE[jr.mrfStatus!]}`}>
+                                {MRF_STATUS_LABEL[jr.mrfStatus!]}
+                              </Badge>
+                              <Badge variant="outline" className="text-[10px]">MRF</Badge>
+                            </>
+                          ) : (
+                            <Badge className={`text-[10px] ${STATUS_BADGE[jr.status]}`}>{STATUS_LABEL[jr.status]}</Badge>
+                          )}
                           {jr.priority === "urgent" && (
                             <Badge variant="destructive" className="text-[10px]">
                               <AlertTriangle className="size-3 mr-1" /> Urgent

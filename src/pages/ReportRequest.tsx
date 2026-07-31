@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { Send, CheckCircle2, AlertTriangle, Inbox, FileText, ExternalLink } from "lucide-react";
+import { Send, CheckCircle2, AlertTriangle, Inbox, FileText, ExternalLink, Printer } from "lucide-react";
 import { ReporterLayout } from "@/components/ReporterLayout";
 import { ImageUpload, ImageAttachment } from "@/components/ImageUpload";
 import { Button } from "@/components/ui/button";
@@ -259,28 +259,43 @@ export default function ReportRequest() {
               ) : (
                 <div className="space-y-3">
                   {recentMrf.map((m) => (
-                    <Link
+                    <div
                       key={m.id}
-                      to={`/report/maintenance/${m.id}`}
-                      className="block rounded-lg border border-border/60 bg-panel p-3 text-sm hover:bg-panel-elevated transition-colors"
+                      className="rounded-lg border border-border/60 bg-panel p-3 text-sm hover:bg-panel-elevated transition-colors"
                     >
                       <div className="flex items-center justify-between gap-2 mb-1">
-                        <span className="font-mono-data text-xs text-primary font-bold">
-                          {m.jobNumber}
-                        </span>
-                        <Badge
-                          variant={m.urgency === "critical" || m.urgency === "high" ? "destructive" : "secondary"}
-                          className="text-[10px]"
+                        <Link
+                          to={`/report/maintenance/${m.id}`}
+                          className="font-mono-data text-xs text-primary font-bold hover:underline"
                         >
-                          {urgencyLabel(m.urgency)}
-                        </Badge>
+                          {m.jobNumber}
+                        </Link>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => window.open(`/report/maintenance/${m.id}?print=1`, "_blank")}
+                            className="p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                            title="Print maintenance request"
+                            aria-label="Print maintenance request"
+                          >
+                            <Printer className="size-3.5" />
+                          </button>
+                          <Badge
+                            variant={m.urgency === "critical" || m.urgency === "high" ? "destructive" : "secondary"}
+                            className="text-[10px]"
+                          >
+                            {urgencyLabel(m.urgency)}
+                          </Badge>
+                        </div>
                       </div>
-                      <p className="text-foreground line-clamp-2 mb-1">{m.problemDescription}</p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{m.equipmentName}</span>
-                        <span>{relativeTime(m.submittedAt)}</span>
-                      </div>
-                    </Link>
+                      <Link to={`/report/maintenance/${m.id}`} className="block">
+                        <p className="text-foreground line-clamp-2 mb-1 hover:underline">{m.problemDescription}</p>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>{m.equipmentName}</span>
+                          <span>{relativeTime(m.submittedAt)}</span>
+                        </div>
+                      </Link>
+                    </div>
                   ))}
                 </div>
               )}

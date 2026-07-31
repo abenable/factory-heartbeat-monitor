@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Printer, Save, Send, ShieldCheck, Undo2 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { ReporterLayout } from "@/components/ReporterLayout";
@@ -52,6 +52,8 @@ const STATUS_BADGE: Record<MaintenanceRequest["status"], string> = {
 export default function MaintenanceRequestForm() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const autoPrint = searchParams.get("print") === "1";
   const username = getUser() ?? "";
   const user = getWorker(username);
   const role = getUserRole();
@@ -122,6 +124,14 @@ export default function MaintenanceRequestForm() {
     setOperatorCustodianName(user.name);
     setOperatorCustodianDesignation(user.jobTitle);
   }, [mode, user]);
+
+  // Auto-print when opened from a print action
+  useEffect(() => {
+    if (autoPrint && mode === "view" && existing) {
+      const timer = setTimeout(() => window.print(), 600);
+      return () => clearTimeout(timer);
+    }
+  }, [autoPrint, mode, existing]);
 
   const selectedMachine = useMemo(() => machines.find((m) => m.id === equipmentId), [equipmentId]);
 
@@ -551,7 +561,11 @@ export default function MaintenanceRequestForm() {
     addMaintenanceRequest(req);
     toast.success("Maintenance request submitted", { description: jobNumber });
     setSubmitting(false);
-    navigate(`/job-requests/maintenance/${jobNumber}`);
+    // Reporters stay in the operator portal; supervisors/admin go to the requests list.
+    const detailPath = isReporterUser
+      ? `/report/maintenance/${jobNumber}`
+      : `/job-requests/maintenance/${jobNumber}`;
+    navigate(detailPath);
   }
 
   function handleApprove() {

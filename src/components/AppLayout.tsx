@@ -1,6 +1,7 @@
 import { ReactNode, useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 import { jobRequests } from "@/data/jobRequests";
+import { maintenanceRequests } from "@/data/maintenanceRequests";
 import { StatusDot } from "@/components/StatusDot";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Sidebar } from "@/components/Sidebar";
@@ -17,7 +18,10 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
   const openJR = jobRequests.filter((r) => r.status !== "converted").length;
-  const hasUrgent = jobRequests.some((r) => r.status !== "converted" && r.priority === "urgent");
+  const openMRF = maintenanceRequests.filter((r) => r.status === "submitted").length;
+  const totalOpenRequests = openJR + openMRF;
+  const hasUrgent = jobRequests.some((r) => r.status !== "converted" && r.priority === "urgent") ||
+    maintenanceRequests.some((r) => r.status === "submitted" && (r.urgency === "critical" || r.urgency === "high"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
@@ -76,9 +80,9 @@ export function AppLayout({ children, pageTitle, breadcrumb }: AppLayoutProps) {
           </div>
           <div className="flex items-center gap-3 md:gap-6 shrink-0">
             <div className="flex items-center gap-2">
-              <StatusDot tone={openJR > 0 ? (hasUrgent ? "crit" : "warn") : "ok"} />
+              <StatusDot tone={totalOpenRequests > 0 ? (hasUrgent ? "crit" : "warn") : "ok"} />
               <span className="font-mono-data text-xs text-muted-foreground tracking-wide uppercase">
-                {openJR > 0 ? `${openJR} Open Job Request${openJR === 1 ? "" : "s"}` : "All Caught Up"}
+                {totalOpenRequests > 0 ? `${totalOpenRequests} Open Job Request${totalOpenRequests === 1 ? "" : "s"}` : "All Caught Up"}
               </span>
             </div>
             <div className="hidden md:block h-4 w-px bg-border" />
