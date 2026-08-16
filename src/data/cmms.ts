@@ -369,6 +369,14 @@ export function getPMTask(id: string): PMTask | undefined {
   return pmTasks.find((p) => p.id === id);
 }
 
+export function nextPMTaskId(): string {
+  const seqs = pmTasks
+    .map((p) => Number(p.id.replace(/^PM-/, "")))
+    .filter((n) => !Number.isNaN(n));
+  const next = (seqs.length ? Math.max(...seqs) : 0) + 1;
+  return `PM-${String(next).padStart(2, "0")}`;
+}
+
 export function addPMTask(task: PMTask) {
   pmTasks.push(task);
 }
