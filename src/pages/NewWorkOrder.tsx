@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   machines,
   addWorkOrder,
+  nextWorkOrderReferenceNumber,
   WorkOrder,
   WorkOrderPriority,
   WorkOrderStatus,
@@ -22,6 +23,8 @@ import {
   LEVEL_LABELS,
 } from "@/data/crafts";
 import { getWorker } from "@/data/workers";
+import { getUser } from "@/lib/auth";
+import { PrintableWorkOrder } from "@/components/PrintableWorkOrder";
 import { toast } from "@/hooks/use-toast";
 
 const priorities: WorkOrderPriority[] = ["low", "medium", "high", "critical"];
@@ -30,9 +33,10 @@ const woTypes: WorkOrderType[] = ["corrective", "preventive", "predictive", "con
 
 function emptyForm() {
   const idSuffix = Math.floor(2000 + Math.random() * 8000);
+  const requester = getWorker(getUser());
   return {
     id: `WO-${idSuffix}`,
-    referenceNumber: `KMC-WO-${String(Math.floor(1 + Math.random() * 999)).padStart(3, "0")}`,
+    referenceNumber: nextWorkOrderReferenceNumber(),
     machineId: machines[0]?.id ?? "",
     title: "",
     priority: "medium" as WorkOrderPriority,
@@ -50,6 +54,10 @@ function emptyForm() {
     ppeInput: "",
     authorizedBy: "Nakimbugwe",
     comments: "",
+    requestorName: requester?.name ?? "",
+    requestorEmail: requester?.email ?? "",
+    requestorDesignation: requester?.jobTitle ?? "",
+    workshop: "",
   };
 }
 
@@ -107,6 +115,10 @@ const NewWorkOrder = () => {
           : undefined,
       authorizedBy: form.authorizedBy.trim() || undefined,
       comments: form.comments.trim() || undefined,
+      requestorName: form.requestorName.trim() || undefined,
+      requestorEmail: form.requestorEmail.trim() || undefined,
+      requestorDesignation: form.requestorDesignation.trim() || undefined,
+      workshop: form.workshop.trim() || undefined,
     };
   };
 
@@ -138,7 +150,10 @@ const NewWorkOrder = () => {
   return (
     <AppLayout pageTitle="New Work Order" breadcrumb="WORK ORDERS / CREATE">
       <form onSubmit={onSave} className="flex flex-col gap-6 max-w-5xl">
-        <div className="flex flex-wrap items-center justify-between gap-3 no-print">
+      {/* Everything the supervisor edits on screen — hidden entirely when printing,
+          so only the PrintableWorkOrder template below comes out of the printer. */}
+      <div className="no-print flex flex-col gap-6">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <Button type="button" variant="ghost" size="sm" onClick={() => navigate("/work-orders")}>
             <ArrowLeft className="size-4" />
             Back
@@ -161,8 +176,8 @@ const NewWorkOrder = () => {
           <Field label="Work Order Number">
             <Input value={form.id} onChange={(e) => update("id", e.target.value)} required />
           </Field>
-          <Field label="Reference Number">
-            <Input value={form.referenceNumber} onChange={(e) => update("referenceNumber", e.target.value)} placeholder="e.g. KMC-WO-001" />
+          <Field label="Reference Number (Auto-generated)">
+            <Input value={form.referenceNumber} readOnly disabled className="font-mono-data" />
           </Field>
           <Field label="Equipment">
             <select
@@ -218,6 +233,28 @@ const NewWorkOrder = () => {
                 </option>
               ))}
             </select>
+          </Field>
+        </Panel>
+
+        {/* Requestor */}
+        <SectionHeading>Requestor Information</SectionHeading>
+        <Panel className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
+          <Field label="Requestor Name">
+            <Input value={form.requestorName} onChange={(e) => update("requestorName", e.target.value)} placeholder="Full name" />
+          </Field>
+          <Field label="Email">
+            <Input
+              type="email"
+              value={form.requestorEmail}
+              onChange={(e) => update("requestorEmail", e.target.value)}
+              placeholder="name@kiiramotors.com"
+            />
+          </Field>
+          <Field label="Designation">
+            <Input value={form.requestorDesignation} onChange={(e) => update("requestorDesignation", e.target.value)} placeholder="e.g. Production Line Operator" />
+          </Field>
+          <Field label="Workshop">
+            <Input value={form.workshop} onChange={(e) => update("workshop", e.target.value)} placeholder="e.g. Press Shop - Station 3" />
           </Field>
         </Panel>
 
@@ -418,9 +455,10 @@ const NewWorkOrder = () => {
             placeholder="Notes, safety considerations, approvals..."
           />
         </Panel>
+      </div>
 
-        {/* Printable report */}
-        <PrintView form={form} machine={machine} />
+        {/* Printable report — matches the physical Maintenance Work Order Form */}
+        <PrintableWorkOrder wo={buildWO()} />
       </form>
     </AppLayout>
   );
@@ -442,147 +480,6 @@ function splitLines(input: string): string[] {
     .split(/\n|,/)
     .map((s) => s.trim())
     .filter(Boolean);
-}
-
-function PrintView({
-  form,
-  machine,
-}: {
-  form: ReturnType<typeof emptyForm>;
-  machine?: ReturnType<typeof machines.find>;
-}) {
-  return (
-    <div className="print-only">
-      <h1 style={{ fontSize: 22, marginBottom: 4 }}>Kiira Motors Corporation — Work Order</h1>
-      <p style={{ marginBottom: 16, color: "#444" }}>Printed {new Date().toLocaleString()}</p>
-
-      <h2 style={{ fontSize: 14, borderBottom: "1px solid #000", paddingBottom: 4, marginBottom: 8 }}>
-        Work Order {form.id}
-      </h2>
-      <table>
-        <tbody>
-          <PRow label="Reference Number" value={form.referenceNumber || "—"} />
-          <PRow label="Date Created" value={new Date().toLocaleString()} />
-          <PRow label="Priority" value={form.priority.toUpperCase()} />
-          <PRow label="Type" value={form.type.replace("-", " ").replace(/^\w/, (c) => c.toUpperCase())} />
-        </tbody>
-      </table>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Asset Details
-      </h3>
-      <table>
-        <tbody>
-          <PRow label="Machine Name" value={machine?.name ?? "—"} />
-          <PRow label="Asset ID" value={form.machineId} />
-          <PRow label="Location" value={machine?.sector ?? "—"} />
-        </tbody>
-      </table>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Problem Description
-      </h3>
-      <p style={{ marginBottom: 12, whiteSpace: "pre-wrap" }}>
-        {form.problemDescription || "—"}
-      </p>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Task Description
-      </h3>
-      <ol style={{ paddingLeft: 20, marginBottom: 12 }}>
-        {form.taskInputs
-          .map((t) => t.trim())
-          .filter(Boolean)
-          .map((t, i) => (
-            <li key={i} style={{ marginBottom: 4 }}>
-              {t}
-            </li>
-          ))}
-      </ol>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Assigned To
-      </h3>
-      <table>
-        <tbody>
-          <PRow label="Technician" value={form.assignee || "—"} />
-          <PRow label="Department" value={form.department || "—"} />
-        </tbody>
-      </table>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Schedule
-      </h3>
-      <table>
-        <tbody>
-          <PRow
-            label="Start Date"
-            value={form.startDate ? new Date(form.startDate).toLocaleString() : "—"}
-          />
-          <PRow
-            label="Expected Completion"
-            value={form.expectedCompletion ? new Date(form.expectedCompletion).toLocaleString() : "—"}
-          />
-        </tbody>
-      </table>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Required Resources
-      </h3>
-      <table>
-        <tbody>
-          <PRow label="Tools" value={form.toolsInput.replace(/\n/g, ", ") || "—"} />
-          <PRow label="Spare Parts" value={form.sparePartsInput.replace(/\n/g, ", ") || "—"} />
-          <PRow label="PPE" value={form.ppeInput.replace(/\n/g, ", ") || "—"} />
-        </tbody>
-      </table>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Approval
-      </h3>
-      <p style={{ marginBottom: 12 }}>Authorized By: {form.authorizedBy || "—"}</p>
-
-      <h3 style={{ fontSize: 12, marginTop: 16, marginBottom: 6, textTransform: "uppercase" }}>
-        Work Log (to be filled after job)
-      </h3>
-      <table>
-        <tbody>
-          <PRow label="Actual Start Time" value="_____________" />
-          <PRow label="Actual Completion Time" value="_____________" />
-          <PRow label="Parts Used" value="_____________" />
-          <PRow label="Observations" value="_____________" />
-          <PRow label="Root Cause" value="_____________" />
-        </tbody>
-      </table>
-
-      <div style={{ marginTop: 16 }}>
-        <strong>Status:</strong> {form.status.replace("_", " ").toUpperCase()}
-      </div>
-
-      <div style={{ marginTop: 24, display: "flex", gap: 32 }}>
-        <SigLine label="Technician signature" />
-        <SigLine label="Supervisor signature" />
-      </div>
-    </div>
-  );
-}
-
-function PRow({ label, value }: { label: string; value: string }) {
-  return (
-    <tr>
-      <th style={{ width: 200, textAlign: "left", verticalAlign: "top" }}>{label}</th>
-      <td style={{ whiteSpace: "pre-wrap" }}>{value}</td>
-    </tr>
-  );
-}
-
-function SigLine({ label }: { label: string }) {
-  return (
-    <div style={{ flex: 1 }}>
-      <div style={{ borderBottom: "1px solid #000", height: 40 }} />
-      <small>{label}</small>
-    </div>
-  );
 }
 
 const NewWorkOrderGuarded = () => (isViewer() ? <Navigate to="/work-orders" replace /> : <NewWorkOrder />);

@@ -78,6 +78,30 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function seenKey(username: string) {
+  return `technician:${username}:seenWorkOrders`;
+}
+
+function getSeenWorkOrderIds(username: string): Set<string> {
+  try {
+    const raw = localStorage.getItem(seenKey(username));
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function markWorkOrderSeen(username: string, id: string) {
+  const seen = getSeenWorkOrderIds(username);
+  if (seen.has(id)) return;
+  seen.add(id);
+  try {
+    localStorage.setItem(seenKey(username), JSON.stringify([...seen]));
+  } catch {
+    // ignore storage errors (e.g. private browsing)
+  }
+}
+
 function woProgress(wo: WorkOrder) {
   const total = wo.tasks.length || 1;
   const done = wo.tasks.filter((t) => t.completed).length;
@@ -125,6 +149,12 @@ const TechnicianDashboard = () => {
 
   const mine = allWorkOrders.filter(
     (w) => w.assignee.toLowerCase() === username.toLowerCase(),
+  );
+
+  const seenIds = useMemo(
+    () => getSeenWorkOrderIds(username),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [username, refresh],
   );
 
   const filtered =
@@ -275,7 +305,16 @@ const TechnicianDashboard = () => {
           </Card>
         )}
         {filtered.map((wo) => (
-          <WorkOrderCard key={wo.id} wo={wo} onClick={() => setSelected(wo)} />
+          <WorkOrderCard
+            key={wo.id}
+            wo={wo}
+            isNew={!seenIds.has(wo.id)}
+            onClick={() => {
+              markWorkOrderSeen(username, wo.id);
+              setSelected(wo);
+              setRefresh((n) => n + 1);
+            }}
+          />
         ))}
       </div>
 
@@ -292,20 +331,25 @@ const TechnicianDashboard = () => {
 
 function WorkOrderCard({
   wo,
+  isNew,
   onClick,
 }: {
   wo: WorkOrder;
+  isNew: boolean;
   onClick: () => void;
 }) {
   const machine = getMachine(wo.machineId);
   const meta = statusMeta[wo.status];
   const progress = woProgress(wo);
   const overdue = wo.status !== "done" && new Date(wo.dueAt).getTime() < Date.now();
+  const isPreventive = wo.type === "preventive";
 
   return (
     <Card
       onClick={onClick}
-      className="cursor-pointer border-border/60 transition-shadow hover:shadow-md hover:border-primary/40"
+      className={`cursor-pointer border-border/60 transition-shadow hover:shadow-md hover:border-primary/40 ${
+        isNew ? "ring-1 ring-primary/50" : ""
+      }`}
     >
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
@@ -318,6 +362,18 @@ function WorkOrderCard({
                 <span className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
                   {wo.id}
                 </span>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+              {isNew && (
+                <Badge className="text-[10px] bg-foreground text-background">
+                  New Work Order
+                </Badge>
+              )}
+              {isPreventive && (
+                <Badge className="text-[10px] bg-led-ok/15 text-led-ok border border-led-ok/30">
+                  Preventive Maintenance
+                </Badge>
               )}
               <Badge className={`text-[10px] ${priorityTone[wo.priority]}`}>
                 {wo.priority}
@@ -437,6 +493,11 @@ function WorkOrderDetailDialog({
               <span className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
                 {draft.id}
               </span>
+            )}
+            {draft.type === "preventive" && (
+              <Badge className="text-[10px] bg-led-ok/15 text-led-ok border border-led-ok/30">
+                Preventive Maintenance
+              </Badge>
             )}
             <Badge className={`text-[10px] ${priorityTone[draft.priority]}`}>{draft.priority}</Badge>
           </div>

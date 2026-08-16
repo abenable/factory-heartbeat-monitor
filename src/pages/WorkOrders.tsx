@@ -6,6 +6,7 @@ import { Panel, SectionHeading } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
 import {
   workOrders as initial,
+  WorkOrder,
   WorkOrderStatus,
   WorkOrderPriority,
   getMachine,
@@ -13,7 +14,9 @@ import {
   woTypeLabel,
 } from "@/data/cmms";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
+import { WorkOrderDetailDialog } from "@/components/WorkOrderDetailDialog";
 import { isViewer } from "@/lib/auth";
+import logoRed from "@/assets/kmc-logo-red.svg";
 
 const statusFilters: { key: WorkOrderStatus | "all"; label: string }[] = [
   { key: "all", label: "All" },
@@ -32,6 +35,7 @@ const priorityColor: Record<WorkOrderPriority, string> = {
 
 const WorkOrders = () => {
   const [filter, setFilter] = useState<WorkOrderStatus | "all">("all");
+  const [selected, setSelected] = useState<WorkOrder | null>(null);
   const list = useMemo(
     () =>
       filter === "all" ? initial : initial.filter((w) => w.status === filter),
@@ -87,6 +91,7 @@ const WorkOrders = () => {
           </div>
         </div>
 
+        <div className="no-print flex flex-col gap-6">
         <SectionHeading>{list.length} Work Orders</SectionHeading>
         <Panel className="overflow-x-auto">
           <table className="w-full text-left min-w-[640px]">
@@ -101,20 +106,25 @@ const WorkOrders = () => {
                 <th className="p-3 w-28">Status</th>
                 <th className="p-3 w-32">Assignee</th>
                 <th className="p-3 w-32">Due</th>
-                <th className="p-3 w-16 no-print">Print</th>
+                <th className="p-3 w-16">Print</th>
               </tr>
             </thead>
             <tbody className="font-mono-data text-xs">
               {list.map((w) => (
                 <tr
                   key={w.id}
-                  className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors"
+                  onClick={() => setSelected(w)}
+                  className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors cursor-pointer"
                 >
                   <td className="p-3 font-bold">{w.id}</td>
                   <td className="p-3 font-mono-data text-primary">{w.referenceNumber ?? "—"}</td>
                   <td className="p-3">{w.title}</td>
                   <td className="p-3">
-                    <Link to={`/machines/${w.machineId}`} className="text-muted-foreground hover:text-primary">
+                    <Link
+                      to={`/machines/${w.machineId}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-muted-foreground hover:text-primary"
+                    >
                       {w.machineId}
                     </Link>
                   </td>
@@ -131,9 +141,12 @@ const WorkOrders = () => {
                   <td className="p-3 text-muted-foreground">
                     {new Date(w.dueAt).toISOString().slice(5, 16).replace("T", " ")}
                   </td>
-                  <td className="p-3 no-print">
+                  <td className="p-3">
                     <button
-                      onClick={() => printSingleWorkOrder(w)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        printSingleWorkOrder(w);
+                      }}
                       className="text-muted-foreground hover:text-primary"
                       aria-label={`Print ${w.id}`}
                       title="Print this work order"
@@ -146,12 +159,16 @@ const WorkOrders = () => {
             </tbody>
           </table>
         </Panel>
+        </div>
 
         {/* Printable header — only shows when printing the filtered list */}
         <div className="print-only">
-          <h1 style={{ fontSize: 20, marginBottom: 4 }}>
-            Work Orders — {filter === "all" ? "All" : filter.replace("_", " ").toUpperCase()}
-          </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <img src={logoRed} alt="KMC" style={{ width: 36, height: 36, objectFit: "contain" }} />
+            <h1 style={{ fontSize: 20, margin: 0 }}>
+              Kiira Motors Corporation — Work Orders — {filter === "all" ? "All" : filter.replace("_", " ").toUpperCase()}
+            </h1>
+          </div>
           <p style={{ marginBottom: 12, color: "#444" }}>
             Printed {new Date().toLocaleString()} · {list.length} item(s)
           </p>
@@ -179,6 +196,10 @@ const WorkOrders = () => {
           </table>
         </div>
       </div>
+
+      {selected && (
+        <WorkOrderDetailDialog wo={selected} onClose={() => setSelected(null)} />
+      )}
     </AppLayout>
   );
 };

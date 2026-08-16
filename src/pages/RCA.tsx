@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { machines } from "@/data/cmms";
+import logoRed from "@/assets/kmc-logo-red.svg";
 
 const RCA = () => {
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const RCA = () => {
           </Button>
         </div>
 
-        <SectionHeading>RCA Inputs</SectionHeading>
+        <SectionHeading className="no-print">RCA Inputs</SectionHeading>
         <Panel className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 no-print">
           <Field label="Equipment">
             <Input
@@ -146,9 +147,12 @@ const RCA = () => {
 
         {/* Printable report */}
         <div className="print-only">
-          <h1 style={{ fontSize: 22, marginBottom: 4 }}>
-            Kiira Motors Corporation — Root Cause Analysis
-          </h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <img src={logoRed} alt="KMC" style={{ width: 40, height: 40, objectFit: "contain" }} />
+            <h1 style={{ fontSize: 22, margin: 0 }}>
+              Kiira Motors Corporation — Root Cause Analysis
+            </h1>
+          </div>
           <p style={{ marginBottom: 16, color: "#444" }}>
             Printed {new Date().toLocaleString()}
           </p>

@@ -29,6 +29,7 @@ import CraftsmenManagement from "./pages/CraftsmenManagement.tsx";
 import Profile from "./pages/Profile.tsx";
 import TechnicianDashboard from "./pages/TechnicianDashboard.tsx";
 import TechnicianPerformance from "./pages/TechnicianPerformance.tsx";
+import TechnicianProgress from "./pages/TechnicianProgress.tsx";
 import ReportRequest from "./pages/ReportRequest.tsx";
 
 const queryClient = new QueryClient();
@@ -66,6 +67,7 @@ const App = () => (
             <Route path="/job-requests/:id" element={<RequireSupervisor><JobRequestDetail /></RequireSupervisor>} />
             <Route path="/work-orders" element={<RequireSupervisor><WorkOrders /></RequireSupervisor>} />
             <Route path="/work-orders/new" element={<RequireSupervisor><NewWorkOrder /></RequireSupervisor>} />
+            <Route path="/technician-progress" element={<RequireSupervisor><TechnicianProgress /></RequireSupervisor>} />
             <Route path="/rca" element={<RequireSupervisor><RCA /></RequireSupervisor>} />
             <Route path="/backlog" element={<RequireSupervisor><Backlog /></RequireSupervisor>} />
             <Route path="/maintenance" element={<RequireSupervisor><PMSchedule /></RequireSupervisor>} />

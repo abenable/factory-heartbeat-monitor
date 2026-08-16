@@ -3,6 +3,7 @@ import { Printer } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { Button } from "@/components/ui/button";
+import logoRed from "@/assets/kmc-logo-red.svg";
 import {
   workOrders,
   getBacklog,
@@ -162,35 +163,37 @@ export default function PerformanceReports() {
                 Downtime Cost by Machine
               </h3>
               <p className="text-xs text-muted-foreground mb-4">
-                Estimated lost production value per machine over the last 30 days, sorted by highest cost impact.
+                Top 8 machines by estimated lost production value over the last 30 days.
               </p>
-              <ResponsiveContainer width="100%" height={240}>
+              <ResponsiveContainer width="100%" height={280}>
                 <BarChart
-                  data={downtime.byCost.map((m) => ({
+                  data={downtime.byCost.slice(0, 8).map((m) => ({
                     name: m.id,
                     cost: Math.round(m.cost),
                   }))}
+                  layout="vertical"
+                  margin={{ left: 8, right: 16 }}
+                  barCategoryGap="28%"
                 >
-                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" horizontal={false} />
                   <XAxis
-                    dataKey="name"
-                    stroke="hsl(var(--muted-foreground))"
-                    fontSize={10}
-                    interval={0}
-                    angle={-20}
-                    textAnchor="end"
-                    height={60}
-                  />
-                  <YAxis
+                    type="number"
                     stroke="hsl(var(--muted-foreground))"
                     fontSize={10}
                     tickFormatter={(v) => `$${(v / 1000).toFixed(0)}k`}
+                  />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    stroke="hsl(var(--muted-foreground))"
+                    fontSize={10}
+                    width={72}
                   />
                   <RTooltip
                     formatter={(value) => [`$${Number(value).toLocaleString()}`, "Cost"]}
                     contentStyle={chartTooltipStyle}
                   />
-                  <Bar dataKey="cost" fill="hsl(var(--led-crit))" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="cost" fill="hsl(var(--led-crit))" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Panel>
@@ -499,7 +502,10 @@ export default function PerformanceReports() {
 
         {/* Printable summary */}
         <div className="print-only">
-          <h1 style={{ fontSize: 20, marginBottom: 4 }}>Kiira Motors Corporation — Performance Report</h1>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <img src={logoRed} alt="KMC" style={{ width: 36, height: 36, objectFit: "contain" }} />
+            <h1 style={{ fontSize: 20, margin: 0 }}>Kiira Motors Corporation — Performance Report</h1>
+          </div>
           <p style={{ marginBottom: 12, color: "#444" }}>
             Printed {new Date().toLocaleString()}
           </p>

@@ -111,10 +111,19 @@ export interface WorkOrderWorkLog {
   rootCause?: string;
   /** Challenges or blockers encountered while performing the job. */
   challengesFaced?: string;
-  /** Free-form technician comments for the work order. */
+  /** Free-form technician comments for the work order — printed as "Remarks (After Completion of Work)". */
   comments?: string;
   /** Photos taken by the technician to document the work or challenges. */
   images?: { name: string; dataUrl: string }[];
+
+  // ── Printed on the paper "Maintenance Work Order Form" completion section ──
+  descriptionOfWorkCompleted?: string;
+  explanationOfIncompleteWork?: string;
+  /** Typed name used as the technician's completion signature. */
+  completedByName?: string;
+  /** Typed name used as the supervisor's approval signature. */
+  approvedByName?: string;
+  approvedAt?: string;
 }
 
 export interface WorkOrder {
@@ -141,6 +150,13 @@ export interface WorkOrder {
   /** Human-readable maintenance reference number shown on cards/reports, e.g. M-2041. */
   referenceNumber?: string;
 
+  // ── Requestor (printed on the paper "Maintenance Work Order Form") ──
+  requestorName?: string;
+  requestorEmail?: string;
+  requestorDesignation?: string;
+  /** Workshop / station where the equipment is located, distinct from `department`. */
+  workshop?: string;
+
   // Legacy optional fields (for backward compat)
   workArea?: string;
   equipmentStatus?: string;
@@ -154,6 +170,22 @@ export function addWorkOrder(wo: WorkOrder) {
   workOrders.unshift(wo);
 }
 
+/**
+ * Auto-generates the next "CWO-####" reference number, matching the numbering
+ * on the printed Maintenance Work Order Form. Scans existing work orders for
+ * the highest CWO-prefixed sequence and increments it.
+ */
+export function nextWorkOrderReferenceNumber(): string {
+  const prefix = "CWO-";
+  const seqs = workOrders
+    .map((w) => w.referenceNumber ?? "")
+    .filter((r) => r.startsWith(prefix))
+    .map((r) => Number(r.slice(prefix.length)))
+    .filter((n) => !Number.isNaN(n));
+  const next = (seqs.length ? Math.max(...seqs) : 200) + 1;
+  return `${prefix}${String(next).padStart(4, "0")}`;
+}
+
 export function updateWorkOrder(id: string, updates: Partial<WorkOrder>) {
   const idx = workOrders.findIndex((w) => w.id === id);
   if (idx !== -1) {
@@ -161,18 +193,220 @@ export function updateWorkOrder(id: string, updates: Partial<WorkOrder>) {
   }
 }
 
+export type PMFrequency = "daily" | "weekly" | "monthly" | "quarterly";
+
+export interface PMChecklistItem {
+  id: string;
+  section: string;
+  description: string;
+  result?: "ok" | "faulty" | "na";
+}
+
+export interface PMCompletionLog {
+  id: string;
+  completedAt: string;
+  completedBy: string; // worker username
+  startTime?: string;
+  endTime?: string;
+  /** Actual hours the visit took — the source of truth for duration estimates. */
+  durationHours?: number;
+  /** Snapshot of the checklist results recorded during this visit. */
+  items: PMChecklistItem[];
+  remarks?: string;
+}
+
 export interface PMTask {
   id: string;
+  /** e.g. KMC/DPD/2026/CL0201 — mirrors the paper Equipment Maintenance Checklist. */
+  referenceNumber?: string;
   machineId: string;
   task: string;
   intervalDays: number;
   lastDone: string;
   nextDue: string;
-  frequency?: "daily" | "weekly" | "monthly" | "quarterly";
+  frequency?: PMFrequency;
   procedures?: string;
   requiredTools?: string;
   safetyInstructions?: string;
-  personInCharge?: string; // worker username
+  personInCharge?: string; // worker username — assigned technician
+  scheduledBy?: string; // worker username — supervisor who scheduled/assigned it
+  workshop?: string;
+  department?: string;
+  /** Manual override for the estimated visit duration; history-based average is preferred when available. */
+  estimatedHours?: number;
+  /** Sectioned checklist for the next scheduled visit. */
+  checklist: PMChecklistItem[];
+  /** Past completed visits — the source of "who completed it and how long it took". */
+  history: PMCompletionLog[];
+}
+
+/**
+ * Standard sectioned checklist template for the Equipment Maintenance
+ * Checklist paper form (panel/electrical & control-systems PM), used to
+ * generate a fresh checklist for every machine and every completed visit.
+ */
+export const PM_CHECKLIST_TEMPLATE: { section: string; items: string[] }[] = [
+  {
+    section: "Panel Distribution, LV Transformer & Protection",
+    items: [
+      "Visual inspection of switchgear/panel — check for burn marks or discoloration",
+      "Check tightness of terminal and busbar connections",
+      "Check earthing/bonding continuity",
+      "Insulation resistance (megger) test",
+    ],
+  },
+  {
+    section: "PLC / DCS & Control Electronics",
+    items: [
+      "Visual inspection of status/fault LEDs",
+      "Backup battery / UPS health check",
+      "Program and configuration backup verified",
+      "Review alarm and event logs",
+    ],
+  },
+  {
+    section: "Inverters, VFDs, Motor Drivers & Converters",
+    items: [
+      "Check for stored fault/error codes",
+      "Cooling fan and filter check",
+      "Terminal tightness check",
+    ],
+  },
+  {
+    section: "Motors & Servo Drives",
+    items: [
+      "Vibration and abnormal noise check",
+      "Insulation resistance (megger) check",
+      "Bearing lubrication check",
+      "Alignment and coupling check",
+    ],
+  },
+  {
+    section: "Temperature Controllers & Panel Thermal Management",
+    items: [
+      "Sensor calibration check",
+      "Panel fan/filter cleaning",
+      "Thermal scan for hot spots",
+      "Setpoint verification",
+    ],
+  },
+  {
+    section: "Contactors, Relays & Starters",
+    items: [
+      "Visual/thermal wear inspection",
+      "Contact resistance check",
+      "Coil voltage check",
+    ],
+  },
+  {
+    section: "Alarms, Beacons & Signal Lights",
+    items: [
+      "Functional test of audible alarms",
+      "Beacon and signal light check",
+    ],
+  },
+  {
+    section: "Batteries & Backup Power",
+    items: [
+      "Battery voltage and charge check",
+      "Terminal corrosion check",
+    ],
+  },
+  {
+    section: "Cooling, Earthing & Bonding",
+    items: [
+      "Visual inspection, IR scanning where available",
+    ],
+  },
+];
+
+let pmChecklistItemSeq = 0;
+export function buildPMChecklist(): PMChecklistItem[] {
+  return PM_CHECKLIST_TEMPLATE.flatMap((sec) =>
+    sec.items.map((description) => ({
+      id: `pmi-${++pmChecklistItemSeq}`,
+      section: sec.section,
+      description,
+    })),
+  );
+}
+
+export const PM_DEFAULT_HOURS: Record<PMFrequency, number> = {
+  daily: 1,
+  weekly: 1.5,
+  monthly: 2,
+  quarterly: 3,
+};
+
+/**
+ * Estimated visit duration: the average of actual logged durations from past
+ * completions when available (the real signal), falling back to a manual
+ * override or a sensible default for the task's frequency.
+ */
+export function estimatedPMHours(task: PMTask): { hours: number; source: "history" | "manual" | "default" } {
+  const logged = task.history.map((h) => h.durationHours).filter((h): h is number => typeof h === "number" && h > 0);
+  if (logged.length > 0) {
+    return { hours: logged.reduce((s, h) => s + h, 0) / logged.length, source: "history" };
+  }
+  if (task.estimatedHours) return { hours: task.estimatedHours, source: "manual" };
+  return { hours: PM_DEFAULT_HOURS[task.frequency ?? "monthly"], source: "default" };
+}
+
+export function pmDaysUntil(iso: string, now: Date = new Date()): number {
+  return Math.ceil((new Date(iso).getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+export function isPMOverdue(task: PMTask, now: Date = new Date()): boolean {
+  return pmDaysUntil(task.nextDue, now) <= 0;
+}
+
+export function isPMDueSoon(task: PMTask, withinDays = 7, now: Date = new Date()): boolean {
+  const days = pmDaysUntil(task.nextDue, now);
+  return days > 0 && days <= withinDays;
+}
+
+export function getPMTask(id: string): PMTask | undefined {
+  return pmTasks.find((p) => p.id === id);
+}
+
+export function addPMTask(task: PMTask) {
+  pmTasks.push(task);
+}
+
+export function updatePMTask(id: string, updates: Partial<PMTask>) {
+  const idx = pmTasks.findIndex((p) => p.id === id);
+  if (idx !== -1) {
+    pmTasks[idx] = { ...pmTasks[idx], ...updates };
+  }
+}
+
+export function nextPMReferenceNumber(year = new Date().getFullYear()): string {
+  const prefix = `KMC/DPD/${year}/CL`;
+  const seqs = pmTasks
+    .map((p) => p.referenceNumber ?? "")
+    .filter((r) => r.startsWith(prefix))
+    .map((r) => Number(r.slice(prefix.length)))
+    .filter((n) => !Number.isNaN(n));
+  const next = (seqs.length ? Math.max(...seqs) : 200) + 1;
+  return `${prefix}${String(next).padStart(3, "0")}`;
+}
+
+/** Record a completed PM visit: logs history, advances lastDone/nextDue, resets the checklist. */
+export function completePMVisit(
+  taskId: string,
+  entry: Omit<PMCompletionLog, "id">,
+): void {
+  const task = getPMTask(taskId);
+  if (!task) return;
+  const completedDate = entry.completedAt.slice(0, 10);
+  const next = new Date(entry.completedAt);
+  next.setDate(next.getDate() + task.intervalDays);
+  updatePMTask(taskId, {
+    lastDone: completedDate,
+    nextDue: next.toISOString().slice(0, 10),
+    history: [{ id: `pmlog-${task.id}-${task.history.length + 1}`, ...entry }, ...task.history],
+    checklist: buildPMChecklist(),
+  });
 }
 
 export const machines: Machine[] = [
@@ -1141,17 +1375,91 @@ export const workOrders: WorkOrder[] = [
   },
 ];
 
-export const pmTasks: PMTask[] = [
-  { id: "PM-01", machineId: "MS-TUBE-01", task: "Lens and nozzle inspection", intervalDays: 30, lastDone: "2026-07-02", nextDue: "2026-08-01", frequency: "monthly", procedures: "Inspect lens for burn marks. Check nozzle concentricity. Replace if kerf > 0.1 mm.", requiredTools: "Lens wipes, nozzle gauge", safetyInstructions: "Disable laser source. Wait 5 min after shutdown.", personInCharge: "Wagoli" },
-  { id: "PM-02", machineId: "MS-LATHE-01", task: "Spindle lubrication", intervalDays: 14, lastDone: "2026-07-06", nextDue: "2026-07-20", frequency: "weekly", procedures: "Apply grease to spindle bearings (2 pumps). Check oil mist level.", requiredTools: "Grease gun, lint-free cloth", safetyInstructions: "Spindle must be at rest. Lockout before access.", personInCharge: "Mukisa" },
-  { id: "PM-03", machineId: "MS-MILL-01", task: "Coolant flush", intervalDays: 60, lastDone: "2026-05-17", nextDue: "2026-07-16", frequency: "monthly", procedures: "Drain old coolant. Flush tank with clean water. Refill with 5% concentrate mix.", requiredTools: "Drain pan, pH test kit", safetyInstructions: "Wear chemical-resistant gloves and goggles.", personInCharge: "Suubi" },
-  { id: "PM-04", machineId: "WL-WELD-01", task: "Torch tip and liner check", intervalDays: 21, lastDone: "2026-07-06", nextDue: "2026-07-27", frequency: "weekly", procedures: "Remove worn tip. Clean threads. Install new tip. Verify gas flow.", requiredTools: "Tip wrench, wire brush", safetyInstructions: "Purge gas lines before disassembly.", personInCharge: "Tabalaata" },
-  { id: "PM-05", machineId: "PS-SPRAY-01", task: "Paint pattern verification", intervalDays: 14, lastDone: "2026-07-06", nextDue: "2026-07-20", frequency: "weekly", procedures: "Run pattern test card. Check atomization. Record fan width.", requiredTools: "Pattern test card, calipers", safetyInstructions: "Use booth ventilation. Ground applicator.", personInCharge: "Wagoli" },
-  { id: "PM-06", machineId: "PS-COMP-01", task: "Filter and oil check", intervalDays: 30, lastDone: "2026-07-07", nextDue: "2026-08-06", frequency: "monthly", procedures: "Replace oil filter. Check air filter. Sample oil for analysis.", requiredTools: "Filter wrench, sample bottle", safetyInstructions: "Depressurize receiver. Wear ear protection.", personInCharge: "Oumo" },
-  { id: "PM-07", machineId: "CL2-SLING-01", task: "Hoist brake and chain inspection", intervalDays: 30, lastDone: "2026-06-22", nextDue: "2026-07-22", frequency: "monthly", procedures: "Test brake slip. Measure chain wear. Record load test.", requiredTools: "Chain gauge, load cell", safetyInstructions: "Tag out before entry. Use fall protection if elevated.", personInCharge: "Odeke" },
-  { id: "PM-08", machineId: "QIT-TEST-01", task: "Analyzer drift check", intervalDays: 14, lastDone: "2026-07-06", nextDue: "2026-07-20", frequency: "weekly", procedures: "Run calibration gas. Verify zero and span. Replace filter if differential > limit.", requiredTools: "Calibration gas, filter wrench", safetyInstructions: "Rollers locked. Chock vehicle.", personInCharge: "Oumo" },
-  { id: "PM-09", machineId: "CL1-VIN-01", task: "Stylus and vision calibration", intervalDays: 60, lastDone: "2026-06-12", nextDue: "2026-08-11", frequency: "monthly", procedures: "Replace worn stylus. Verify engraving depth. Calibrate vision camera.", requiredTools: "Stylus kit, depth gauge, calibration plaque", safetyInstructions: "Lock marking head. Wear eye protection.", personInCharge: "Mukisa" },
+function daysFromNow(n: number): string {
+  return new Date(Date.now() + n * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+}
+
+function daysAgo(n: number): string {
+  return daysFromNow(-n);
+}
+
+let pmLogSeq = 0;
+function pmLog(
+  taskId: string,
+  completedBy: string,
+  daysBeforeNow: number,
+  durationHours: number,
+  okCount: number,
+  faultyCount: number,
+  remarks?: string,
+): PMCompletionLog {
+  const items = buildPMChecklist().map((item, i) => ({
+    ...item,
+    result: (i < okCount ? "ok" : i < okCount + faultyCount ? "faulty" : "na") as PMChecklistItem["result"],
+  }));
+  const completedAt = daysAgo(daysBeforeNow);
+  return {
+    id: `pmlog-${taskId}-${++pmLogSeq}`,
+    completedAt: `${completedAt}T14:00:00.000Z`,
+    completedBy,
+    startTime: `${completedAt}T${String(10).padStart(2, "0")}:00:00.000Z`,
+    endTime: `${completedAt}T${String(10 + Math.floor(durationHours)).padStart(2, "0")}:${String(Math.round((durationHours % 1) * 60)).padStart(2, "0")}:00.000Z`,
+    durationHours,
+    items,
+    remarks,
+  };
+}
+
+/** The 9 originally curated PM tasks — rich narrative content, kept as-is and extended with checklist/history. */
+const curatedPMTasks: PMTask[] = [
+  { id: "PM-01", referenceNumber: "KMC/DPD/2026/CL201", machineId: "MS-TUBE-01", task: "Lens and nozzle inspection", intervalDays: 30, lastDone: "2026-07-02", nextDue: "2026-08-01", frequency: "monthly", procedures: "Inspect lens for burn marks. Check nozzle concentricity. Replace if kerf > 0.1 mm.", requiredTools: "Lens wipes, nozzle gauge", safetyInstructions: "Disable laser source. Wait 5 min after shutdown.", personInCharge: "Wagoli", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-01", "Wagoli", 45, 2.5, 19, 1, "Nozzle showed early wear, replaced.")] },
+  { id: "PM-02", referenceNumber: "KMC/DPD/2026/CL202", machineId: "MS-LATHE-01", task: "Spindle lubrication", intervalDays: 14, lastDone: "2026-07-06", nextDue: "2026-07-20", frequency: "weekly", procedures: "Apply grease to spindle bearings (2 pumps). Check oil mist level.", requiredTools: "Grease gun, lint-free cloth", safetyInstructions: "Spindle must be at rest. Lockout before access.", personInCharge: "Mukisa", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-02", "Mukisa", 60, 1.2, 20, 0), pmLog("PM-02", "Mukisa", 74, 1.4, 20, 0)] },
+  { id: "PM-03", referenceNumber: "KMC/DPD/2026/CL203", machineId: "MS-MILL-01", task: "Coolant flush", intervalDays: 60, lastDone: "2026-05-17", nextDue: "2026-07-16", frequency: "monthly", procedures: "Drain old coolant. Flush tank with clean water. Refill with 5% concentrate mix.", requiredTools: "Drain pan, pH test kit", safetyInstructions: "Wear chemical-resistant gloves and goggles.", personInCharge: "Suubi", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-03", "Suubi", 90, 2.8, 18, 2, "Tank had heavier sediment than usual.")] },
+  { id: "PM-04", referenceNumber: "KMC/DPD/2026/CL204", machineId: "WL-WELD-01", task: "Torch tip and liner check", intervalDays: 21, lastDone: "2026-07-06", nextDue: "2026-07-27", frequency: "weekly", procedures: "Remove worn tip. Clean threads. Install new tip. Verify gas flow.", requiredTools: "Tip wrench, wire brush", safetyInstructions: "Purge gas lines before disassembly.", personInCharge: "Tabalaata", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-04", "Tabalaata", 28, 1.6, 20, 0)] },
+  { id: "PM-05", referenceNumber: "KMC/DPD/2026/CL205", machineId: "PS-SPRAY-01", task: "Paint pattern verification", intervalDays: 14, lastDone: "2026-07-06", nextDue: "2026-07-20", frequency: "weekly", procedures: "Run pattern test card. Check atomization. Record fan width.", requiredTools: "Pattern test card, calipers", safetyInstructions: "Use booth ventilation. Ground applicator.", personInCharge: "Wagoli", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-05", "Wagoli", 21, 1.1, 20, 0)] },
+  { id: "PM-06", referenceNumber: "KMC/DPD/2026/CL206", machineId: "PS-COMP-01", task: "Filter and oil check", intervalDays: 30, lastDone: "2026-07-07", nextDue: "2026-08-06", frequency: "monthly", procedures: "Replace oil filter. Check air filter. Sample oil for analysis.", requiredTools: "Filter wrench, sample bottle", safetyInstructions: "Depressurize receiver. Wear ear protection.", personInCharge: "Oumo", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-06", "Oumo", 38, 2.2, 20, 0), pmLog("PM-06", "Oumo", 68, 2.0, 19, 1)] },
+  { id: "PM-07", referenceNumber: "KMC/DPD/2026/CL207", machineId: "CL2-SLING-01", task: "Hoist brake and chain inspection", intervalDays: 30, lastDone: "2026-06-22", nextDue: "2026-07-22", frequency: "monthly", procedures: "Test brake slip. Measure chain wear. Record load test.", requiredTools: "Chain gauge, load cell", safetyInstructions: "Tag out before entry. Use fall protection if elevated.", personInCharge: "Odeke", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-07", "Odeke", 53, 3.1, 20, 0)] },
+  { id: "PM-08", referenceNumber: "KMC/DPD/2026/CL208", machineId: "QIT-TEST-01", task: "Analyzer drift check", intervalDays: 14, lastDone: "2026-07-06", nextDue: "2026-07-20", frequency: "weekly", procedures: "Run calibration gas. Verify zero and span. Replace filter if differential > limit.", requiredTools: "Calibration gas, filter wrench", safetyInstructions: "Rollers locked. Chock vehicle.", personInCharge: "Oumo", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-08", "Oumo", 21, 0.9, 20, 0)] },
+  { id: "PM-09", referenceNumber: "KMC/DPD/2026/CL209", machineId: "CL1-VIN-01", task: "Stylus and vision calibration", intervalDays: 60, lastDone: "2026-06-12", nextDue: "2026-08-11", frequency: "monthly", procedures: "Replace worn stylus. Verify engraving depth. Calibrate vision camera.", requiredTools: "Stylus kit, depth gauge, calibration plaque", safetyInstructions: "Lock marking head. Wear eye protection.", personInCharge: "Mukisa", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-09", "Mukisa", 66, 2.4, 20, 0)] },
 ];
+
+/** Remaining fleet machines that had no PM coverage — generated from the standard checklist template. */
+const generatedPMTasks: PMTask[] = [
+  { id: "PM-10", machineId: "MS-DRILL-01", task: "Pillar drill preventive inspection", frequency: "monthly", intervalDays: 30, personInCharge: "Mukisa", daysDue: -6, hist: [["Mukisa", 40, 1.8, 20, 0]] },
+  { id: "PM-11", machineId: "MS-BEND-01", task: "Press brake preventive inspection", frequency: "monthly", intervalDays: 30, personInCharge: "Suubi", daysDue: 3, hist: [["Suubi", 27, 2.1, 19, 1]] },
+  { id: "PM-12", machineId: "MS-SHEAR-01", task: "Hydraulic shear preventive inspection", frequency: "quarterly", intervalDays: 90, personInCharge: "Wagoli", daysDue: 12, hist: [["Wagoli", 78, 3.2, 20, 0]] },
+  { id: "PM-13", machineId: "WL-SIDE-01", task: "Panel former preventive inspection", frequency: "weekly", intervalDays: 14, personInCharge: "Tabalaata", daysDue: -2, hist: [["Tabalaata", 12, 1.4, 20, 0]] },
+  { id: "PM-14", machineId: "WL-UHOOP-01", task: "Roll former preventive inspection", frequency: "monthly", intervalDays: 30, personInCharge: "Tabalaata", daysDue: 9, hist: [["Tabalaata", 34, 2.0, 20, 0]] },
+  { id: "PM-15", machineId: "WL-MERGE-01", task: "Assembly fixture preventive inspection", frequency: "monthly", intervalDays: 30, personInCharge: "Mutebi", daysDue: 20, hist: [] },
+  { id: "PM-16", machineId: "PS-POLY-01", task: "PU dispenser preventive inspection", frequency: "monthly", intervalDays: 30, personInCharge: "Wagoli", daysDue: -1, hist: [["Wagoli", 32, 2.3, 18, 2]] },
+  { id: "PM-17", machineId: "TS-COMP-01", task: "Compressor preventive inspection", frequency: "monthly", intervalDays: 30, personInCharge: "Oumo", daysDue: 6, hist: [["Oumo", 29, 1.9, 20, 0]] },
+  { id: "PM-18", machineId: "CL2-MOTOR-01", task: "Powertrain lift preventive inspection", frequency: "quarterly", intervalDays: 90, personInCharge: "Odeke", daysDue: 35, hist: [["Odeke", 55, 2.9, 20, 0]] },
+  { id: "PM-19", machineId: "CL2-LIFT-01", task: "Multi-point lift preventive inspection", frequency: "quarterly", intervalDays: 90, personInCharge: "Odeke", daysDue: -14, hist: [["Odeke", 100, 3.4, 19, 1]] },
+  { id: "PM-20", machineId: "QIT-COMP-01", task: "Compressor preventive inspection", frequency: "monthly", intervalDays: 30, personInCharge: "Oumo", daysDue: 15, hist: [["Oumo", 20, 2.1, 20, 0]] },
+  { id: "PM-21", machineId: "QIT-DRILL-01", task: "Bench drill preventive inspection", frequency: "weekly", intervalDays: 14, personInCharge: "Mukisa", daysDue: 4, hist: [["Mukisa", 9, 1.0, 20, 0]] },
+].map(({ id, machineId, task, frequency, intervalDays, personInCharge, daysDue, hist }) => ({
+  id,
+  referenceNumber: nextRefFor(id),
+  machineId,
+  task,
+  intervalDays,
+  frequency: frequency as PMFrequency,
+  nextDue: daysFromNow(daysDue),
+  lastDone: daysAgo(intervalDays - daysDue),
+  personInCharge,
+  scheduledBy: "Nakimbugwe",
+  checklist: buildPMChecklist(),
+  history: hist.map(([who, daysBefore, hours, ok, faulty]) =>
+    pmLog(id, who as string, daysBefore as number, hours as number, ok as number, faulty as number),
+  ),
+}));
+
+function nextRefFor(id: string): string {
+  const seq = 200 + Number(id.slice(3));
+  return `KMC/DPD/2026/CL${seq}`;
+}
+
+export const pmTasks: PMTask[] = [...curatedPMTasks, ...generatedPMTasks];
 
 export function getMachine(id: string) {
   return machines.find((m) => m.id === id);

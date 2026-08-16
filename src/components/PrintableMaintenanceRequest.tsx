@@ -1,6 +1,7 @@
 import type { MaintenanceRequest } from "@/data/maintenanceRequests";
 import { URGENCY_ORDER, urgencyLabel, urgencyHint, timeToFirstResponse } from "@/data/maintenanceRequests";
 import { getMachine } from "@/data/cmms";
+import logoRed from "@/assets/kmc-logo-red.svg";
 
 interface PrintableMaintenanceRequestProps {
   request: MaintenanceRequest;
@@ -12,7 +13,7 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
     <div className="print-only print-block printable-mrf">
       <div className="mrf-header">
         <div className="mrf-logo">
-          <div className="mrf-logo-mark">KMC</div>
+          <img src={logoRed} alt="KMC" className="mrf-logo-mark" />
           <div>
             <div className="mrf-logo-title">Kiira Motors Corporation</div>
             <div className="mrf-logo-sub">Computerised Maintenance Management System</div>
@@ -186,13 +187,8 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
         .mrf-logo-mark {
           width: 44px;
           height: 44px;
-          border: 2px solid #000;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-weight: bold;
-          font-size: 12px;
+          object-fit: contain;
+          flex-shrink: 0;
         }
         .mrf-logo-title {
           font-weight: bold;

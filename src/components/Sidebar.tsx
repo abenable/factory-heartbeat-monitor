@@ -12,9 +12,10 @@ import {
   Package,
   TrendingUp,
   History,
+  Gauge,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { workOrders, getBacklog } from "@/data/cmms";
+import { workOrders, getBacklog, pmTasks, isPMOverdue } from "@/data/cmms";
 import { jobRequests } from "@/data/jobRequests";
 import { getUser, logout } from "@/lib/auth";
 import { getWorker } from "@/data/workers";
@@ -24,6 +25,7 @@ const nav = [
   { to: "/machines", label: "Machines", icon: Cpu },
   { to: "/job-requests", label: "Job Requests", icon: Inbox },
   { to: "/work-orders", label: "Work Orders", icon: ClipboardList },
+  { to: "/technician-progress", label: "Technician Progress", icon: Gauge },
   { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
   { to: "/backlog", label: "Backlog", icon: History },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
@@ -42,11 +44,13 @@ export function Sidebar({ logo, subtitle, onLogout }: SidebarProps) {
   const openJR = jobRequests.filter((r) => r.status !== "converted").length;
   const openWO = workOrders.filter((w) => w.status !== "done").length;
   const backlogCount = getBacklog().length;
+  const overduePMCount = pmTasks.filter((p) => isPMOverdue(p)).length;
 
   const counts: Record<string, number | undefined> = {
     "/job-requests": openJR,
     "/work-orders": openWO,
     "/backlog": backlogCount,
+    "/maintenance": overduePMCount,
   };
 
   const user = getUser() ?? "Operator";
@@ -94,7 +98,11 @@ export function Sidebar({ logo, subtitle, onLogout }: SidebarProps) {
             <item.icon className="size-4 shrink-0" />
             <span className="truncate flex-1">{item.label}</span>
             {counts[item.to] ? (
-              <span className="font-mono-data text-[10px] bg-secondary px-1.5 py-0.5">
+              <span
+                className={`font-mono-data text-[10px] px-1.5 py-0.5 ${
+                  item.to === "/maintenance" ? "bg-led-crit text-white" : "bg-secondary"
+                }`}
+              >
                 {counts[item.to]}
               </span>
             ) : null}

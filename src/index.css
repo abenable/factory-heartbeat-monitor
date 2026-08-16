@@ -3,111 +3,115 @@
 @tailwind utilities;
 
 /* Industrial CMMS — light + dark. All colors HSL.
-   Light = clean white with KMC red accents.
-   Dark  = deep red control console. */
+   Brand red sourced from kiiramotors.com (#BE1E2D — hsl(354 73% 43%)).
+   Light = clean white console with KMC red accents.
+   Dark  = matte black console with the KMC red glowing on black, mirroring
+           the corporate site's dark chrome (#292929 / #2b2c2c panels). */
 
 @layer base {
   :root {
-    /* === LIGHT — clean white with cyan accents === */
+    /* === LIGHT — clean white with KMC red accents === */
     --background:  0  0%  98%;
-    --foreground:  220  20%  18%;
+    --foreground:  220  20%  15%;
 
     --panel:       0  0%  100%;
     --panel-elevated:  220  15%  96%;
 
     --card:        0  0%  100%;
-    --card-foreground:  220  20%  18%;
+    --card-foreground:  220  20%  15%;
 
     --popover:     0  0%  100%;
-    --popover-foreground:  220  20%  18%;
+    --popover-foreground:  220  20%  15%;
 
-    /* Primary: KMC red #C8102E */
-    --primary:     350  85%  42%;
+    /* Primary: KMC red #BE1E2D */
+    --primary:     354  73%  43%;
     --primary-foreground:  0  0%  100%;
 
     /* Secondary: pale gray-red */
-    --secondary:   350  20%  94%;
+    --secondary:   354  22%  95%;
     --secondary-foreground:  220  20%  20%;
 
-    --muted:       350  15%  95%;
+    --muted:       354  15%  96%;
     --muted-foreground:  220  12%  45%;
 
-    /* Accent: KMC red #C8102E */
-    --accent:      350  85%  42%;
+    /* Accent: KMC red #BE1E2D */
+    --accent:      354  73%  43%;
     --accent-foreground:  0  0%  100%;
 
-    --destructive:  355  75%  48%;
+    /* Destructive: a brighter alert red, kept distinct from the brand maroon-red primary */
+    --destructive:  4  88%  52%;
     --destructive-foreground:  0  0%  100%;
 
     --border:      220  15%  90%;
     --input:       220  15%  90%;
-    --ring:        350  85%  42%;
+    --ring:        354  73%  43%;
 
-    /* Status LEDs */
-    --led-ok:      155  70%  36%;
+    /* Status LEDs — ok/warn/crit/info are visually distinct from brand red */
+    --led-ok:      155  65%  35%;
     --led-warn:    38   95%  50%;
-    --led-crit:    0    78%  48%;
-    --led-info:    350  85%  42%;
+    --led-crit:    4    85%  50%;
+    --led-info:    210  80%  48%;
 
     --radius: 0.375rem;
 
     /* Sidebar */
     --sidebar-background:  0  0%  99%;
     --sidebar-foreground:  220  15%  32%;
-    --sidebar-primary:     350  85%  42%;
+    --sidebar-primary:     354  73%  43%;
     --sidebar-primary-foreground:  0  0%  100%;
     --sidebar-accent:      220  15%  94%;
-    --sidebar-accent-foreground:  220  20%  18%;
+    --sidebar-accent-foreground:  220  20%  15%;
     --sidebar-border:      220  15%  90%;
-    --sidebar-ring:        350  85%  42%;
+    --sidebar-ring:        354  73%  43%;
   }
 
   .dark {
-    /* === DARK — clean black-and-white/professional theme === */
-    --background:  0  0%  0%;
-    --foreground:  0  0%  100%;
+    /* === DARK — matte black console, KMC red glowing on black === */
+    --background:  0  0%  3%;
+    --foreground:  0  0%  96%;
 
-    --panel:       0  0%  6%;
-    --panel-elevated:  0  0%  12%;
+    --panel:       0  0%  7%;
+    --panel-elevated:  0  0%  14%;
 
-    --card:        0  0%  6%;
-    --card-foreground:  0  0%  100%;
+    --card:        0  0%  7%;
+    --card-foreground:  0  0%  96%;
 
-    --popover:     0  0%  10%;
-    --popover-foreground:  0  0%  100%;
+    --popover:     0  0%  9%;
+    --popover-foreground:  0  0%  96%;
 
-    --primary:     0  0%  100%;
-    --primary-foreground:  0  0%  0%;
+    /* Primary: KMC red #BE1E2D, lifted slightly for contrast against black */
+    --primary:     354  78%  50%;
+    --primary-foreground:  0  0%  100%;
 
     --secondary:   0  0%  14%;
-    --secondary-foreground:  0  0%  100%;
+    --secondary-foreground:  0  0%  94%;
 
     --muted:       0  0%  12%;
-    --muted-foreground:  0  0%  60%;
+    --muted-foreground:  0  0%  62%;
 
-    --accent:      0  0%  18%;
+    --accent:      354  78%  50%;
     --accent-foreground:  0  0%  100%;
 
-    --destructive:  0  0%  100%;
-    --destructive-foreground:  0  0%  0%;
+    --destructive:  4  90%  58%;
+    --destructive-foreground:  0  0%  100%;
 
-    --border:      0  0%  18%;
-    --input:       0  0%  18%;
-    --ring:        0  0%  100%;
+    --border:      0  0%  16%;
+    --input:       0  0%  16%;
+    --ring:        354  78%  50%;
 
-    --led-ok:      0  0%  100%;
-    --led-warn:    0  0%  70%;
-    --led-crit:    0  0%  45%;
-    --led-info:    0  0%  85%;
+    --led-ok:      155  60%  45%;
+    --led-warn:    38   95%  55%;
+    --led-crit:    4    90%  58%;
+    --led-info:    210  85%  60%;
 
     --sidebar-background:  0  0%  4%;
-    --sidebar-foreground:  0  0%  60%;
-    --sidebar-primary:     0  0%  100%;
-    --sidebar-primary-foreground:  0  0%  0%;
+    --sidebar-foreground:  0  0%  65%;
+    --sidebar-primary:     354  78%  50%;
+    --sidebar-primary-foreground:  0  0%  100%;
     --sidebar-accent:      0  0%  14%;
-    --sidebar-accent-foreground:  0  0%  100%;
-    --sidebar-border:      0  0%  16%;
-    --sidebar-ring:        0  0%  100%;
+    --sidebar-accent-foreground:  0  0%  98%;
+    --sidebar-border:      0  0%  15%;
+    --sidebar-ring:        354  78%  50%;
   }
 }
 
@@ -146,7 +150,7 @@
   .bg-panel  { background-color: hsl(var(--panel)); }
   .bg-panel-elevated { background-color: hsl(var(--panel-elevated)); }
 
-  /* KMC red status badge — solid #C8102E */
+  /* KMC red status badge — theme-aware, matches --primary in both modes */
   .badge-cyan {
     display: inline-flex;
     align-items: center;
@@ -155,22 +159,28 @@
     font-size: 12px;
     font-weight: 500;
     line-height: 1.33;
-    background: hsl(350 85% 42%);
-    color: #fff;
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
     text-transform: uppercase;
     letter-spacing: 0.04em;
     font-family: 'Geist Mono', ui-monospace, monospace;
     font-variant-numeric: tabular-nums;
   }
 
-  /* KMC red text #C8102E */
+  /* KMC red text — theme-aware, matches --primary in both modes */
   .text-cyan {
-    color: hsl(350 85% 42%);
+    color: hsl(var(--primary));
   }
 
   /* Theme-aware subtle gradient */
   .bg-gradient-blue {
     background: linear-gradient(135deg, hsl(var(--panel)) 0%, hsl(var(--accent) / 0.15) 100%);
+  }
+
+  /* Dark mode: flat panel instead of a red-tinted gradient — the accent
+     wash read as an unwanted red glow across every stat card. */
+  .dark .bg-gradient-blue {
+    background: hsl(var(--panel));
   }
 }
 
@@ -186,7 +196,83 @@
   main { padding: 0 !important; overflow: visible !important; }
   .print-only { display: block !important; }
   .print-block { break-inside: avoid; }
+  /* Printing a single work order: the printable form is appended as a sibling
+     of #root directly on <body>. Hiding #root wholesale hides every other
+     visible section on whichever page triggered the print (stat cards,
+     filters, tables, other print-only blocks, etc.) so only that one work
+     order — nothing from "page one" of the app itself — reaches the printer. */
+  body.printing-single-wo #root { display: none !important; }
   table { width: 100% !important; border-collapse: collapse; }
   th, td { border: 1px solid #999 !important; padding: 6px 8px !important; color: #000 !important; }
   thead { background: #eee !important; }
 }
+
+/* === Maintenance Work Order Form print template ===
+   Mirrors the physical KMC paper form. Only ever rendered inside a
+   .print-only container (hidden on screen), sized to fit one A4 page. */
+.wo-print {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000;
+  font-size: 10.5px;
+  line-height: 1.35;
+}
+
+.wo-print-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wo-print-logo { width: 36px; height: 36px; object-fit: contain; flex-shrink: 0; }
+
+.wo-print-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+}
+.wo-print-header h1 { font-size: 16px; margin: 0; letter-spacing: 0.3px; }
+.wo-print-header h2 { font-size: 11px; margin: 2px 0 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.wo-print-cwo {
+  border: 1px solid #000 !important;
+  padding: 3px 12px !important;
+  text-align: center;
+  font-size: 10px;
+  white-space: nowrap;
+}
+.wo-print-cwo strong { display: block; font-size: 15px; letter-spacing: 0.5px; }
+
+.wo-print-grid { width: 100% !important; border-collapse: collapse; margin-bottom: 8px; table-layout: fixed; }
+.wo-print-grid th, .wo-print-grid td { border: 1px solid #000 !important; padding: 2.5px 6px !important; font-size: 10px !important; text-align: left; vertical-align: top; }
+.wo-print-grid th { width: 17%; font-weight: 700; background: #f0f0f0 !important; }
+.wo-print-grid td { width: 33%; }
+
+.wo-print-box { border: 1px solid #000; margin-bottom: 6px; }
+.wo-print-box-label {
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: #f0f0f0;
+  border-bottom: 1px solid #000;
+  padding: 2px 6px;
+}
+.wo-print-box-body { min-height: 16px; padding: 3px 6px; font-size: 10px; white-space: pre-wrap; }
+
+.wo-print-table-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.3px; margin: 10px 0 4px; }
+.wo-print-parts { width: 100% !important; border-collapse: collapse; margin-bottom: 8px; }
+.wo-print-parts th, .wo-print-parts td { border: 1px solid #000 !important; padding: 2.5px 6px !important; font-size: 10px !important; }
+.wo-print-parts th { background: #f0f0f0 !important; text-align: left; }
+.wo-print-parts td:first-child { text-align: center; }
+
+.wo-print-signoff {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 24px;
+  margin-top: 14px;
+}
+.wo-print-signoff-field { display: flex; flex-direction: column; }
+.wo-print-sig-line { border-bottom: 1px solid #000; height: 22px; font-size: 10px; padding-bottom: 2px; }
+.wo-print-signoff-field span { font-size: 9px; color: #444; margin-top: 2px; }

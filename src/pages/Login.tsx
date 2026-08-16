@@ -43,13 +43,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen w-full flex relative overflow-hidden bg-background lg:bg-white">
+    <div className="min-h-screen w-full flex relative overflow-hidden bg-background">
       {/* Left — brand panel */}
       <div
         aria-hidden
         className="hidden lg:flex lg:w-3/5 relative flex-col justify-between p-12 pb-16"
         style={{
-          background: "linear-gradient(135deg, #C8102E 0%, #9B0B20 55%, #6E0716 100%)",
+          background:
+            "linear-gradient(135deg, hsl(354 73% 43%) 0%, hsl(354 78% 28%) 55%, hsl(352 82% 15%) 100%)",
         }}
       >
         <div
@@ -80,9 +81,6 @@ const Login = () => {
         </div>
 
         <div className="relative z-10 max-w-lg">
-          <h2 className="text-white text-3xl font-semibold leading-tight mb-4">
-            Factory Heartbeat Monitor
-          </h2>
           <p className="text-white/75 text-base leading-relaxed">
             Computerised Maintenance Management System. Monitor factory machines,
             alerts, work orders, and preventive maintenance in real time.
@@ -114,7 +112,7 @@ const Login = () => {
       <div
         className="lg:hidden absolute top-0 left-0 right-0 h-48 z-0"
         style={{
-          background: "linear-gradient(135deg, #C8102E 0%, #9B0B20 100%)",
+          background: "linear-gradient(135deg, hsl(354 73% 43%) 0%, hsl(354 78% 28%) 100%)",
         }}
       >
         <div
@@ -158,11 +156,11 @@ const Login = () => {
                   height={36}
                   className="size-9 object-contain"
                 />
-                <span className="font-semibold text-lg tracking-tight text-[#111]">
+                <span className="font-semibold text-lg tracking-tight text-foreground">
                   KMC CMMS
                 </span>
               </div>
-              <CardTitle className="text-2xl tracking-tight text-[#111]">
+              <CardTitle className="text-2xl tracking-tight text-foreground">
                 Welcome back
               </CardTitle>
               <CardDescription>

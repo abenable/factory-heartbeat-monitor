@@ -17,11 +17,12 @@ export function Panel({ children, className }: PanelProps) {
 interface SectionHeadingProps {
   children: ReactNode;
   right?: ReactNode;
+  className?: string;
 }
 
-export function SectionHeading({ children, right }: SectionHeadingProps) {
+export function SectionHeading({ children, right, className }: SectionHeadingProps) {
   return (
-    <div className="flex items-end justify-between border-b border-border pb-2 mb-4">
+    <div className={cn("flex items-end justify-between border-b border-border pb-2 mb-4", className)}>
       <h2 className="font-mono-data text-xs text-primary uppercase tracking-widest">
         {children}
       </h2>
