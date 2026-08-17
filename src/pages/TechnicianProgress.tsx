@@ -49,7 +49,7 @@ function technicianAggregate(username: string): TechAggregate {
   };
 }
 
-const TechnicianProgress = () => {
+export function TechnicianProgressPanel() {
   const [selectedTech, setSelectedTech] = useState<WorkerProfile | null>(null);
   const [selectedWO, setSelectedWO] = useState<WorkOrder | null>(null);
 
@@ -76,7 +76,7 @@ const TechnicianProgress = () => {
     : 0;
 
   return (
-    <AppLayout pageTitle="Technician Progress" breadcrumb="WORKFORCE / PROGRESS">
+    <>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
         <SummaryCard label="Technicians" value={technicians.length} icon={Wrench} tone="default" />
         <SummaryCard label="Active Work Orders" value={totalActive} icon={Clock} tone="default" />
@@ -119,9 +119,15 @@ const TechnicianProgress = () => {
           }}
         />
       )}
-    </AppLayout>
+    </>
   );
-};
+}
+
+const TechnicianProgress = () => (
+  <AppLayout pageTitle="Technician Progress" breadcrumb="WORKFORCE / PROGRESS">
+    <TechnicianProgressPanel />
+  </AppLayout>
+);
 
 function TechnicianCard({
   worker,

@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import {
@@ -10,6 +9,7 @@ import {
   getCostFor,
 } from "@/data/crafts";
 import { WORKERS, onLeaveUsernames } from "@/data/workers";
+import { TechnicianProgressPanel } from "@/pages/TechnicianProgress";
 import {
   ResponsiveContainer,
   BarChart,
@@ -28,6 +28,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
 export default function CraftsmenManagement() {
   const workforce = Object.values(WORKERS).filter((w) => w.role !== "viewer");
   const performers = workforce.filter((w) => w.performance);
+  const maintenanceWorkforce = workforce.filter((w) => w.department.includes("Maintenance"));
 
   const avgCompletion = performers.length
     ? performers.reduce((s, w) => s + (w.performance?.completed ?? 0), 0) / performers.length
@@ -56,7 +57,7 @@ export default function CraftsmenManagement() {
   }));
 
   return (
-    <AppLayout pageTitle="Craftsmen" breadcrumb="WORKFORCE PERFORMANCE">
+    <AppLayout pageTitle="Man Power" breadcrumb="WORKFORCE PERFORMANCE">
       <div className="flex flex-col gap-6">
         {/* Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -64,6 +65,63 @@ export default function CraftsmenManagement() {
           <SummaryPanel label="On Leave" value={String(onLeave).padStart(2, "0")} />
           <SummaryPanel label="Avg Completed" value={avgCompletion.toFixed(0)} />
           <SummaryPanel label="Avg Days" value={avgDays.toFixed(1)} />
+        </div>
+
+        {/* Workforce under the maintenance department */}
+        <div>
+          <SectionHeading>Workforce — Maintenance Department</SectionHeading>
+          <Panel className="overflow-x-auto">
+            {maintenanceWorkforce.length === 0 ? (
+              <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
+                NO MAINTENANCE-DEPARTMENT STAFF
+              </div>
+            ) : (
+              <table className="w-full text-left min-w-[640px]">
+                <thead>
+                  <tr className="border-b border-border bg-panel-elevated font-mono-data text-[10px] text-primary uppercase">
+                    <th className="p-3">Name</th>
+                    <th className="p-3">Department</th>
+                    <th className="p-3">Job Title</th>
+                    <th className="p-3 w-28">Shift</th>
+                    <th className="p-3 w-24">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="text-sm">
+                  {maintenanceWorkforce.map((w) => {
+                    const onLeaveNow = onLeaveUsernames.includes(w.username);
+                    return (
+                      <tr key={w.username} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
+                        <td className="p-3">
+                          <div className="font-medium">{w.name}</div>
+                          <div className="text-xs text-muted-foreground font-mono-data">{w.workerId}</div>
+                        </td>
+                        <td className="p-3 text-muted-foreground">{w.department}</td>
+                        <td className="p-3 text-muted-foreground">{w.jobTitle}</td>
+                        <td className="p-3 text-xs text-muted-foreground">{w.shift}</td>
+                        <td className="p-3">
+                          <span
+                            className={`font-mono-data text-[10px] uppercase px-2 py-0.5 rounded-full ${
+                              onLeaveNow
+                                ? "bg-led-warn/15 text-led-warn"
+                                : "bg-led-ok/15 text-led-ok"
+                            }`}
+                          >
+                            {onLeaveNow ? "On Leave" : "Available"}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </Panel>
+        </div>
+
+        {/* Technician progress */}
+        <div>
+          <SectionHeading>Technician Progress</SectionHeading>
+          <TechnicianProgressPanel />
         </div>
 
         {/* Performance charts */}

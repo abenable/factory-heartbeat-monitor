@@ -7,6 +7,7 @@ import {
   Clock,
   MinusCircle,
   Plus,
+  Printer,
   Timer,
   UserCog,
 } from "lucide-react";
@@ -43,9 +44,10 @@ import {
   PMFrequency,
   PMChecklistItem,
 } from "@/data/cmms";
-import { WORKERS, getWorker } from "@/data/workers";
+import { WORKERS, onLeaveUsernames, getWorker } from "@/data/workers";
 import { getUser } from "@/lib/auth";
 import { toast } from "sonner";
+import { printPMChecklist } from "@/components/PrintablePMChecklist";
 
 type FreqFilter = "all" | PMFrequency;
 type DueFilter = "all" | "overdue" | "due-soon";
@@ -68,8 +70,9 @@ const freqFilters: { key: FreqFilter; label: string }[] = [
 
 const freqLabel = (f?: string) => (f ? f.charAt(0).toUpperCase() + f.slice(1) : "—");
 
+/** Only technicians who are currently available (not on leave) can be assigned a PM task. */
 const technicians = Object.values(WORKERS).filter(
-  (w) => w.role !== "supervisor" && w.role !== "viewer" && w.role !== "reporter",
+  (w) => w.role !== "supervisor" && w.role !== "viewer" && w.role !== "reporter" && !onLeaveUsernames.includes(w.username),
 );
 
 export default function PMSchedule() {
@@ -196,6 +199,19 @@ export default function PMSchedule() {
                         Est. {est.hours.toFixed(1)}h
                         {est.source === "history" && ` · from ${p.history.length} visit${p.history.length === 1 ? "" : "s"}`}
                       </Badge>
+                      {p.visitStartedAt ? (
+                        <Badge className="text-[9px] bg-led-ok/15 text-led-ok border border-led-ok/30">
+                          In Progress
+                        </Badge>
+                      ) : p.visitAcknowledgedAt ? (
+                        <Badge className="text-[9px] bg-primary/15 text-primary border border-primary/30">
+                          Acknowledged
+                        </Badge>
+                      ) : (
+                        <Badge className="text-[9px] bg-led-warn/15 text-led-warn border border-led-warn/30">
+                          Awaiting Technician
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm font-medium mt-1">{p.task}</p>
                     <div className="flex items-center gap-2 mt-1 text-xs text-muted-foreground">
@@ -229,6 +245,10 @@ export default function PMSchedule() {
                       <Button size="sm" variant="outline" onClick={() => setScheduleTarget(p)}>
                         <UserCog className="size-4" />
                         Schedule / Assign
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => printPMChecklist(p)}>
+                        <Printer className="size-4" />
+                        Print Checklist
                       </Button>
                     </div>
 
@@ -333,9 +353,9 @@ function NewPMDialog({
   const [department, setDepartment] = useState("");
 
   const machine = machines.find((m) => m.id === machineId);
-  const candidateWorkers = machine?.assignedTechnicians?.length
-    ? machine.assignedTechnicians
-    : technicians.map((t) => t.username);
+  const candidateWorkers = (
+    machine?.assignedTechnicians?.length ? machine.assignedTechnicians : technicians.map((t) => t.username)
+  ).filter((u) => !onLeaveUsernames.includes(u));
 
   const save = () => {
     if (!task.trim()) {
@@ -504,9 +524,9 @@ function ScheduleDialog({
   const [safetyInstructions, setSafetyInstructions] = useState(task.safetyInstructions ?? "");
 
   const machine = getMachine(task.machineId);
-  const candidateWorkers = machine?.assignedTechnicians?.length
-    ? machine.assignedTechnicians
-    : technicians.map((t) => t.username);
+  const candidateWorkers = (
+    machine?.assignedTechnicians?.length ? machine.assignedTechnicians : technicians.map((t) => t.username)
+  ).filter((u) => !onLeaveUsernames.includes(u));
 
   const save = () => {
     updatePMTask(task.id, {

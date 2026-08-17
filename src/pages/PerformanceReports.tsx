@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Printer } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
@@ -43,17 +43,57 @@ const chartTooltipStyle = {
   fontSize: 12,
 };
 
+type Period = "day" | "week" | "month" | "year";
+
+const periodOptions: { key: Period; label: string }[] = [
+  { key: "day", label: "Today" },
+  { key: "week", label: "Past Week" },
+  { key: "month", label: "Past Month" },
+  { key: "year", label: "Past Year" },
+];
+
+const PERIOD_DAYS: Record<Period, number> = { day: 1, week: 7, month: 30, year: 365 };
+
+function getPeriodRange(period: Period) {
+  const end = new Date();
+  const start = new Date(end.getTime() - PERIOD_DAYS[period] * 24 * 60 * 60 * 1000);
+  return { start, end };
+}
+
+function fmtShortDate(d: Date) {
+  return d.toLocaleDateString(undefined, { month: "short", day: "2-digit", year: "numeric" });
+}
+
 export default function PerformanceReports() {
+  const [period, setPeriod] = useState<Period>("month");
+  const { start, end } = useMemo(() => getPeriodRange(period), [period]);
+  const periodLabel = periodOptions.find((p) => p.key === period)!.label;
+
+  const periodWorkOrders = useMemo(
+    () => workOrders.filter((w) => {
+      const created = new Date(w.createdAt).getTime();
+      return created >= start.getTime() && created <= end.getTime();
+    }),
+    [start, end],
+  );
+  const periodAlerts = useMemo(
+    () => alerts.filter((a) => {
+      const ts = new Date(a.timestamp).getTime();
+      return ts >= start.getTime() && ts <= end.getTime();
+    }),
+    [start, end],
+  );
+
   const backlog = getBacklog();
-  const completedWO = workOrders.filter((w) => w.status === "done");
-  const delayedWO = workOrders.filter((w) => w.status !== "done" && new Date(w.dueAt).getTime() < Date.now());
-  const suspendedWO = workOrders.filter((w) => w.status === "blocked");
-  const openWO = workOrders.filter((w) => w.status === "open");
-  const inProgressWO = workOrders.filter((w) => w.status === "in_progress");
+  const completedWO = periodWorkOrders.filter((w) => w.status === "done");
+  const delayedWO = periodWorkOrders.filter((w) => w.status !== "done" && new Date(w.dueAt).getTime() < Date.now());
+  const suspendedWO = periodWorkOrders.filter((w) => w.status === "blocked");
+  const openWO = periodWorkOrders.filter((w) => w.status === "open");
+  const inProgressWO = periodWorkOrders.filter((w) => w.status === "in_progress");
 
   // Cost estimate: sum of (estimatedHours × craftsman rate) per WO
   const totalEstimatedCost = useMemo(() => {
-    return workOrders.reduce((sum, wo) => {
+    return periodWorkOrders.reduce((sum, wo) => {
       if (!wo.estimatedHours || wo.estimatedHours <= 0) return sum;
       // Find primary craft of assignee
       const worker = crafts.find((c) => {
@@ -63,12 +103,12 @@ export default function PerformanceReports() {
       const rate = worker ? worker.costPerHourUSD : 8; // default
       return sum + wo.estimatedHours * rate;
     }, 0);
-  }, []);
+  }, [periodWorkOrders]);
 
   // Craftsmen performance: WO count per worker
   const craftsmanPerf = useMemo(() => {
     const map = new Map<string, { total: number; done: number; name: string }>();
-    workOrders.forEach((wo) => {
+    periodWorkOrders.forEach((wo) => {
       const key = wo.assignee || "Unassigned";
       const curr = map.get(key) || { total: 0, done: 0, name: key };
       curr.total++;
@@ -79,9 +119,10 @@ export default function PerformanceReports() {
       ...v,
       rate: v.total > 0 ? ((v.done / v.total) * 100).toFixed(0) : "0",
     }));
-  }, []);
+  }, [periodWorkOrders]);
 
-  // Plant performance extras
+  // Plant performance extras — fleet-wide snapshot (not period-scoped; the
+  // underlying telemetry is a rolling 30-day figure, not a queryable series)
   const avgUptime = machines.reduce((s, m) => s + m.uptime, 0) / machines.length;
   const runningCount = machines.filter((m) => m.status === "running").length;
   const downCount = machines.filter((m) => m.status === "down").length;
@@ -89,7 +130,7 @@ export default function PerformanceReports() {
   const mtbfHours = 412; // mock
   const totalDowntime = machines.reduce((s, m) => s + (100 - m.uptime) * 7.2, 0);
 
-  // Downtime cost analysis
+  // Downtime cost analysis — same fleet-snapshot caveat as above
   const downtime = getDowntimeCostAnalysis();
   const byMachine = [...machines]
     .map((m) => ({ id: m.id, name: m.name, downtime: (100 - m.uptime) * 7.2 }))
@@ -97,24 +138,45 @@ export default function PerformanceReports() {
     .slice(0, 5);
   const maxDown = Math.max(...byMachine.map((b) => b.downtime), 1);
 
-  // Alerts by severity
+  // Alerts by severity, scoped to the selected period
   const sev = {
-    crit: alerts.filter((a) => a.severity === "crit").length,
-    warn: alerts.filter((a) => a.severity === "warn").length,
-    info: alerts.filter((a) => a.severity === "info").length,
+    crit: periodAlerts.filter((a) => a.severity === "crit").length,
+    warn: periodAlerts.filter((a) => a.severity === "warn").length,
+    info: periodAlerts.filter((a) => a.severity === "info").length,
   };
   const sevTotal = sev.crit + sev.warn + sev.info || 1;
 
   return (
     <AppLayout pageTitle="Performance Reports" breadcrumb="ANALYTICS & KPIs">
       <div className="flex flex-col gap-6">
-        {/* Print button */}
-        <div className="flex justify-end no-print">
+        {/* Period selector + print button */}
+        <div className="flex flex-wrap items-center justify-between gap-3 no-print">
+          <div className="flex flex-wrap gap-1">
+            {periodOptions.map((p) => (
+              <button
+                key={p.key}
+                onClick={() => setPeriod(p.key)}
+                className={`px-3 py-1.5 font-mono-data text-[10px] uppercase tracking-widest border rounded-full transition-colors ${
+                  period === p.key
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border text-muted-foreground hover:text-primary"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
           <Button variant="outline" size="sm" onClick={() => window.print()}>
             <Printer className="size-4" />
             Print Report
           </Button>
         </div>
+
+        <p className="text-xs text-muted-foreground -mt-2 no-print">
+          Showing work orders and alerts from <strong>{fmtShortDate(start)}</strong> to{" "}
+          <strong>{fmtShortDate(end)}</strong> ({periodLabel.toLowerCase()}). Fleet uptime, downtime cost, and
+          MTTR/MTBF reflect the current 30-day telemetry snapshot regardless of period.
+        </p>
 
         {/* Top KPI row */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -274,7 +336,7 @@ export default function PerformanceReports() {
         {/* Visual Performance Graphs */}
         <PerformanceGraphs
           machines={machines}
-          workOrders={workOrders}
+          workOrders={periodWorkOrders}
           completedWO={completedWO}
           delayedWO={delayedWO}
           openWO={openWO}
@@ -287,32 +349,32 @@ export default function PerformanceReports() {
 
         {/* Work Order Status Breakdown */}
         <div>
-          <SectionHeading>Work Order Status</SectionHeading>
+          <SectionHeading>Work Order Status ({periodLabel})</SectionHeading>
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
             <CountCard label="Open" count={openWO.length} />
             <CountCard label="In Progress" count={inProgressWO.length} />
             <CountCard label="Blocked" count={suspendedWO.length} tone="warn" />
             <CountCard label="Completed" count={completedWO.length} tone="ok" />
-            <CountCard label="Total" count={workOrders.length} />
+            <CountCard label="Total" count={periodWorkOrders.length} />
           </div>
         </div>
 
         {/* Work Order Throughput */}
         <div>
-          <SectionHeading>Work Order Throughput</SectionHeading>
+          <SectionHeading>Work Order Throughput ({periodLabel})</SectionHeading>
           <Panel className="p-5">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 font-mono-data">
-              <RawStat label="Created" value={workOrders.length} />
-              <RawStat label="Completed" value={workOrders.filter((w) => w.status === "done").length} />
-              <RawStat label="In Progress" value={workOrders.filter((w) => w.status === "in_progress").length} />
-              <RawStat label="Blocked" value={workOrders.filter((w) => w.status === "blocked").length} />
+              <RawStat label="Created" value={periodWorkOrders.length} />
+              <RawStat label="Completed" value={periodWorkOrders.filter((w) => w.status === "done").length} />
+              <RawStat label="In Progress" value={periodWorkOrders.filter((w) => w.status === "in_progress").length} />
+              <RawStat label="Blocked" value={periodWorkOrders.filter((w) => w.status === "blocked").length} />
             </div>
           </Panel>
         </div>
 
         {/* Completed Work Orders */}
         <div>
-          <SectionHeading>Completed Work Orders ({completedWO.length})</SectionHeading>
+          <SectionHeading>Completed Work Orders ({periodLabel}) — {completedWO.length}</SectionHeading>
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
@@ -345,7 +407,7 @@ export default function PerformanceReports() {
 
         {/* Delayed Jobs */}
         <div>
-          <SectionHeading>Delayed Jobs ({delayedWO.length})</SectionHeading>
+          <SectionHeading>Delayed Jobs ({periodLabel}) — {delayedWO.length}</SectionHeading>
           <Panel className="overflow-x-auto">
             {delayedWO.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
@@ -384,7 +446,7 @@ export default function PerformanceReports() {
 
         {/* Suspended Work Orders */}
         <div>
-          <SectionHeading>Suspended Work Orders ({suspendedWO.length})</SectionHeading>
+          <SectionHeading>Suspended Work Orders ({periodLabel}) — {suspendedWO.length}</SectionHeading>
           <Panel className="overflow-x-auto">
             {suspendedWO.length === 0 ? (
               <div className="p-6 text-center font-mono-data text-xs text-muted-foreground">
@@ -468,7 +530,7 @@ export default function PerformanceReports() {
 
         {/* Quality Report —WO completion by type */}
         <div>
-          <SectionHeading>Quality Report — Work Order Type Distribution</SectionHeading>
+          <SectionHeading>Quality Report — Work Order Type Distribution ({periodLabel})</SectionHeading>
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[480px]">
               <thead>
@@ -482,8 +544,8 @@ export default function PerformanceReports() {
               </thead>
               <tbody className="font-mono-data text-xs">
                 {["corrective", "preventive", "predictive", "condition-based"].map((type) => {
-                  const total = workOrders.filter((w) => w.type === type).length;
-                  const done = workOrders.filter((w) => w.type === type && w.status === "done").length;
+                  const total = periodWorkOrders.filter((w) => w.type === type).length;
+                  const done = periodWorkOrders.filter((w) => w.type === type && w.status === "done").length;
                   const pct = total > 0 ? ((done / total) * 100).toFixed(0) : "0";
                   return (
                     <tr key={type} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
@@ -506,6 +568,9 @@ export default function PerformanceReports() {
             <img src={logoRed} alt="KMC" style={{ width: 36, height: 36, objectFit: "contain" }} />
             <h1 style={{ fontSize: 20, margin: 0 }}>Kiira Motors Corporation — Performance Report</h1>
           </div>
+          <p style={{ marginBottom: 4, color: "#444" }}>
+            Period: {periodLabel} ({fmtShortDate(start)} – {fmtShortDate(end)})
+          </p>
           <p style={{ marginBottom: 12, color: "#444" }}>
             Printed {new Date().toLocaleString()}
           </p>

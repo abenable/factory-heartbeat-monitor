@@ -91,12 +91,12 @@ function WorkOrderFormMarkup({
       </table>
 
       <div className="wo-print-signoff">
-        <SignoffField label="Work Completed by" value={wo.workLog?.completedByName} />
+        <SignatureField label="Work Completed by" name={wo.workLog?.completedByName} />
         <SignoffField
           label="Date & Time Completed"
           value={wo.workLog?.actualCompletionTime ? fmtDateTime(wo.workLog.actualCompletionTime) : undefined}
         />
-        <SignoffField label="Work Approved by" value={wo.workLog?.approvedByName} />
+        <SignatureField label="Work Approved by" name={wo.workLog?.approvedByName} />
         <SignoffField label="Date" value={wo.workLog?.approvedAt ? fmtDate(wo.workLog.approvedAt) : undefined} />
       </div>
     </>
@@ -138,6 +138,22 @@ function SignoffField({ label, value }: { label: string; value?: string }) {
     <div className="wo-print-signoff-field">
       <div className="wo-print-sig-line">{value}</div>
       <span>{label}</span>
+    </div>
+  );
+}
+
+/**
+ * A physical signature line — always left blank on the printed page, even
+ * when a technician/supervisor has already "signed" digitally by typing
+ * their name in the app. The typed name is shown only as a small printed
+ * caption underneath, so the paper copy still has room for a wet signature.
+ */
+function SignatureField({ label, name }: { label: string; name?: string }) {
+  return (
+    <div className="wo-print-signoff-field">
+      <div className="wo-print-sig-line" />
+      <span>{label}</span>
+      {name && <span className="wo-print-sig-name">Print name: {name}</span>}
     </div>
   );
 }
@@ -188,6 +204,11 @@ export function printSingleWorkOrder(wo: WorkOrder) {
   const signoff = (label: string, value: string | undefined) =>
     `<div class="wo-print-signoff-field"><div class="wo-print-sig-line">${esc(value || "")}</div><span>${label}</span></div>`;
 
+  const signature = (label: string, name: string | undefined) =>
+    `<div class="wo-print-signoff-field"><div class="wo-print-sig-line"></div><span>${label}</span>${
+      name ? `<span class="wo-print-sig-name">Print name: ${esc(name)}</span>` : ""
+    }</div>`;
+
   container.innerHTML = `
     <div class="wo-print-header">
       <div class="wo-print-brand">
@@ -235,9 +256,9 @@ export function printSingleWorkOrder(wo: WorkOrder) {
       </tbody>
     </table>
     <div class="wo-print-signoff">
-      ${signoff("Work Completed by", wo.workLog?.completedByName)}
+      ${signature("Work Completed by", wo.workLog?.completedByName)}
       ${signoff("Date &amp; Time Completed", wo.workLog?.actualCompletionTime ? fmtDateTime(wo.workLog.actualCompletionTime) : undefined)}
-      ${signoff("Work Approved by", wo.workLog?.approvedByName)}
+      ${signature("Work Approved by", wo.workLog?.approvedByName)}
       ${signoff("Date", wo.workLog?.approvedAt ? fmtDate(wo.workLog.approvedAt) : undefined)}
     </div>
   `;

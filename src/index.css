@@ -276,3 +276,11 @@
 .wo-print-signoff-field { display: flex; flex-direction: column; }
 .wo-print-sig-line { border-bottom: 1px solid #000; height: 22px; font-size: 10px; padding-bottom: 2px; }
 .wo-print-signoff-field span { font-size: 9px; color: #444; margin-top: 2px; }
+.wo-print-sig-name { font-style: italic; }
+
+.wo-print-checklist-section { margin-top: 10px; }
+.wo-print-checklist-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px; }
+.wo-print-checklist { width: 100% !important; border-collapse: collapse; margin-bottom: 6px; }
+.wo-print-checklist th, .wo-print-checklist td { border: 1px solid #000 !important; padding: 2.5px 6px !important; font-size: 9.5px !important; }
+.wo-print-checklist th { background: #f0f0f0 !important; text-align: left; }
+.wo-print-checklist td.wo-print-check-col { text-align: center; width: 34px; }

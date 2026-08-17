@@ -38,15 +38,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { getUser } from "@/lib/auth";
-import { getWorker } from "@/data/workers";
+import { getWorker, WorkerProfile } from "@/data/workers";
 import {
   workOrders as allWorkOrders,
   getMachine,
   updateWorkOrder,
+  pmTasks,
+  updatePMTask,
+  estimatedPMHours,
+  pmDaysUntil,
+  isPMOverdue,
+  isPMDueSoon,
   WorkOrder,
   WorkOrderStatus,
   WorkOrderPriority,
+  PMTask,
 } from "@/data/cmms";
+import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
+import { printPMChecklist } from "@/components/PrintablePMChecklist";
 
 const filters: { key: WorkOrderStatus | "all" | "active"; label: string }[] = [
   { key: "active", label: "Active" },
@@ -318,9 +327,13 @@ const TechnicianDashboard = () => {
         ))}
       </div>
 
+      {/* My Preventive Maintenance */}
+      <MyPMSection username={username} worker={worker} />
+
       {selected && (
         <WorkOrderDetailDialog
           wo={selected}
+          currentUser={worker}
           onClose={() => setSelected(null)}
           onUpdated={() => setRefresh((n) => n + 1)}
         />
@@ -328,6 +341,125 @@ const TechnicianDashboard = () => {
     </TechnicianLayout>
   );
 };
+
+function MyPMSection({ username, worker }: { username: string; worker: WorkerProfile | null }) {
+  const [tick, setTick] = useState(0);
+  const myPM = useMemo(
+    () => pmTasks.filter((p) => p.personInCharge?.toLowerCase() === username.toLowerCase()),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [username, tick],
+  );
+
+  if (myPM.length === 0) return null;
+
+  const refresh = () => setTick((t) => t + 1);
+
+  return (
+    <div className="mt-8">
+      <div className="flex items-center gap-2 mb-4">
+        <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+          My Preventive Maintenance
+        </span>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {myPM
+          .sort((a, b) => new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime())
+          .map((task) => (
+            <PMCard key={task.id} task={task} worker={worker} onUpdated={refresh} />
+          ))}
+      </div>
+    </div>
+  );
+}
+
+function PMCard({
+  task,
+  worker,
+  onUpdated,
+}: {
+  task: PMTask;
+  worker: WorkerProfile | null;
+  onUpdated: () => void;
+}) {
+  const machine = getMachine(task.machineId);
+  const days = pmDaysUntil(task.nextDue);
+  const overdue = isPMOverdue(task);
+  const dueSoon = isPMDueSoon(task);
+  const est = estimatedPMHours(task);
+  const signatureName = worker?.name ?? task.personInCharge ?? "";
+
+  const acknowledge = () => {
+    updatePMTask(task.id, { visitAcknowledgedAt: new Date().toISOString(), visitAcknowledgedByName: signatureName });
+    toast.success("PM receipt confirmed", { description: signatureName });
+    onUpdated();
+  };
+
+  const start = () => {
+    updatePMTask(task.id, { visitStartedAt: new Date().toISOString() });
+    toast.success("PM visit started", { description: task.id });
+    onUpdated();
+  };
+
+  return (
+    <Card className="border-border/60">
+      <CardHeader className="pb-3">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-1.5 mb-1">
+              <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+                {task.referenceNumber ?? task.id}
+              </span>
+              <Badge
+                className={`text-[10px] ${
+                  overdue ? "bg-led-crit text-white" : dueSoon ? "bg-led-warn text-white" : "bg-secondary text-secondary-foreground"
+                }`}
+              >
+                {overdue ? `${Math.abs(days)}d OVERDUE` : dueSoon ? `Due in ${days}d` : `Due ${formatDate(task.nextDue)}`}
+              </Badge>
+            </div>
+            <CardTitle className="text-base leading-tight">{task.task}</CardTitle>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0 flex flex-col gap-3">
+        <div className="flex items-center justify-between text-sm text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <Wrench className="size-3.5" />
+            {machine?.name ?? task.machineId}
+          </span>
+          <span className="flex items-center gap-1 text-xs">
+            <Timer className="size-3.5" /> Est. {est.hours.toFixed(1)}h
+          </span>
+        </div>
+
+        {!task.visitAcknowledgedAt ? (
+          <Button size="sm" onClick={acknowledge}>
+            <CheckCircle2 className="size-4" /> Confirm Received
+          </Button>
+        ) : (
+          <div className="flex flex-col gap-2">
+            <p className="text-xs text-muted-foreground">
+              Received by <strong className="text-foreground">{task.visitAcknowledgedByName}</strong>
+            </p>
+            {!task.visitStartedAt ? (
+              <Button size="sm" variant="outline" onClick={start}>
+                <Loader2 className="size-4" /> Start
+              </Button>
+            ) : (
+              <p className="text-xs text-led-ok font-medium flex items-center gap-1">
+                <CheckCircle2 className="size-3.5" /> In progress
+              </p>
+            )}
+          </div>
+        )}
+
+        <Button size="sm" variant="outline" onClick={() => printPMChecklist(task)}>
+          Print Checklist
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
 
 function WorkOrderCard({
   wo,
@@ -368,6 +500,11 @@ function WorkOrderCard({
               {isNew && (
                 <Badge className="text-[10px] bg-foreground text-background">
                   New Work Order
+                </Badge>
+              )}
+              {!wo.acknowledgedAt && (
+                <Badge className="text-[10px] bg-led-warn text-white">
+                  Awaiting Confirmation
                 </Badge>
               )}
               {isPreventive && (
@@ -434,14 +571,17 @@ function WorkOrderCard({
 
 function WorkOrderDetailDialog({
   wo,
+  currentUser,
   onClose,
   onUpdated,
 }: {
   wo: WorkOrder;
+  currentUser: WorkerProfile | null;
   onClose: () => void;
   onUpdated: () => void;
 }) {
   const [draft, setDraft] = useState<WorkOrder>(() => ({ ...wo }));
+  const signatureName = currentUser?.name ?? draft.assignee;
 
   const machine = getMachine(draft.machineId);
   const progress = useMemo(() => woProgress(draft), [draft]);
@@ -453,7 +593,11 @@ function WorkOrderDetailDialog({
         next.workLog = { ...next.workLog, actualStartTime: nowIso() };
       }
       if (status === "done" && !next.workLog?.actualCompletionTime) {
-        next.workLog = { ...next.workLog, actualCompletionTime: nowIso() };
+        next.workLog = {
+          ...next.workLog,
+          actualCompletionTime: nowIso(),
+          completedByName: next.workLog?.completedByName ?? signatureName,
+        };
         next.tasks = next.tasks.map((t) => ({ ...t, completed: true }));
       }
       return next;
@@ -479,6 +623,25 @@ function WorkOrderDetailDialog({
     toast.success("Work order updated", { description: draft.id });
     onUpdated();
     onClose();
+  };
+
+  const acknowledge = () => {
+    const updates = { acknowledgedAt: nowIso(), acknowledgedByName: signatureName };
+    setDraft((d) => ({ ...d, ...updates }));
+    updateWorkOrder(draft.id, updates);
+    toast.success("Receipt confirmed", { description: signatureName });
+    onUpdated();
+  };
+
+  const startWork = () => {
+    const updates: Partial<WorkOrder> = {
+      status: "in_progress",
+      workLog: { ...draft.workLog, actualStartTime: draft.workLog?.actualStartTime ?? nowIso() },
+    };
+    setDraft((d) => ({ ...d, ...updates }));
+    updateWorkOrder(draft.id, updates);
+    toast.success("Work started", { description: draft.id });
+    onUpdated();
   };
 
   return (
@@ -508,6 +671,31 @@ function WorkOrderDetailDialog({
         </DialogHeader>
 
         <div className="space-y-6 py-2">
+          {/* Receipt confirmation */}
+          {!draft.acknowledgedAt ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/5 p-3">
+              <span className="text-sm">
+                <strong>New assignment.</strong> Confirm you've received this work order.
+              </span>
+              <Button size="sm" onClick={acknowledge}>
+                <CheckCircle2 className="size-4" /> Confirm Received
+              </Button>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-panel p-3 text-sm">
+              <span className="text-muted-foreground">
+                Received by <strong className="text-foreground">{draft.acknowledgedByName}</strong>
+                {" · "}
+                {formatDate(draft.acknowledgedAt)}
+              </span>
+              {!draft.workLog?.actualStartTime && (
+                <Button size="sm" variant="outline" onClick={startWork}>
+                  <Loader2 className="size-4" /> Start Work
+                </Button>
+              )}
+            </div>
+          )}
+
           {/* Status stepper */}
           <div className="grid grid-cols-4 gap-1 rounded-lg bg-panel p-1">
             {(["open", "in_progress", "blocked", "done"] as WorkOrderStatus[]).map((s, i, arr) => {
@@ -722,6 +910,9 @@ function WorkOrderDetailDialog({
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>
             Cancel
+          </Button>
+          <Button variant="outline" onClick={() => printSingleWorkOrder(draft)}>
+            Print Work Order
           </Button>
           <Button onClick={save} className="bg-primary text-primary-foreground hover:bg-primary/90">
             Save Update

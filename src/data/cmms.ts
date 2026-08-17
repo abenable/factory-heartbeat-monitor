@@ -150,6 +150,12 @@ export interface WorkOrder {
   /** Human-readable maintenance reference number shown on cards/reports, e.g. M-2041. */
   referenceNumber?: string;
 
+  // ── Technician receipt ── set when the assigned technician confirms they've
+  // received this work order, before they click Start (which moves status to in_progress).
+  acknowledgedAt?: string;
+  /** Typed name used as the technician's receipt confirmation. */
+  acknowledgedByName?: string;
+
   // ── Requestor (printed on the paper "Maintenance Work Order Form") ──
   requestorName?: string;
   requestorEmail?: string;
@@ -238,6 +244,12 @@ export interface PMTask {
   checklist: PMChecklistItem[];
   /** Past completed visits — the source of "who completed it and how long it took". */
   history: PMCompletionLog[];
+
+  // ── Current visit workflow — reset by completePMVisit() once logged ──
+  visitAcknowledgedAt?: string;
+  /** Typed name used as the technician's receipt confirmation for the current visit. */
+  visitAcknowledgedByName?: string;
+  visitStartedAt?: string;
 }
 
 /**
@@ -414,6 +426,9 @@ export function completePMVisit(
     nextDue: next.toISOString().slice(0, 10),
     history: [{ id: `pmlog-${task.id}-${task.history.length + 1}`, ...entry }, ...task.history],
     checklist: buildPMChecklist(),
+    visitAcknowledgedAt: undefined,
+    visitAcknowledgedByName: undefined,
+    visitStartedAt: undefined,
   });
 }
 

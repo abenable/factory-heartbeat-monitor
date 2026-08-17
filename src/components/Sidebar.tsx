@@ -6,13 +6,11 @@ import {
   Inbox,
   ClipboardList,
   CalendarClock,
-  ClipboardCheck,
   LogOut,
   Wrench,
   Package,
   TrendingUp,
   History,
-  Gauge,
 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { workOrders, getBacklog, pmTasks, isPMOverdue } from "@/data/cmms";
@@ -25,12 +23,10 @@ const nav = [
   { to: "/machines", label: "Machines", icon: Cpu },
   { to: "/job-requests", label: "Job Requests", icon: Inbox },
   { to: "/work-orders", label: "Work Orders", icon: ClipboardList },
-  { to: "/technician-progress", label: "Technician Progress", icon: Gauge },
-  { to: "/rca", label: "Root Cause Analysis", icon: ClipboardCheck },
   { to: "/backlog", label: "Backlog", icon: History },
   { to: "/maintenance", label: "PM Schedule", icon: CalendarClock },
-  { to: "/material-control", label: "Material Control", icon: Package },
-  { to: "/craftsmen-management", label: "Craftsmen Management", icon: Wrench },
+  { to: "/material-control", label: "Inventory", icon: Package },
+  { to: "/craftsmen-management", label: "Man Power", icon: Wrench },
   { to: "/performance-reports", label: "Performance Reports", icon: TrendingUp },
 ];
 

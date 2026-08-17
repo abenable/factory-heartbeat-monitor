@@ -176,6 +176,11 @@ export function WorkOrderDetailDialog({
             <Meta label="Department" value={wo.department ?? "—"} icon={ClipboardList} />
             <Meta label="Type" value={woTypeLabel(wo.type)} icon={Hourglass} />
             <Meta label="Status" value={woStatusLabel(wo.status)} icon={CheckCircle2} />
+            <Meta
+              label="Receipt Confirmed"
+              value={wo.acknowledgedAt ? `${wo.acknowledgedByName} · ${formatDate(wo.acknowledgedAt)}` : "Not yet confirmed"}
+              icon={CheckCircle2}
+            />
           </div>
 
           {/* Problem */}

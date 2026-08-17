@@ -29,7 +29,7 @@ export default function MaterialControl() {
   const totalPOValue = purchaseOrders.reduce((s, p) => s + p.costUSD, 0);
 
   return (
-    <AppLayout pageTitle="Material Control" breadcrumb="PURCHASE & INVENTORY">
+    <AppLayout pageTitle="Inventory" breadcrumb="PURCHASE & INVENTORY">
       <div className="flex flex-col gap-6">
         {/* KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
