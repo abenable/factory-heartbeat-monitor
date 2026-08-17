@@ -67,9 +67,9 @@ const filters: { key: WorkOrderStatus | "all" | "active"; label: string }[] = [
 ];
 
 const priorityTone: Record<WorkOrderPriority, string> = {
-  critical: "bg-led-crit text-white",
-  high: "bg-led-warn text-white",
-  medium: "bg-primary text-primary-foreground",
+  emergency: "bg-led-crit text-white",
+  urgent: "bg-led-warn text-white",
+  normal: "bg-primary text-primary-foreground",
   low: "bg-secondary text-secondary-foreground",
 };
 

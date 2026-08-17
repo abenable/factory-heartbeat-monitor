@@ -27,7 +27,7 @@ import { getUser } from "@/lib/auth";
 import { PrintableWorkOrder } from "@/components/PrintableWorkOrder";
 import { toast } from "@/hooks/use-toast";
 
-const priorities: WorkOrderPriority[] = ["low", "medium", "high", "critical"];
+const priorities: WorkOrderPriority[] = ["low", "normal", "urgent", "emergency"];
 const statuses: WorkOrderStatus[] = ["open", "in_progress", "blocked", "done"];
 const woTypes: WorkOrderType[] = ["corrective", "preventive", "predictive", "condition-based"];
 
@@ -39,7 +39,7 @@ function emptyForm() {
     referenceNumber: nextWorkOrderReferenceNumber(),
     machineId: machines[0]?.id ?? "",
     title: "",
-    priority: "medium" as WorkOrderPriority,
+    priority: "normal" as WorkOrderPriority,
     status: "open" as WorkOrderStatus,
     type: "corrective" as WorkOrderType,
     assignee: "",

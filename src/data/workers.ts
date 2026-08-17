@@ -190,7 +190,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     workerId: "23/U/0897",
     department: "Mechanical Maintenance",
     license: "Apprenticeship · DIT-APP-2301",
-    licenseExpiry: "2026-08-15",
+    licenseExpiry: "2027-08-15",
     joined: "2024-01-15",
     shift: "Day · 08:00 – 17:00",
     phone: "+256 772 100 011",

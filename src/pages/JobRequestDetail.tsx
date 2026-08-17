@@ -35,7 +35,7 @@ const STATUS_LABEL: Record<JobRequestStatus, string> = {
   converted: "Converted",
 };
 
-const priorities: WorkOrderPriority[] = ["low", "medium", "high", "critical"];
+const priorities: WorkOrderPriority[] = ["low", "normal", "urgent", "emergency"];
 const woTypes: WorkOrderType[] = ["corrective", "preventive", "predictive", "condition-based"];
 
 function defaultDueAt(): string {
@@ -61,7 +61,7 @@ export default function JobRequestDetail() {
 
   const [form, setForm] = useState(() => ({
     title: "",
-    priority: "medium" as WorkOrderPriority,
+    priority: "normal" as WorkOrderPriority,
     type: "corrective" as WorkOrderType,
     assignee: "",
     department: "",
@@ -97,7 +97,7 @@ export default function JobRequestDetail() {
     if (viewer || request.status === "converted") return;
     setForm({
       title: request.description.slice(0, 60),
-      priority: request.priority === "urgent" ? "high" : "medium",
+      priority: request.priority === "urgent" ? "urgent" : "normal",
       type: "corrective",
       assignee: "",
       department: machine?.sector ?? "",

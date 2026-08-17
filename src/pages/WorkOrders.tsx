@@ -27,9 +27,9 @@ const statusFilters: { key: WorkOrderStatus | "all"; label: string }[] = [
 ];
 
 const priorityColor: Record<WorkOrderPriority, string> = {
-  critical: "text-led-crit",
-  high: "text-led-warn",
-  medium: "text-foreground",
+  emergency: "text-led-crit",
+  urgent: "text-led-warn",
+  normal: "text-foreground",
   low: "text-muted-foreground",
 };
 
