@@ -4,7 +4,6 @@ import { ArrowLeft, Printer, Save, Send, ShieldCheck, Undo2 } from "lucide-react
 import { AppLayout } from "@/components/AppLayout";
 import { ReporterLayout } from "@/components/ReporterLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
-import { SignaturePad, textToSignatureDataUrl } from "@/components/SignaturePad";
 import { PrintableMaintenanceRequest } from "@/components/PrintableMaintenanceRequest";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -72,7 +71,8 @@ export default function MaintenanceRequestForm() {
   // Editable form state
   const [equipmentId, setEquipmentId] = useState("");
   const [equipmentName, setEquipmentName] = useState("");
-  const [workshopStation, setWorkshopStation] = useState("");
+  const [workshop, setWorkshop] = useState("");
+  const [station, setStation] = useState("");
   const [operatorCustodianName, setOperatorCustodianName] = useState("");
   const [operatorCustodianDesignation, setOperatorCustodianDesignation] = useState("");
 
@@ -82,12 +82,10 @@ export default function MaintenanceRequestForm() {
   const [requesterDesignation, setRequesterDesignation] = useState("");
   const [requestDateTime, setRequestDateTime] = useState(formatDateTimeLocal(new Date()));
   const [problemDescription, setProblemDescription] = useState("");
-  const [requesterSignature, setRequesterSignature] = useState("");
-  const [requesterSignatureText, setRequesterSignatureText] = useState("");
+  const [requesterSignatureName, setRequesterSignatureName] = useState("");
   const [urgency, setUrgency] = useState<MaintenanceUrgency>("medium");
 
-  const [supervisorSignature, setSupervisorSignature] = useState("");
-  const [supervisorSignatureText, setSupervisorSignatureText] = useState("");
+  const [supervisorSignatureName, setSupervisorSignatureName] = useState("");
   const [workOrderIssuedAt, setWorkOrderIssuedAt] = useState("");
   const [workOrderNumber, setWorkOrderNumber] = useState("");
 
@@ -98,7 +96,8 @@ export default function MaintenanceRequestForm() {
     if (!existing) return;
     setEquipmentId(existing.equipmentId);
     setEquipmentName(existing.equipmentName);
-    setWorkshopStation(existing.workshopStation);
+    setWorkshop(existing.workshop);
+    setStation(existing.station);
     setOperatorCustodianName(existing.operatorCustodianName);
     setOperatorCustodianDesignation(existing.operatorCustodianDesignation);
     setRequesterName(existing.requesterName);
@@ -107,9 +106,9 @@ export default function MaintenanceRequestForm() {
     setRequesterDesignation(existing.requesterDesignation);
     setRequestDateTime(formatDateTimeLocal(new Date(existing.requestDateTime)));
     setProblemDescription(existing.problemDescription);
-    setRequesterSignature(existing.requesterSignature);
+    setRequesterSignatureName(existing.requesterSignatureName);
     setUrgency(existing.urgency);
-    setSupervisorSignature(existing.approval?.signatureDataUrl ?? "");
+    setSupervisorSignatureName(existing.approval?.signatureName ?? "");
     setWorkOrderIssuedAt(existing.response.workOrderIssuedAt ? formatDateTimeLocal(new Date(existing.response.workOrderIssuedAt)) : "");
     setWorkOrderNumber(existing.response.workOrderNumber ?? "");
   }, [existing]);
@@ -140,7 +139,8 @@ export default function MaintenanceRequestForm() {
     if (!selectedMachine) return;
     setEquipmentId(selectedMachine.id);
     setEquipmentName(selectedMachine.name);
-    setWorkshopStation(`${selectedMachine.sector} — ${selectedMachine.plant}`);
+    setWorkshop(selectedMachine.sector);
+    setStation(selectedMachine.line ?? selectedMachine.section ?? selectedMachine.plant);
   }, [selectedMachine]);
 
   const requesterLocked = mode === "view";
@@ -211,7 +211,7 @@ export default function MaintenanceRequestForm() {
           <Field label="Email" locked={requesterLocked}>
             <Input type="email" value={requesterEmail} onChange={(e) => setRequesterEmail(e.target.value)} disabled={requesterLocked} required />
           </Field>
-          <Field label="Department / Workshop" locked={requesterLocked}>
+          <Field label="Department" locked={requesterLocked}>
             <Input value={requesterDepartment} onChange={(e) => setRequesterDepartment(e.target.value)} disabled={requesterLocked} required />
           </Field>
           <Field label="Designation" locked={requesterLocked}>
@@ -240,7 +240,8 @@ export default function MaintenanceRequestForm() {
                 const m = machines.find((x) => x.id === v);
                 if (m) {
                   setEquipmentName(m.name);
-                  setWorkshopStation(`${m.sector} — ${m.plant}`);
+                  setWorkshop(m.sector);
+                  setStation(m.line ?? m.section ?? m.plant);
                 }
               }}
               disabled={requesterLocked}
@@ -260,19 +261,22 @@ export default function MaintenanceRequestForm() {
               </SelectContent>
             </Select>
           </Field>
-          <Field label="Equipment Name" locked={requesterLocked}>
+          <Field label="Machine / Equipment Name" locked={requesterLocked}>
             <Input value={equipmentName} onChange={(e) => setEquipmentName(e.target.value)} disabled={requesterLocked} required />
           </Field>
-          <Field label="Equipment ID" locked={requesterLocked}>
+          <Field label="Machine / Equipment ID" locked={requesterLocked}>
             <Input value={equipmentId} onChange={(e) => setEquipmentId(e.target.value)} disabled={requesterLocked} required />
           </Field>
-          <Field label="Workshop / Station" locked={requesterLocked}>
-            <Input value={workshopStation} onChange={(e) => setWorkshopStation(e.target.value)} disabled={requesterLocked} required />
+          <Field label="Workshop" locked={requesterLocked}>
+            <Input value={workshop} onChange={(e) => setWorkshop(e.target.value)} disabled={requesterLocked} required />
           </Field>
-          <Field label="Operator / Custodian Name" locked={requesterLocked}>
+          <Field label="Station" locked={requesterLocked}>
+            <Input value={station} onChange={(e) => setStation(e.target.value)} disabled={requesterLocked} required />
+          </Field>
+          <Field label="Equipment Operator / Custodian" locked={requesterLocked}>
             <Input value={operatorCustodianName} onChange={(e) => setOperatorCustodianName(e.target.value)} disabled={requesterLocked} required />
           </Field>
-          <Field label="Operator / Custodian Designation" locked={requesterLocked}>
+          <Field label="Designation" locked={requesterLocked}>
             <Input value={operatorCustodianDesignation} onChange={(e) => setOperatorCustodianDesignation(e.target.value)} disabled={requesterLocked} required />
           </Field>
         </div>
@@ -291,35 +295,17 @@ export default function MaintenanceRequestForm() {
               placeholder="Describe the fault, when it started, and any immediate safety or production impact."
             />
           </Field>
-          <Field label="Requester Signature" locked={requesterLocked}>
-            <SignaturePad
-              value={requesterSignature}
-              onChange={(val) => {
-                setRequesterSignature(val);
-                if (val) setRequesterSignatureText("");
-              }}
+          <Field label="Signature" locked={requesterLocked}>
+            <Input
+              value={requesterSignatureName}
+              onChange={(e) => setRequesterSignatureName(e.target.value)}
               disabled={requesterLocked}
-              label="Draw signature"
-              placeholder={requesterLocked ? "Signature captured" : "Sign here"}
+              placeholder="Type your first name as your signature"
+              maxLength={40}
             />
-            <div className="mt-3">
-              <Label htmlFor="requester-sig-text" className="text-sm text-muted-foreground">
-                Or type your first name as signature
-              </Label>
-              <Input
-                id="requester-sig-text"
-                className="mt-1"
-                value={requesterSignatureText}
-                onChange={(e) => {
-                  const text = e.target.value;
-                  setRequesterSignatureText(text);
-                  setRequesterSignature(textToSignatureDataUrl(text.trim()));
-                }}
-                disabled={requesterLocked}
-                placeholder="e.g. Ritah"
-                maxLength={40}
-              />
-            </div>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              This confirms your soft-copy submission. The printed form has a blank line for a physical signature.
+            </p>
           </Field>
         </div>
       </Panel>
@@ -378,34 +364,16 @@ export default function MaintenanceRequestForm() {
 
         <div className={`mt-4 ${isApprover ? "" : "opacity-80 pointer-events-none"}`}>
           <Field label="Supervisor Signature" locked={!isApprover}>
-            <SignaturePad
-              value={supervisorSignature}
-              onChange={(val) => {
-                setSupervisorSignature(val);
-                if (val) setSupervisorSignatureText("");
-              }}
+            <Input
+              value={supervisorSignatureName}
+              onChange={(e) => setSupervisorSignatureName(e.target.value)}
               disabled={!isApprover}
-              label="Draw signature"
-              placeholder={!isApprover ? "Awaiting supervisor signature" : "Supervisor signs here"}
+              placeholder={!isApprover ? "Awaiting supervisor signature" : "Type your first name as your signature"}
+              maxLength={40}
             />
-            <div className="mt-3">
-              <Label htmlFor="supervisor-sig-text" className="text-sm text-muted-foreground">
-                Or type your first name as signature
-              </Label>
-              <Input
-                id="supervisor-sig-text"
-                className="mt-1"
-                value={supervisorSignatureText}
-                onChange={(e) => {
-                  const text = e.target.value;
-                  setSupervisorSignatureText(text);
-                  setSupervisorSignature(textToSignatureDataUrl(text.trim()));
-                }}
-                disabled={!isApprover}
-                placeholder="e.g. Nakimbugwe"
-                maxLength={40}
-              />
-            </div>
+            <p className="text-xs text-muted-foreground mt-1.5">
+              This confirms your soft-copy approval. The printed form has a blank line for a physical signature.
+            </p>
           </Field>
         </div>
 
@@ -506,14 +474,15 @@ export default function MaintenanceRequestForm() {
   function validateCreate(): boolean {
     if (!requesterName.trim()) return toastError("Requester name is required");
     if (!requesterEmail.trim()) return toastError("Requester email is required");
-    if (!requesterDepartment.trim()) return toastError("Department / workshop is required");
+    if (!requesterDepartment.trim()) return toastError("Department is required");
     if (!requesterDesignation.trim()) return toastError("Designation is required");
     if (!equipmentId.trim() || !equipmentName.trim()) return toastError("Please select equipment");
-    if (!workshopStation.trim()) return toastError("Workshop / station is required");
+    if (!workshop.trim()) return toastError("Workshop is required");
+    if (!station.trim()) return toastError("Station is required");
     if (!operatorCustodianName.trim()) return toastError("Operator / custodian name is required");
     if (!operatorCustodianDesignation.trim()) return toastError("Operator / custodian designation is required");
     if (!problemDescription.trim()) return toastError("Problem description is required");
-    if (!requesterSignature) return toastError("Requester signature is required");
+    if (!requesterSignatureName.trim()) return toastError("Requester signature is required");
     return true;
   }
 
@@ -542,11 +511,12 @@ export default function MaintenanceRequestForm() {
       requesterDepartment,
       requesterDesignation,
       requestDateTime: new Date(requestDateTime).toISOString() || now,
-      requesterSignature,
+      requesterSignatureName,
       requesterSignedAt: now,
       equipmentName,
       equipmentId,
-      workshopStation,
+      workshop,
+      station,
       operatorCustodianName,
       operatorCustodianDesignation,
       problemDescription,
@@ -570,7 +540,7 @@ export default function MaintenanceRequestForm() {
 
   function handleApprove() {
     if (!existing) return;
-    if (!supervisorSignature) {
+    if (!supervisorSignatureName.trim()) {
       toast.error("Supervisor signature is required to approve.");
       return;
     }
@@ -582,7 +552,7 @@ export default function MaintenanceRequestForm() {
         supervisorName: user?.name ?? username,
         supervisorUsername: username,
         supervisorDepartment: user?.department ?? "",
-        signatureDataUrl: supervisorSignature,
+        signatureName: supervisorSignatureName,
         approvedAt: now,
       },
       response: {

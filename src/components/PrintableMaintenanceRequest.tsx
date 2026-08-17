@@ -1,6 +1,5 @@
 import type { MaintenanceRequest } from "@/data/maintenanceRequests";
-import { URGENCY_ORDER, urgencyLabel, urgencyHint, timeToFirstResponse } from "@/data/maintenanceRequests";
-import { getMachine } from "@/data/cmms";
+import { URGENCY_ORDER, timeToFirstResponse } from "@/data/maintenanceRequests";
 import logoRed from "@/assets/kmc-logo-red.svg";
 
 interface PrintableMaintenanceRequestProps {
@@ -8,7 +7,6 @@ interface PrintableMaintenanceRequestProps {
 }
 
 export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceRequestProps) {
-  const machine = getMachine(request.equipmentId);
   return (
     <div className="print-only print-block printable-mrf">
       <div className="mrf-header">
@@ -16,7 +14,7 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
           <img src={logoRed} alt="KMC" className="mrf-logo-mark" />
           <div>
             <div className="mrf-logo-title">Kiira Motors Corporation</div>
-            <div className="mrf-logo-sub">Computerised Maintenance Management System</div>
+            <div className="mrf-logo-sub">Mission Vehicles Made In Uganda</div>
           </div>
         </div>
         <div className="mrf-jobno">
@@ -27,51 +25,54 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
 
       <h1 className="mrf-title">Maintenance Request Form</h1>
 
-      {/* Section 1: Requester */}
-      <SectionTitle title="1. Requester Information" />
+      {/* Requester + equipment header grid */}
       <table className="mrf-table">
         <tbody>
           <tr>
             <Cell label="Name" value={request.requesterName} />
-            <Cell label="Email" value={request.requesterEmail} />
+            <Cell label="Department" value={request.requesterDepartment} />
           </tr>
           <tr>
-            <Cell label="Department / Workshop" value={request.requesterDepartment} />
+            <Cell label="Email" value={request.requesterEmail} />
             <Cell label="Designation" value={request.requesterDesignation} />
           </tr>
           <tr>
-            <Cell label="Date / Time of Request" value={formatDateTime(request.requestDateTime)} colSpan={3} />
+            <Cell label="Date of Request" value={formatDate(request.requestDateTime)} />
+            <Cell label="Time of Request" value={formatTime(request.requestDateTime)} />
           </tr>
         </tbody>
       </table>
 
-      {/* Section 2: Equipment */}
-      <SectionTitle title="2. Equipment Information" />
+      <SectionTitle title="Equipment Details" />
       <table className="mrf-table">
         <tbody>
           <tr>
-            <Cell label="Equipment Name" value={request.equipmentName} />
-            <Cell label="Equipment ID" value={request.equipmentId} />
+            <Cell label="Machine / Equipment Name" value={request.equipmentName} />
+            <Cell label="Machine / Equipment ID" value={request.equipmentId} />
           </tr>
           <tr>
-            <Cell label="Workshop / Station" value={request.workshopStation} />
-            <Cell label="Plant" value={machine?.plant ?? "—"} />
+            <Cell label="Workshop" value={request.workshop} />
+            <Cell label="Station" value={request.station} />
           </tr>
           <tr>
-            <Cell label="Operator / Custodian Name" value={request.operatorCustodianName} />
-            <Cell label="Operator / Custodian Designation" value={request.operatorCustodianDesignation} />
+            <Cell label="Equipment Operator / Custodian" value={request.operatorCustodianName} />
+            <Cell label="Designation" value={request.operatorCustodianDesignation} />
           </tr>
         </tbody>
       </table>
 
-      {/* Section 3: Issue Description */}
-      <SectionTitle title="3. Problem Description" />
+      {/* Issue description + on-the-spot signature */}
+      <SectionTitle title="Issue Description" />
       <div className="mrf-box">
+        <span className="mrf-label">Problem Description</span>
         <p className="mrf-pre">{request.problemDescription || "No description provided."}</p>
+        <div className="mrf-inline-sig">
+          <span className="mrf-label">Signature</span>
+          <div className="wo-print-sig-line" />
+        </div>
       </div>
 
-      {/* Section 4: Urgency */}
-      <SectionTitle title="4. Urgency Level (tick one only)" />
+      <SectionTitle title="Urgency Level (tick one only)" />
       <table className="mrf-table">
         <tbody>
           <tr>
@@ -79,79 +80,62 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
               <td key={u.value} className="mrf-tick-cell">
                 <span className={`mrf-tick ${request.urgency === u.value ? "mrf-ticked" : ""}`} />
                 <strong>{u.label}</strong>
-                <span className="mrf-hint"> — {u.hint}</span>
+                <span className="mrf-hint"> ({u.hint})</span>
               </td>
             ))}
           </tr>
         </tbody>
       </table>
 
-      {/* Signature row */}
-      <table className="mrf-table mt-2">
-        <tbody>
-          <tr>
-            <td className="mrf-sig-cell">
-              <strong>Requester Signature</strong>
-              <div className="mrf-sig-box">
-                {request.requesterSignature ? (
-                  <img src={request.requesterSignature} alt="Requester signature" className="mrf-sig-img" />
-                ) : null}
-              </div>
-              <small>{request.requesterName}</small>
-            </td>
-            <td className="mrf-sig-cell">
-              <strong>Date</strong>
-              <div className="mrf-sig-box" />
-              <small>{formatDate(request.requesterSignedAt ?? request.submittedAt)}</small>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Section 5: Supervisor Approval */}
-      <SectionTitle title="5. Supervisor Approval" />
-      <table className="mrf-table">
-        <tbody>
-          <tr>
-            <Cell label="Supervisor Name" value={request.approval?.supervisorName ?? "____________________"} />
-            <Cell label="Department" value={request.approval?.supervisorDepartment ?? "____________________"} />
-            <Cell label="Date" value={request.approval ? formatDate(request.approval.approvedAt) : "____________________"} />
-          </tr>
-        </tbody>
-      </table>
-      <div className="mrf-approval-row">
-        <div className="mrf-approval-sig">
-          <strong>Supervisor Signature</strong>
-          <div className="mrf-sig-box">
-            {request.approval?.signatureDataUrl ? (
-              <img src={request.approval.signatureDataUrl} alt="Supervisor signature" className="mrf-sig-img" />
-            ) : null}
-          </div>
+      <div className="wo-print-signoff mrf-req-signoff">
+        <div className="wo-print-signoff-field">
+          <div className="wo-print-sig-line" />
+          <span>Signature</span>
+          {request.requesterSignatureName && (
+            <span className="wo-print-sig-name">Print name: {request.requesterSignatureName}</span>
+          )}
         </div>
-        <div className="mrf-approval-stamp">
-          <div className="mrf-stamp-box">
-            {request.approval ? <span className="mrf-stamp">APPROVED</span> : <span className="mrf-stamp-placeholder"> stamp / sign</span>}
-          </div>
+        <div className="wo-print-signoff-field">
+          <div className="wo-print-sig-line">{formatDate(request.requesterSignedAt ?? request.submittedAt)}</div>
+          <span>Date</span>
         </div>
       </div>
 
-      {/* Section 6: Response Tracking */}
-      <SectionTitle title="6. Response Tracking" />
+      <SectionTitle title="Approval" />
+      <div className="mrf-approval-row">
+        <div className="mrf-approval-cell">
+          <span className="mrf-label">Supervisor's Name</span>
+          <span className="mrf-value">{request.approval?.supervisorName ?? " "}</span>
+        </div>
+        <div className="mrf-approval-cell">
+          <span className="mrf-label">Date</span>
+          <span className="mrf-value">{request.approval ? formatDate(request.approval.approvedAt) : " "}</span>
+        </div>
+        <div className="mrf-approval-cell mrf-approval-sign">
+          <span className="mrf-label">Sign</span>
+          <div className="wo-print-sig-line" />
+          {request.approval?.signatureName && (
+            <span className="wo-print-sig-name">Print name: {request.approval.signatureName}</span>
+          )}
+        </div>
+      </div>
+
+      <SectionTitle title="Response Time Tracking" />
       <table className="mrf-table">
         <thead>
           <tr>
-            <th>Request Received</th>
-            <th>Work Order Issued</th>
+            <th>Request Received Time</th>
+            <th>Work Order Issue Time</th>
             <th>Time to First Response</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>{request.response.receivedAt ? formatDateTime(request.response.receivedAt) : "____________________"}</td>
+            <td>{request.response.receivedAt ? formatDateTime(request.response.receivedAt) : "—"}</td>
             <td>
               {request.response.workOrderIssuedAt
-                ? `${formatDateTime(request.response.workOrderIssuedAt)} (${request.response.workOrderNumber ?? "—"})`
-                : "____________________"}
+                ? `${formatDateTime(request.response.workOrderIssuedAt)}${request.response.workOrderNumber ? ` (${request.response.workOrderNumber})` : ""}`
+                : "—"}
             </td>
             <td>{timeToFirstResponse(request)}</td>
           </tr>
@@ -197,6 +181,8 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
         .mrf-logo-sub {
           font-size: 9pt;
           color: #333;
+          text-transform: uppercase;
+          letter-spacing: 0.3px;
         }
         .mrf-jobno {
           text-align: right;
@@ -257,11 +243,21 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
         .mrf-box {
           border: 1px solid #000;
           padding: 8px;
-          min-height: 70px;
+          min-height: 90px;
+          display: flex;
+          flex-direction: column;
         }
         .mrf-pre {
           white-space: pre-wrap;
-          margin: 0;
+          margin: 4px 0 auto;
+          flex: 1;
+        }
+        .mrf-inline-sig {
+          display: grid;
+          grid-template-columns: 90px 1fr;
+          align-items: end;
+          gap: 8px;
+          margin-top: 10px;
         }
         .mrf-tick-cell {
           text-align: center;
@@ -291,55 +287,22 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
           font-size: 8pt;
           color: #333;
         }
-        .mrf-sig-cell {
-          width: 50%;
-        }
-        .mrf-sig-box {
-          border-bottom: 1px solid #000;
-          height: 44px;
-          margin: 6px 0 2px;
-          display: flex;
-          align-items: flex-end;
-        }
-        .mrf-sig-img {
-          max-height: 40px;
-          width: auto;
+        .mrf-req-signoff {
+          margin-bottom: 4px;
         }
         .mrf-approval-row {
-          display: flex;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
           gap: 16px;
-          margin-top: 8px;
+          border: 1px solid #000;
+          padding: 8px;
         }
-        .mrf-approval-sig {
-          flex: 1;
-        }
-        .mrf-approval-stamp {
-          width: 140px;
+        .mrf-approval-cell {
           display: flex;
-          align-items: center;
-          justify-content: center;
+          flex-direction: column;
         }
-        .mrf-stamp-box {
-          border: 2px dashed #999;
-          width: 100%;
-          height: 70px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          text-align: center;
-          color: #666;
-        }
-        .mrf-stamp {
-          color: #c00;
-          font-weight: bold;
-          font-size: 12pt;
-          border: 2px solid #c00;
-          padding: 4px 8px;
-          transform: rotate(-12deg);
-        }
-        .mrf-stamp-placeholder {
-          font-size: 8pt;
-          color: #999;
+        .mrf-approval-sign .wo-print-sig-line {
+          margin-top: 4px;
         }
         .mrf-footer {
           margin-top: 16px;
@@ -347,7 +310,6 @@ export function PrintableMaintenanceRequest({ request }: PrintableMaintenanceReq
           color: #555;
           text-align: center;
         }
-        .mt-2 { margin-top: 8px; }
       `}</style>
     </div>
   );
@@ -374,4 +336,9 @@ function formatDateTime(iso: string): string {
 function formatDate(iso: string): string {
   const d = new Date(iso);
   return d.toLocaleDateString(undefined, { month: "short", day: "2-digit", year: "numeric" });
+}
+
+function formatTime(iso: string): string {
+  const d = new Date(iso);
+  return d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }

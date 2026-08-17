@@ -8,7 +8,8 @@ export interface MaintenanceRequestApproval {
   supervisorName: string;
   supervisorUsername: string;
   supervisorDepartment: string;
-  signatureDataUrl: string;
+  /** Typed name used as the supervisor's soft-copy signature; the printed form always leaves the line blank for a physical signature. */
+  signatureName: string;
   approvedAt: string;
 }
 
@@ -34,13 +35,15 @@ export interface MaintenanceRequest {
   requesterDepartment: string;
   requesterDesignation: string;
   requestDateTime: string;
-  requesterSignature: string; // captured signature data URL
+  /** Typed name used as the requester's soft-copy signature; the printed form always leaves the line blank for a physical signature. */
+  requesterSignatureName: string;
   requesterSignedAt?: string;
 
   // ── Equipment ──
   equipmentName: string;
   equipmentId: string;
-  workshopStation: string;
+  workshop: string;
+  station: string;
   operatorCustodianName: string;
   operatorCustodianDesignation: string;
 
@@ -79,11 +82,12 @@ export const maintenanceRequests: MaintenanceRequest[] = [
     requesterDepartment: "Production Line",
     requesterDesignation: "Production Line Operator",
     requestDateTime: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    requesterSignature: "",
+    requesterSignatureName: "Ritah",
     requesterSignedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     equipmentName: "Hydraulic Press T5",
     equipmentId: "STAMP-PR-01",
-    workshopStation: "Press Shop - Station 3",
+    workshop: "Press Shop",
+    station: "Station 3",
     operatorCustodianName: "Asiimwe Ritah",
     operatorCustodianDesignation: "Production Line Operator",
     problemDescription:
@@ -100,7 +104,7 @@ export const maintenanceRequests: MaintenanceRequest[] = [
       supervisorName: "Nakimbugwe Angel",
       supervisorUsername: "Nakimbugwe",
       supervisorDepartment: "Operations Maintenance",
-      signatureDataUrl: "",
+      signatureName: "Nakimbugwe",
       approvedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000 + 28 * 60 * 1000).toISOString(),
     },
   },
