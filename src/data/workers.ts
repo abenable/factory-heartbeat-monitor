@@ -241,7 +241,7 @@ export const WORKERS: Record<string, WorkerProfile> = {
     phone: "+256 772 100 014",
     email: "sserwada@kiiramotors.com",
     certifications: ["Workshop Safety Induction"],
-    performance: { completed: 4, avgDays: 5.0, availability: 89, quality: 87, safety: 94 },
+    performance: { completed: 4, avgDays: 5.0, availability: 89, quality: 87, safety: 94, monthly: [2, 3, 3, 4, 4, 4] },
   },
   Asiimwe: {
     username: "Asiimwe",
