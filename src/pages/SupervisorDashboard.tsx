@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { jobRequests, JobRequestStatus } from "@/data/jobRequests";
 import { maintenanceRequests, MaintenanceRequestStatus, MaintenanceUrgency } from "@/data/maintenanceRequests";
-import { machines, workOrders, getMachine, pmTasks, SECTORS } from "@/data/cmms";
+import { machines, workOrders, getMachine, pmTasks, isPMOverdue, SECTORS } from "@/data/cmms";
 import { WORKERS, onLeaveUsernames } from "@/data/workers";
 import {
   ResponsiveContainer,
@@ -244,6 +244,7 @@ export default function SupervisorDashboard() {
     () =>
       pmTasks
         .filter((p) => {
+          if (p.visitStatus === "done" || isPMOverdue(p)) return false;
           if (site === "All") return true;
           const m = getMachine(p.machineId);
           if (!m) return false;

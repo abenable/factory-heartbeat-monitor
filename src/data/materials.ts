@@ -58,24 +58,24 @@ export interface MaterialAlert {
 }
 
 export const purchaseOrders: PurchaseOrder[] = [
-  { id: "PO-2026-041", supplier: "Hydraulics UG Ltd", item: "Hydraulic seal kit (STAMP-PR-01)", qty: 4, unit: "set", status: "open", orderDate: "2026-07-06", deliveryDeadline: "2026-07-26", costUSD: 320, plant: "Jinja North" },
-  { id: "PO-2026-042", supplier: "Bearing World", item: "Spindle bearing 7208", qty: 10, unit: "pc", status: "open", orderDate: "2026-07-09", deliveryDeadline: "2026-07-22", costUSD: 450, plant: "Jinja North" },
-  { id: "PO-2026-043", supplier: "Siemens Parts", item: "Conveyor drive belt B-section", qty: 20, unit: "m", status: "closed", orderDate: "2026-06-20", deliveryDeadline: "2026-07-06", receivedQty: 20, costUSD: 180, plant: "Jinja South" },
-  { id: "PO-2026-044", supplier: "Coolant Solutions", item: "Coolant concentrate (20L)", qty: 6, unit: "drum", status: "overdue", orderDate: "2026-06-23", deliveryDeadline: "2026-07-06", costUSD: 540, plant: "Jinja South" },
-  { id: "PO-2026-045", supplier: "LubeTech Supplies", item: "High-temp bearing grease", qty: 12, unit: "cartridge", status: "open", orderDate: "2026-07-10", deliveryDeadline: "2026-07-26", costUSD: 96, plant: "Jinja North" },
-  { id: "PO-2026-046", supplier: "FilterMax", item: "Hydraulic filter HF-220", qty: 8, unit: "pc", status: "open", orderDate: "2026-07-10", deliveryDeadline: "2026-07-26", costUSD: 120, plant: "Jinja North" },
+  { id: "PO-2026-041", supplier: "Hydraulics UG Ltd", item: "Hydraulic seal kit (STAMP-PR-01)", qty: 4, unit: "set", status: "open", orderDate: "2026-08-05", deliveryDeadline: "2026-08-25", costUSD: 320, plant: "Jinja North" },
+  { id: "PO-2026-042", supplier: "Bearing World", item: "Spindle bearing 7208", qty: 10, unit: "pc", status: "open", orderDate: "2026-08-08", deliveryDeadline: "2026-08-21", costUSD: 450, plant: "Jinja North" },
+  { id: "PO-2026-043", supplier: "Siemens Parts", item: "Conveyor drive belt B-section", qty: 20, unit: "m", status: "closed", orderDate: "2026-07-20", deliveryDeadline: "2026-08-05", receivedQty: 20, costUSD: 180, plant: "Jinja South" },
+  { id: "PO-2026-044", supplier: "Coolant Solutions", item: "Coolant concentrate (20L)", qty: 6, unit: "drum", status: "overdue", orderDate: "2026-07-25", deliveryDeadline: "2026-08-14", costUSD: 540, plant: "Jinja South" },
+  { id: "PO-2026-045", supplier: "LubeTech Supplies", item: "High-temp bearing grease", qty: 12, unit: "cartridge", status: "open", orderDate: "2026-08-09", deliveryDeadline: "2026-08-25", costUSD: 96, plant: "Jinja North" },
+  { id: "PO-2026-046", supplier: "FilterMax", item: "Hydraulic filter HF-220", qty: 8, unit: "pc", status: "open", orderDate: "2026-08-09", deliveryDeadline: "2026-08-25", costUSD: 120, plant: "Jinja North" },
 ];
 
 export const materialDraws: MaterialDraw[] = [
-  { id: "MD-041", date: "2026-07-13", item: "Spindle bearing 7208", qty: 4, unit: "pc", drawnBy: "Mukisa", workOrderId: "WO-2041", machineId: "LATH-AX-09" },
-  { id: "MD-042", date: "2026-07-12", item: "Hydraulic filter HF-220", qty: 1, unit: "pc", drawnBy: "Odeke", workOrderId: "WO-2038", machineId: "INJ-MD-11" },
-  { id: "MD-043", date: "2026-07-11", item: "Coolant pump seal", qty: 2, unit: "pc", drawnBy: "Suubi", workOrderId: "WO-2040", machineId: "MILL-CN-04" },
-  { id: "MD-044", date: "2026-07-10", item: "Conveyor roller bearing 6205", qty: 4, unit: "pc", drawnBy: "Odeke", workOrderId: "WO-2036", machineId: "CONV-MN-02" },
+  { id: "MD-041", date: "2026-08-12", item: "Spindle bearing 7208", qty: 4, unit: "pc", drawnBy: "Mukisa", workOrderId: "WO-2041", machineId: "LATH-AX-09" },
+  { id: "MD-042", date: "2026-08-11", item: "Hydraulic filter HF-220", qty: 1, unit: "pc", drawnBy: "Odeke", workOrderId: "WO-2038", machineId: "INJ-MD-11" },
+  { id: "MD-043", date: "2026-08-10", item: "Coolant pump seal", qty: 2, unit: "pc", drawnBy: "Suubi", workOrderId: "WO-2040", machineId: "MILL-CN-04" },
+  { id: "MD-044", date: "2026-08-09", item: "Conveyor roller bearing 6205", qty: 4, unit: "pc", drawnBy: "Odeke", workOrderId: "WO-2036", machineId: "CONV-MN-02" },
 ];
 
 export const materialReturns: MaterialReturn[] = [
-  { id: "MR-011", date: "2026-07-09", item: "Bearing grease cartridge", qty: 2, unit: "pc", returnedBy: "Wagoli", reason: "Wrong spec — needed high-temp grade" },
-  { id: "MR-012", date: "2026-07-08", item: "O-ring kit (metric)", qty: 1, unit: "set", returnedBy: "Oumo", reason: "Excess from WO-2037" },
+  { id: "MR-011", date: "2026-08-08", item: "Bearing grease cartridge", qty: 2, unit: "pc", returnedBy: "Wagoli", reason: "Wrong spec — needed high-temp grade" },
+  { id: "MR-012", date: "2026-08-07", item: "O-ring kit (metric)", qty: 1, unit: "set", returnedBy: "Oumo", reason: "Excess from WO-2037" },
 ];
 
 export const inventory: InventoryItem[] = [
