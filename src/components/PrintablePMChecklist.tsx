@@ -1,14 +1,61 @@
-import { PMTask, getMachine } from "@/data/cmms";
+import { PMTask, PMChecklistItem, getMachine } from "@/data/cmms";
 import { getWorker } from "@/data/workers";
 import logoRed from "@/assets/kmc-logo-red.svg";
 
 const freqLabel = (f?: string) => (f ? f.charAt(0).toUpperCase() + f.slice(1) : "—");
 
+interface PrintData {
+  items: PMChecklistItem[];
+  isFinished: boolean;
+  technicianName?: string;
+  completedAt?: string;
+  remarks?: string;
+  approvedByName?: string;
+  approvedAt?: string;
+}
+
+/**
+ * Decides what to print: the technician's finished, submitted checklist
+ * (once completePMVisit() has logged it) with their signature and any
+ * supervisor approval — or the current blank/in-progress template if the
+ * visit hasn't been completed yet. Supervisors only ever preview/approve
+ * what a technician already filled in; they never fill it themselves.
+ */
+function resolvePrintData(task: PMTask): PrintData {
+  const latest = task.history[0];
+  if (task.visitStatus === "done" && latest) {
+    return {
+      items: latest.items,
+      isFinished: true,
+      technicianName: getWorker(latest.completedBy)?.name ?? latest.completedBy,
+      completedAt: latest.completedAt,
+      remarks: latest.remarks,
+      approvedByName: latest.approvedByName,
+      approvedAt: latest.approvedAt,
+    };
+  }
+  return { items: task.checklist, isFinished: false };
+}
+
+function fmtDate(iso?: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString();
+}
+
+function fmtDateTime(iso?: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime())
+    ? ""
+    : d.toLocaleString(undefined, { month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
 /**
  * Printable Preventive Maintenance Checklist — mirrors the physical KMC
  * Equipment Maintenance Checklist paper form (header info grid, sectioned
  * checklist, sign-off). Renders nothing on screen; appears only when
- * window.print() is invoked. Designed to fit one A4 page.
+ * window.print() is invoked. Prints landscape and is designed to fit one page.
  */
 export function PrintablePMChecklist({ task }: { task: PMTask }) {
   const machine = getMachine(task.machineId);
@@ -30,7 +77,8 @@ function PMChecklistMarkup({
   machineName?: string;
   personName?: string;
 }) {
-  const sections = Array.from(new Set(task.checklist.map((i) => i.section)));
+  const data = resolvePrintData(task);
+  const sections = Array.from(new Set(data.items.map((i) => i.section)));
 
   return (
     <>
@@ -39,7 +87,9 @@ function PMChecklistMarkup({
           <img src={logoRed} alt="KMC" className="wo-print-logo" />
           <div>
             <h1>Kiira Motors Corporation</h1>
-            <h2>Preventive Maintenance Checklist</h2>
+            <h2>
+              Preventive Maintenance Checklist {data.isFinished ? "— Completed" : "— Blank / In Progress"}
+            </h2>
           </div>
         </div>
         <div className="wo-print-cwo">
@@ -64,12 +114,14 @@ function PMChecklistMarkup({
         {task.safetyInstructions && <Box label="Safety Instructions" value={task.safetyInstructions} />}
       </div>
 
+      {data.isFinished && data.remarks && <Box label="Technician Remarks" value={data.remarks} />}
+
       <div className="wo-print-checklist-legend">Mark one per item: OK · F = Faulty · N/A = Not Applicable</div>
       <div className="wo-print-checklist-columns">
         {sections.map((section) => (
           <div key={section} className="wo-print-checklist-section">
             <div className="wo-print-checklist-title">{section}</div>
-            {task.checklist
+            {data.items
               .filter((i) => i.section === section)
               .map((item) => (
                 <div key={item.id} className="wo-print-check-row">
@@ -86,10 +138,16 @@ function PMChecklistMarkup({
       </div>
 
       <div className="wo-print-signoff">
-        <SignatureField label="Technician Signature" name={personName ?? task.personInCharge} />
-        <SignoffField label="Date & Time" value="" />
-        <SignatureField label="Supervisor Signature" name={task.scheduledBy} />
-        <SignoffField label="Date" value="" />
+        <SignatureField
+          label="Technician Signature"
+          name={data.isFinished ? data.technicianName : undefined}
+        />
+        <SignoffField label="Date & Time Completed" value={data.isFinished ? fmtDateTime(data.completedAt) : ""} />
+        <SignatureField
+          label="Supervisor Signature"
+          name={data.approvedByName}
+        />
+        <SignoffField label="Date Approved" value={data.approvedByName ? fmtDate(data.approvedAt) : ""} />
       </div>
     </>
   );
@@ -159,7 +217,8 @@ export function printPMChecklist(task: PMTask) {
   const machine = getMachine(task.machineId);
   const person = task.personInCharge ? getWorker(task.personInCharge) : null;
   const personName = person?.name ?? task.personInCharge;
-  const sections = Array.from(new Set(task.checklist.map((i) => i.section)));
+  const data = resolvePrintData(task);
+  const sections = Array.from(new Set(data.items.map((i) => i.section)));
 
   const gridRow = (label: string, value: string | undefined, label2: string, value2: string | undefined) =>
     `<tr><th>${esc(label)}</th><td>${esc(value || " ")}</td><th>${esc(label2)}</th><td>${esc(value2 || " ")}</td></tr>`;
@@ -182,7 +241,7 @@ export function printPMChecklist(task: PMTask) {
 
   const sectionsHtml = sections
     .map((section) => {
-      const rows = task.checklist
+      const rows = data.items
         .filter((i) => i.section === section)
         .map(
           (item) =>
@@ -203,7 +262,7 @@ export function printPMChecklist(task: PMTask) {
         <img src="${logoRed}" alt="KMC" class="wo-print-logo" />
         <div>
           <h1>Kiira Motors Corporation</h1>
-          <h2>Preventive Maintenance Checklist</h2>
+          <h2>Preventive Maintenance Checklist ${data.isFinished ? "&mdash; Completed" : "&mdash; Blank / In Progress"}</h2>
         </div>
       </div>
       <div class="wo-print-cwo">
@@ -225,13 +284,14 @@ export function printPMChecklist(task: PMTask) {
       ${box("Required Tools", task.requiredTools)}
       ${box("Safety Instructions", task.safetyInstructions)}
     </div>
+    ${data.isFinished ? box("Technician Remarks", data.remarks) : ""}
     <div class="wo-print-checklist-legend">Mark one per item: OK &middot; F = Faulty &middot; N/A = Not Applicable</div>
     <div class="wo-print-checklist-columns">${sectionsHtml}</div>
     <div class="wo-print-signoff">
-      ${signature("Technician Signature", personName)}
-      ${signoff("Date &amp; Time", "")}
-      ${signature("Supervisor Signature", task.scheduledBy)}
-      ${signoff("Date", "")}
+      ${signature("Technician Signature", data.isFinished ? data.technicianName : undefined)}
+      ${signoff("Date &amp; Time Completed", data.isFinished ? fmtDateTime(data.completedAt) : "")}
+      ${signature("Supervisor Signature", data.approvedByName)}
+      ${signoff("Date Approved", data.approvedByName ? fmtDate(data.approvedAt) : "")}
     </div>
   `;
 

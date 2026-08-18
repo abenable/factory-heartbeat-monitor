@@ -45,6 +45,10 @@ import {
   updateWorkOrder,
   pmTasks,
   updatePMTask,
+  acknowledgePMVisit,
+  blockPMVisit,
+  resumePMVisit,
+  completePMVisit,
   estimatedPMHours,
   pmDaysUntil,
   isPMOverdue,
@@ -53,6 +57,7 @@ import {
   WorkOrderStatus,
   WorkOrderPriority,
   PMTask,
+  PMChecklistItem,
 } from "@/data/cmms";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 import { printPMChecklist } from "@/components/PrintablePMChecklist";
@@ -342,13 +347,36 @@ const TechnicianDashboard = () => {
   );
 };
 
+const pmFilters: { key: WorkOrderStatus | "all" | "active"; label: string }[] = [
+  { key: "active", label: "Active" },
+  { key: "open", label: "Open" },
+  { key: "in_progress", label: "In Progress" },
+  { key: "blocked", label: "Blocked" },
+  { key: "done", label: "Done" },
+  { key: "all", label: "All" },
+];
+
 function MyPMSection({ username, worker }: { username: string; worker: WorkerProfile | null }) {
   const [tick, setTick] = useState(0);
+  const [pmFilter, setPmFilter] = useState<WorkOrderStatus | "all" | "active">("active");
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
   const myPM = useMemo(
     () => pmTasks.filter((p) => p.personInCharge?.toLowerCase() === username.toLowerCase()),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [username, tick],
   );
+
+  const filtered =
+    pmFilter === "all"
+      ? myPM
+      : pmFilter === "active"
+      ? myPM.filter((p) => p.visitStatus !== "done")
+      : myPM.filter((p) => p.visitStatus === pmFilter);
+
+  // Always look the selected task up fresh from pmTasks so the open dialog
+  // reflects the latest state after any update, instead of a stale prop.
+  const selectedTask = selectedId ? pmTasks.find((p) => p.id === selectedId) ?? null : null;
 
   if (myPM.length === 0) return null;
 
@@ -361,47 +389,65 @@ function MyPMSection({ username, worker }: { username: string; worker: WorkerPro
           My Preventive Maintenance
         </span>
       </div>
+
+      <div className="flex flex-wrap gap-2 mb-4">
+        {pmFilters.map((f) => (
+          <button
+            key={f.key}
+            onClick={() => setPmFilter(f.key)}
+            className={`px-3 py-1.5 rounded-full text-xs font-mono-data uppercase tracking-widest border transition-colors ${
+              pmFilter === f.key
+                ? "border-primary bg-primary text-primary-foreground"
+                : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+            }`}
+          >
+            {f.label}
+          </button>
+        ))}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {myPM
+        {filtered.length === 0 && (
+          <Card className="col-span-full p-8 text-center border-dashed">
+            <p className="text-muted-foreground">No preventive maintenance tasks in this view.</p>
+          </Card>
+        )}
+        {filtered
           .sort((a, b) => new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime())
           .map((task) => (
-            <PMCard key={task.id} task={task} worker={worker} onUpdated={refresh} />
+            <PMCard key={task.id} task={task} onClick={() => setSelectedId(task.id)} />
           ))}
       </div>
+
+      {selectedTask && (
+        <PMTaskDetailDialog
+          task={selectedTask}
+          currentUser={worker}
+          onClose={() => setSelectedId(null)}
+          onUpdated={refresh}
+        />
+      )}
     </div>
   );
 }
 
-function PMCard({
-  task,
-  worker,
-  onUpdated,
-}: {
-  task: PMTask;
-  worker: WorkerProfile | null;
-  onUpdated: () => void;
-}) {
+const pmStatusMeta: Record<WorkOrderStatus, { label: string; color: string }> = {
+  open: { label: "Open", color: "text-muted-foreground" },
+  in_progress: { label: "In Progress", color: "text-primary" },
+  blocked: { label: "Blocked", color: "text-led-warn" },
+  done: { label: "Done", color: "text-led-ok" },
+};
+
+function PMCard({ task, onClick }: { task: PMTask; onClick: () => void }) {
   const machine = getMachine(task.machineId);
   const days = pmDaysUntil(task.nextDue);
   const overdue = isPMOverdue(task);
   const dueSoon = isPMDueSoon(task);
   const est = estimatedPMHours(task);
-  const signatureName = worker?.name ?? task.personInCharge ?? "";
-
-  const acknowledge = () => {
-    updatePMTask(task.id, { visitAcknowledgedAt: new Date().toISOString(), visitAcknowledgedByName: signatureName });
-    toast.success("PM receipt confirmed", { description: signatureName });
-    onUpdated();
-  };
-
-  const start = () => {
-    updatePMTask(task.id, { visitStartedAt: new Date().toISOString() });
-    toast.success("PM visit started", { description: task.id });
-    onUpdated();
-  };
+  const meta = pmStatusMeta[task.visitStatus];
 
   return (
-    <Card className="border-border/60">
+    <Card onClick={onClick} className="cursor-pointer border-border/60 transition-shadow hover:shadow-md hover:border-primary/40">
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
@@ -416,6 +462,7 @@ function PMCard({
               >
                 {overdue ? `${Math.abs(days)}d OVERDUE` : dueSoon ? `Due in ${days}d` : `Due ${formatDate(task.nextDue)}`}
               </Badge>
+              <span className={`font-mono-data text-[10px] uppercase ${meta.color}`}>{meta.label}</span>
             </div>
             <CardTitle className="text-base leading-tight">{task.task}</CardTitle>
           </div>
@@ -431,34 +478,291 @@ function PMCard({
             <Timer className="size-3.5" /> Est. {est.hours.toFixed(1)}h
           </span>
         </div>
-
-        {!task.visitAcknowledgedAt ? (
-          <Button size="sm" onClick={acknowledge}>
-            <CheckCircle2 className="size-4" /> Confirm Received
-          </Button>
-        ) : (
-          <div className="flex flex-col gap-2">
-            <p className="text-xs text-muted-foreground">
-              Received by <strong className="text-foreground">{task.visitAcknowledgedByName}</strong>
-            </p>
-            {!task.visitStartedAt ? (
-              <Button size="sm" variant="outline" onClick={start}>
-                <Loader2 className="size-4" /> Start
-              </Button>
-            ) : (
-              <p className="text-xs text-led-ok font-medium flex items-center gap-1">
-                <CheckCircle2 className="size-3.5" /> In progress
-              </p>
-            )}
-          </div>
-        )}
-
-        <Button size="sm" variant="outline" onClick={() => printPMChecklist(task)}>
-          Print Checklist
-        </Button>
+        <div className="flex items-center text-xs text-primary font-medium">
+          {task.visitAcknowledgedAt ? "Open checklist" : "Confirm receipt"} <ChevronRight className="size-3.5 ml-1" />
+        </div>
       </CardContent>
     </Card>
   );
+}
+
+function PMTaskDetailDialog({
+  task,
+  currentUser,
+  onClose,
+  onUpdated,
+}: {
+  task: PMTask;
+  currentUser: WorkerProfile | null;
+  onClose: () => void;
+  onUpdated: () => void;
+}) {
+  const machine = getMachine(task.machineId);
+  const signatureName = currentUser?.name ?? task.personInCharge ?? "";
+  const [remarks, setRemarks] = useState("");
+  const [blockedReason, setBlockedReason] = useState(task.visitBlockedReason ?? "");
+  const sections = Array.from(new Set(task.checklist.map((i) => i.section)));
+
+  const acknowledge = () => {
+    acknowledgePMVisit(task.id, signatureName);
+    toast.success("PM receipt confirmed", { description: signatureName });
+    onUpdated();
+  };
+
+  const setResult = (itemId: string, result: PMChecklistItem["result"]) => {
+    const next = task.checklist.map((i) => (i.id === itemId ? { ...i, result } : i));
+    updatePMTask(task.id, { checklist: next });
+    onUpdated();
+  };
+
+  const reportBlocked = () => {
+    blockPMVisit(task.id, blockedReason.trim() || undefined);
+    toast.info("Marked blocked", { description: task.id });
+    onUpdated();
+  };
+
+  const resume = () => {
+    resumePMVisit(task.id);
+    toast.success("Resumed", { description: task.id });
+    onUpdated();
+  };
+
+  const completeAndSubmit = () => {
+    const now = new Date().toISOString();
+    const start = task.visitStartedAt ?? task.visitAcknowledgedAt;
+    const durationHours = start
+      ? Math.max(0, (new Date(now).getTime() - new Date(start).getTime()) / 36e5)
+      : undefined;
+    completePMVisit(task.id, {
+      completedAt: now,
+      completedBy: task.personInCharge ?? "",
+      startTime: start,
+      endTime: now,
+      durationHours,
+      items: task.checklist,
+      remarks: remarks.trim() || undefined,
+    });
+    toast.success("PM visit completed — sent to supervisor", { description: task.id });
+    setRemarks("");
+    onUpdated();
+    onClose();
+  };
+
+  const isDone = task.visitStatus === "done";
+
+  return (
+    <Dialog open onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
+            <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+              {task.referenceNumber ?? task.id}
+            </span>
+            <Badge className="text-[10px] bg-led-ok/15 text-led-ok border border-led-ok/30">
+              {freqLabelPM(task.frequency)}
+            </Badge>
+          </div>
+          <DialogTitle className="text-left text-xl leading-tight">{task.task}</DialogTitle>
+          <DialogDescription className="text-left">
+            {machine?.name ?? task.machineId} · Due {formatDate(task.nextDue)}
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6 py-2">
+          {/* Receipt confirmation */}
+          {!task.visitAcknowledgedAt ? (
+            <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-primary/40 bg-primary/5 p-3">
+              <span className="text-sm">
+                <strong>New PM assignment.</strong> Confirm you've received this task.
+              </span>
+              <Button size="sm" onClick={acknowledge}>
+                <CheckCircle2 className="size-4" /> Confirm Received
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className="rounded-lg bg-panel p-3 text-sm">
+                <span className="text-muted-foreground">
+                  Received by <strong className="text-foreground">{task.visitAcknowledgedByName}</strong>
+                </span>
+              </div>
+
+              {/* Status stepper */}
+              <div className="grid grid-cols-3 gap-1 rounded-lg bg-panel p-1">
+                {(["open", "in_progress", "blocked"] as WorkOrderStatus[]).map((s) => {
+                  const active = task.visitStatus === s;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => {
+                        if (s === "blocked") reportBlocked();
+                        else resume();
+                      }}
+                      disabled={isDone}
+                      className={`flex flex-col items-center gap-1 rounded-md py-2 text-[10px] font-mono-data uppercase tracking-wider transition-colors ${
+                        active
+                          ? "bg-primary text-primary-foreground"
+                          : "text-muted-foreground hover:bg-panel-elevated"
+                      } ${isDone ? "opacity-50 cursor-not-allowed" : ""}`}
+                    >
+                      {pmStatusMeta[s].label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {task.visitStatus === "blocked" && (
+                <div className="grid gap-1.5">
+                  <Label className="text-xs text-muted-foreground">Reason blocked</Label>
+                  <Input
+                    value={blockedReason}
+                    onChange={(e) => setBlockedReason(e.target.value)}
+                    onBlur={() => blockPMVisit(task.id, blockedReason.trim() || undefined)}
+                    placeholder="e.g. Waiting on replacement part"
+                  />
+                </div>
+              )}
+            </>
+          )}
+
+          {isDone && (
+            <div className="rounded-lg bg-led-ok/10 border border-led-ok/30 p-3 text-sm flex items-center gap-2">
+              <CheckCircle2 className="size-4 text-led-ok" />
+              <span>
+                Completed and sent to supervisor
+                {task.history[0] && ` on ${formatDate(task.history[0].completedAt)}`}.
+                {task.history[0]?.approvedByName
+                  ? ` Approved by ${task.history[0].approvedByName}.`
+                  : " Awaiting supervisor approval."}
+              </span>
+            </div>
+          )}
+
+          {/* Procedures / tools / safety */}
+          {(task.procedures || task.requiredTools || task.safetyInstructions) && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+              {task.procedures && <Meta label="Procedures" value={task.procedures} icon={ClipboardList} />}
+              {task.requiredTools && <Meta label="Required Tools" value={task.requiredTools} icon={ClipboardList} />}
+              {task.safetyInstructions && <Meta label="Safety" value={task.safetyInstructions} icon={AlertTriangle} />}
+            </div>
+          )}
+
+          {/* Checklist */}
+          <div className="space-y-3">
+            <span className="font-mono-data text-[10px] uppercase tracking-widest text-primary">
+              Checklist
+            </span>
+            {sections.map((section) => (
+              <div key={section} className="space-y-1.5">
+                <span className="text-xs font-medium text-muted-foreground">{section}</span>
+                <div className="space-y-1.5">
+                  {task.checklist
+                    .filter((i) => i.section === section)
+                    .map((item) => (
+                      <div
+                        key={item.id}
+                        className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-panel p-2.5"
+                      >
+                        <span className="text-sm flex-1">{item.description}</span>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <PMResultButton
+                            active={item.result === "ok"}
+                            tone="ok"
+                            label="OK"
+                            disabled={!task.visitAcknowledgedAt || isDone}
+                            onClick={() => setResult(item.id, "ok")}
+                          />
+                          <PMResultButton
+                            active={item.result === "faulty"}
+                            tone="crit"
+                            label="F"
+                            disabled={!task.visitAcknowledgedAt || isDone}
+                            onClick={() => setResult(item.id, "faulty")}
+                          />
+                          <PMResultButton
+                            active={item.result === "na"}
+                            tone="muted"
+                            label="N/A"
+                            disabled={!task.visitAcknowledgedAt || isDone}
+                            onClick={() => setResult(item.id, "na")}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {!isDone && task.visitAcknowledgedAt && (
+            <div className="grid gap-1.5">
+              <Label htmlFor="pm-remarks" className="text-xs text-muted-foreground flex items-center gap-1.5">
+                <MessageSquare className="size-3" /> Remarks
+              </Label>
+              <Textarea
+                id="pm-remarks"
+                value={remarks}
+                onChange={(e) => setRemarks(e.target.value)}
+                placeholder="Notes, parts replaced, follow-up required..."
+                rows={2}
+              />
+            </div>
+          )}
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button variant="outline" onClick={onClose}>
+            Close
+          </Button>
+          <Button variant="outline" onClick={() => printPMChecklist(task)}>
+            Print Checklist
+          </Button>
+          {task.visitAcknowledgedAt && !isDone && (
+            <Button onClick={completeAndSubmit} className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <CheckCircle2 className="size-4" /> Complete &amp; Submit to Supervisor
+            </Button>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function PMResultButton({
+  active,
+  tone,
+  label,
+  disabled,
+  onClick,
+}: {
+  active: boolean;
+  tone: "ok" | "crit" | "muted";
+  label: string;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  const activeClass =
+    tone === "ok"
+      ? "bg-led-ok text-white border-led-ok"
+      : tone === "crit"
+      ? "bg-led-crit text-white border-led-crit"
+      : "bg-secondary text-secondary-foreground border-secondary";
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      className={`h-7 px-2 rounded-md border text-[10px] font-mono-data uppercase flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+        active ? activeClass : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function freqLabelPM(f?: string): string {
+  return f ? f.charAt(0).toUpperCase() + f.slice(1) : "—";
 }
 
 function WorkOrderCard({

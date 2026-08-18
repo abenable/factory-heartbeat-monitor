@@ -5,7 +5,9 @@ import {
   Calendar,
   CheckCircle2,
   Clock,
-  MinusCircle,
+  Eye,
+  Loader2,
+  PauseCircle,
   Plus,
   Printer,
   Timer,
@@ -32,7 +34,8 @@ import {
   getMachine,
   addPMTask,
   updatePMTask,
-  completePMVisit,
+  approvePMVisit,
+  isLatestPMVisitApproved,
   estimatedPMHours,
   pmDaysUntil,
   isPMOverdue,
@@ -42,7 +45,7 @@ import {
   buildPMChecklist,
   PMTask,
   PMFrequency,
-  PMChecklistItem,
+  WorkOrderStatus,
 } from "@/data/cmms";
 import { WORKERS, onLeaveUsernames, getWorker } from "@/data/workers";
 import { getUser } from "@/lib/auth";
@@ -81,7 +84,7 @@ export default function PMSchedule() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
   const [scheduleTarget, setScheduleTarget] = useState<PMTask | null>(null);
-  const [completeTarget, setCompleteTarget] = useState<PMTask | null>(null);
+  const [previewTarget, setPreviewTarget] = useState<PMTask | null>(null);
   const [newOpen, setNewOpen] = useState(false);
 
   const sorted = useMemo(() => {
@@ -199,17 +202,16 @@ export default function PMSchedule() {
                         Est. {est.hours.toFixed(1)}h
                         {est.source === "history" && ` · from ${p.history.length} visit${p.history.length === 1 ? "" : "s"}`}
                       </Badge>
-                      {p.visitStartedAt ? (
-                        <Badge className="text-[9px] bg-led-ok/15 text-led-ok border border-led-ok/30">
-                          In Progress
-                        </Badge>
-                      ) : p.visitAcknowledgedAt ? (
-                        <Badge className="text-[9px] bg-primary/15 text-primary border border-primary/30">
-                          Acknowledged
-                        </Badge>
-                      ) : (
-                        <Badge className="text-[9px] bg-led-warn/15 text-led-warn border border-led-warn/30">
-                          Awaiting Technician
+                      <PMStatusBadge status={p.visitStatus} />
+                      {p.visitStatus === "done" && (
+                        <Badge
+                          className={`text-[9px] ${
+                            isLatestPMVisitApproved(p)
+                              ? "bg-led-ok/15 text-led-ok border border-led-ok/30"
+                              : "bg-led-warn/15 text-led-warn border border-led-warn/30"
+                          }`}
+                        >
+                          {isLatestPMVisitApproved(p) ? "Approved" : "Awaiting Approval"}
                         </Badge>
                       )}
                     </div>
@@ -238,9 +240,9 @@ export default function PMSchedule() {
                 {isOpen && (
                   <div className="px-4 pb-4 border-t border-border bg-panel-elevated/30">
                     <div className="flex flex-wrap gap-2 pt-4">
-                      <Button size="sm" onClick={() => setCompleteTarget(p)}>
-                        <CheckCircle2 className="size-4" />
-                        Log Completion
+                      <Button size="sm" onClick={() => setPreviewTarget(p)}>
+                        <Eye className="size-4" />
+                        Preview{p.visitStatus === "done" && !isLatestPMVisitApproved(p) ? " / Approve" : ""}
                       </Button>
                       <Button size="sm" variant="outline" onClick={() => setScheduleTarget(p)}>
                         <UserCog className="size-4" />
@@ -314,11 +316,11 @@ export default function PMSchedule() {
           onSaved={refresh}
         />
       )}
-      {completeTarget && (
-        <CompleteVisitDialog
-          task={completeTarget}
-          onClose={() => setCompleteTarget(null)}
-          onSaved={refresh}
+      {previewTarget && (
+        <PMPreviewDialog
+          task={pmTasks.find((t) => t.id === previewTarget.id) ?? previewTarget}
+          onClose={() => setPreviewTarget(null)}
+          onApproved={refresh}
         />
       )}
       {newOpen && (
@@ -635,88 +637,89 @@ function ScheduleDialog({
   );
 }
 
-function CompleteVisitDialog({
+function PMStatusBadge({ status }: { status: WorkOrderStatus }) {
+  const meta: Record<WorkOrderStatus, { label: string; className: string }> = {
+    open: { label: "Awaiting Technician", className: "bg-led-warn/15 text-led-warn border border-led-warn/30" },
+    in_progress: { label: "In Progress", className: "bg-primary/15 text-primary border border-primary/30" },
+    blocked: { label: "Blocked", className: "bg-led-crit/15 text-led-crit border border-led-crit/30" },
+    done: { label: "Completed", className: "bg-led-ok/15 text-led-ok border border-led-ok/30" },
+  };
+  const m = meta[status];
+  return <Badge className={`text-[9px] ${m.className}`}>{m.label}</Badge>;
+}
+
+/**
+ * Supervisor-facing view. Technicians own filling in and completing the PM
+ * checklist — supervisors only preview it (blank/in-progress or, once the
+ * technician has submitted, their finished results) and approve the
+ * finished copy with a typed signature.
+ */
+function PMPreviewDialog({
   task,
   onClose,
-  onSaved,
+  onApproved,
 }: {
   task: PMTask;
   onClose: () => void;
-  onSaved: () => void;
+  onApproved: () => void;
 }) {
-  const [items, setItems] = useState<PMChecklistItem[]>(() => task.checklist.map((i) => ({ ...i })));
-  const [completedBy, setCompletedBy] = useState(getUser() ?? task.personInCharge ?? "");
-  const [startTime, setStartTime] = useState("");
-  const [endTime, setEndTime] = useState("");
-  const [remarks, setRemarks] = useState("");
-
+  const [approverName, setApproverName] = useState(getUser() ?? "");
   const machine = getMachine(task.machineId);
+  const latest = task.history[0];
+  const isFinished = task.visitStatus === "done" && Boolean(latest);
+  const items = isFinished && latest ? latest.items : task.checklist;
   const sections = Array.from(new Set(items.map((i) => i.section)));
+  const alreadyApproved = isLatestPMVisitApproved(task);
+  const technician = latest ? getWorker(latest.completedBy) : null;
 
-  const setResult = (id: string, result: PMChecklistItem["result"]) =>
-    setItems((prev) => prev.map((i) => (i.id === id ? { ...i, result } : i)));
-
-  const durationHours = (() => {
-    if (!startTime || !endTime) return null;
-    const s = new Date(startTime).getTime();
-    const e = new Date(endTime).getTime();
-    if (Number.isNaN(s) || Number.isNaN(e) || e <= s) return null;
-    return (e - s) / 36e5;
-  })();
-
-  const save = () => {
-    if (!completedBy.trim()) {
-      toast.error("Enter who completed this visit");
+  const approve = () => {
+    if (!approverName.trim()) {
+      toast.error("Type your name to approve");
       return;
     }
-    completePMVisit(task.id, {
-      completedAt: endTime ? new Date(endTime).toISOString() : new Date().toISOString(),
-      completedBy: completedBy.trim(),
-      startTime: startTime ? new Date(startTime).toISOString() : undefined,
-      endTime: endTime ? new Date(endTime).toISOString() : undefined,
-      durationHours: durationHours ?? undefined,
-      items,
-      remarks: remarks.trim() || undefined,
-    });
-    toast.success("PM visit logged", { description: task.id });
-    onSaved();
-    onClose();
+    approvePMVisit(task.id, approverName.trim());
+    toast.success("PM visit approved", { description: task.id });
+    onApproved();
   };
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Log Completion — {task.id}</DialogTitle>
+          <DialogTitle>
+            {task.id} <span className="text-muted-foreground font-normal">— {isFinished ? "Completed" : "Blank / In Progress"}</span>
+          </DialogTitle>
           <DialogDescription>
             {task.task} · {machine?.name ?? task.machineId}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-5 py-2">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <Field label="Completed By">
-              <Input
-                value={completedBy}
-                onChange={(e) => setCompletedBy(e.target.value)}
-                placeholder="Login username"
-              />
-            </Field>
-            <div />
-            <Field label="Start Time">
-              <Input type="datetime-local" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
-            </Field>
-            <Field label="End Time">
-              <Input type="datetime-local" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
-            </Field>
+          <div className="flex flex-wrap items-center gap-2">
+            <PMStatusBadge status={task.visitStatus} />
+            {task.visitStatus === "blocked" && task.visitBlockedReason && (
+              <span className="flex items-center gap-1 text-xs text-led-crit">
+                <PauseCircle className="size-3.5" /> {task.visitBlockedReason}
+              </span>
+            )}
           </div>
 
-          {durationHours !== null && (
-            <div className="rounded-lg bg-panel p-3 flex items-center justify-between text-sm">
-              <span className="text-muted-foreground font-mono-data text-[10px] uppercase tracking-widest">
-                Duration Logged
-              </span>
-              <span className="font-semibold">{durationHours.toFixed(1)} h</span>
+          {!isFinished && (
+            <div className="rounded-lg bg-panel p-3 text-sm text-muted-foreground flex items-center gap-2">
+              <Loader2 className="size-4 shrink-0" />
+              This checklist has not been completed by the technician yet. Showing the blank template — you can
+              print it, but results below are read-only until submitted.
+            </div>
+          )}
+
+          {isFinished && latest && (
+            <div className="rounded-lg bg-panel p-3 text-sm space-y-1">
+              <p>
+                Completed by <strong>{technician?.name ?? latest.completedBy}</strong> on{" "}
+                {latest.completedAt.slice(0, 10)}
+                {latest.durationHours ? ` · ${latest.durationHours.toFixed(1)}h` : ""}
+              </p>
+              {latest.remarks && <p className="text-muted-foreground">Remarks: {latest.remarks}</p>}
             </div>
           )}
 
@@ -734,79 +737,64 @@ function CompleteVisitDialog({
                       className="flex items-center justify-between gap-3 rounded-lg border border-border/60 bg-panel p-2.5"
                     >
                       <span className="text-sm flex-1">{item.description}</span>
-                      <div className="flex items-center gap-1 shrink-0">
-                        <ResultButton
-                          active={item.result === "ok"}
-                          tone="ok"
-                          icon={CheckCircle2}
-                          onClick={() => setResult(item.id, "ok")}
-                        />
-                        <ResultButton
-                          active={item.result === "faulty"}
-                          tone="crit"
-                          icon={AlertTriangle}
-                          onClick={() => setResult(item.id, "faulty")}
-                        />
-                        <ResultButton
-                          active={item.result === "na"}
-                          tone="muted"
-                          icon={MinusCircle}
-                          onClick={() => setResult(item.id, "na")}
-                        />
-                      </div>
+                      <Badge
+                        variant="outline"
+                        className={`text-[10px] shrink-0 ${
+                          item.result === "ok"
+                            ? "text-led-ok border-led-ok/40"
+                            : item.result === "faulty"
+                            ? "text-led-crit border-led-crit/40"
+                            : item.result === "na"
+                            ? "text-muted-foreground"
+                            : "text-muted-foreground border-dashed"
+                        }`}
+                      >
+                        {item.result === "ok" ? "OK" : item.result === "faulty" ? "Faulty" : item.result === "na" ? "N/A" : "Pending"}
+                      </Badge>
                     </div>
                   ))}
               </div>
             </div>
           ))}
 
-          <Field label="Remarks">
-            <Textarea
-              rows={3}
-              value={remarks}
-              onChange={(e) => setRemarks(e.target.value)}
-              placeholder="Notes, parts replaced, follow-up required..."
-            />
-          </Field>
+          {isFinished && (
+            <div className="rounded-lg border border-border/60 p-3 space-y-3">
+              {alreadyApproved && latest ? (
+                <p className="text-sm text-led-ok flex items-center gap-1.5">
+                  <CheckCircle2 className="size-4" />
+                  Approved by <strong>{latest.approvedByName}</strong>
+                  {latest.approvedAt && ` on ${latest.approvedAt.slice(0, 10)}`}
+                </p>
+              ) : (
+                <>
+                  <Field label="Approve with Signature (type your name)">
+                    <Input
+                      value={approverName}
+                      onChange={(e) => setApproverName(e.target.value)}
+                      placeholder="Your name"
+                    />
+                  </Field>
+                  <Button size="sm" onClick={approve}>
+                    <CheckCircle2 className="size-4" />
+                    Approve
+                  </Button>
+                </>
+              )}
+            </div>
+          )}
         </div>
 
         <DialogFooter className="gap-2">
           <Button variant="outline" onClick={onClose}>
-            Cancel
+            Close
           </Button>
-          <Button onClick={save}>
-            <CheckCircle2 className="size-4" />
-            Save Completion
+          <Button variant="outline" onClick={() => printPMChecklist(task)}>
+            <Printer className="size-4" />
+            Print {isFinished ? "Completed" : "Blank"} Checklist
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  );
-}
-
-function ResultButton({
-  active,
-  tone,
-  icon: Icon,
-  onClick,
-}: {
-  active: boolean;
-  tone: "ok" | "crit" | "muted";
-  icon: React.ComponentType<{ className?: string }>;
-  onClick: () => void;
-}) {
-  const activeClass =
-    tone === "ok" ? "bg-led-ok text-white border-led-ok" : tone === "crit" ? "bg-led-crit text-white border-led-crit" : "bg-secondary text-secondary-foreground border-secondary";
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`size-7 rounded-md border flex items-center justify-center transition-colors ${
-        active ? activeClass : "border-border text-muted-foreground hover:border-primary hover:text-primary"
-      }`}
-    >
-      <Icon className="size-4" />
-    </button>
   );
 }
 
