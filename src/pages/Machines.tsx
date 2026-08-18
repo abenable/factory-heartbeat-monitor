@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Plus } from "lucide-react";
+import { Plus, Printer } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel } from "@/components/Panel";
 import { StatusDot } from "@/components/StatusDot";
@@ -37,7 +37,7 @@ const Machines = () => {
     <AppLayout pageTitle="Machines" breadcrumb={`${list.length} OF ${machines.length} NODES`}>
       <div className="flex flex-col gap-6">
         {/* Toolbar */}
-        <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between">
+        <div className="flex flex-col md:flex-row gap-3 md:items-center md:justify-between no-print">
           <div className="flex flex-wrap gap-2">
             {filters.map((f) => (
               <button
@@ -68,6 +68,10 @@ const Machines = () => {
               placeholder="Search by ID, name or sector…"
               className="md:w-80 font-mono-data text-xs bg-panel border-border"
             />
+            <Button variant="outline" size="sm" onClick={() => window.print()}>
+              <Printer className="size-4" />
+              Print
+            </Button>
           </div>
         </div>
 

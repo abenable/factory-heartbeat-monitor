@@ -5,6 +5,8 @@ import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
 import { getBacklog, machines, WorkOrderPriority } from "@/data/cmms";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { printSingleWorkOrder } from "@/components/PrintableWorkOrder";
 
 const priorityColor: Record<WorkOrderPriority, string> = {
@@ -16,11 +18,15 @@ const priorityColor: Record<WorkOrderPriority, string> = {
 
 const Backlog = () => {
   const [machineFilter, setMachineFilter] = useState<string>("all");
+  const [dueFrom, setDueFrom] = useState("");
+  const [dueTo, setDueTo] = useState("");
   const all = getBacklog();
-  const list = useMemo(
-    () => (machineFilter === "all" ? all : all.filter((w) => w.machineId === machineFilter)),
-    [all, machineFilter],
-  );
+  const list = useMemo(() => {
+    let base = machineFilter === "all" ? all : all.filter((w) => w.machineId === machineFilter);
+    if (dueFrom) base = base.filter((w) => w.dueAt.slice(0, 10) >= dueFrom);
+    if (dueTo) base = base.filter((w) => w.dueAt.slice(0, 10) <= dueTo);
+    return base;
+  }, [all, machineFilter, dueFrom, dueTo]);
 
   const overdue = all.filter((w) => new Date(w.dueAt).getTime() < Date.now()).length;
   const aging = all.length - overdue;
@@ -56,11 +62,36 @@ const Backlog = () => {
               </FilterChip>
             ))}
           </div>
-          <Button variant="outline" size="sm" onClick={printAll}>
-            <Printer className="size-4" />
-            Print Backlog
-          </Button>
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <Label className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
+                Due From
+              </Label>
+              <Input type="date" value={dueFrom} onChange={(e) => setDueFrom(e.target.value)} className="h-8 text-xs w-36" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
+                Due To
+              </Label>
+              <Input type="date" value={dueTo} onChange={(e) => setDueTo(e.target.value)} className="h-8 text-xs w-36" />
+            </div>
+            {(dueFrom || dueTo) && (
+              <Button variant="ghost" size="sm" onClick={() => { setDueFrom(""); setDueTo(""); }}>
+                Clear
+              </Button>
+            )}
+            <Button variant="outline" size="sm" onClick={printAll}>
+              <Printer className="size-4" />
+              Print Backlog
+            </Button>
+          </div>
         </div>
+
+        {(dueFrom || dueTo) && (
+          <p className="text-xs text-muted-foreground -mt-2 print-only">
+            Showing items due {dueFrom || "the earliest record"} through {dueTo || "the latest record"}.
+          </p>
+        )}
 
         <SectionHeading>{list.length} Backlog Items</SectionHeading>
         <Panel className="overflow-x-auto">

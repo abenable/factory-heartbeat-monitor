@@ -1,6 +1,10 @@
 import { useMemo, useState } from "react";
+import { Printer } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   purchaseOrders,
   materialDraws,
@@ -18,11 +22,29 @@ const poStatusFilters: { key: POStatus | "all"; label: string }[] = [
 
 export default function MaterialControl() {
   const [poFilter, setPoFilter] = useState<POStatus | "all">("all");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
+
+  const inRange = (date: string) => (!dateFrom || date >= dateFrom) && (!dateTo || date <= dateTo);
 
   const filteredPOs = useMemo(() => {
-    if (poFilter === "all") return purchaseOrders;
-    return purchaseOrders.filter((p) => p.status === poFilter);
-  }, [poFilter]);
+    let base = poFilter === "all" ? purchaseOrders : purchaseOrders.filter((p) => p.status === poFilter);
+    if (dateFrom || dateTo) base = base.filter((p) => inRange(p.orderDate));
+    return base;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [poFilter, dateFrom, dateTo]);
+
+  const filteredDraws = useMemo(
+    () => (dateFrom || dateTo ? materialDraws.filter((d) => inRange(d.date)) : materialDraws),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dateFrom, dateTo],
+  );
+
+  const filteredReturns = useMemo(
+    () => (dateFrom || dateTo ? materialReturns.filter((r) => inRange(r.date)) : materialReturns),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dateFrom, dateTo],
+  );
 
   const openPOs = purchaseOrders.filter((p) => p.status === "open").length;
   const overduePOs = purchaseOrders.filter((p) => p.status === "overdue").length;
@@ -39,11 +61,43 @@ export default function MaterialControl() {
           <Kpi label="Inventory Items" value={inventory.length} />
         </div>
 
+        <div className="flex flex-wrap items-end justify-between gap-3 no-print">
+          <div className="flex flex-wrap items-end gap-2">
+            <div className="flex flex-col gap-1">
+              <Label className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
+                From
+              </Label>
+              <Input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="h-8 text-xs w-36" />
+            </div>
+            <div className="flex flex-col gap-1">
+              <Label className="font-mono-data text-[9px] uppercase tracking-widest text-muted-foreground">
+                To
+              </Label>
+              <Input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="h-8 text-xs w-36" />
+            </div>
+            {(dateFrom || dateTo) && (
+              <Button variant="ghost" size="sm" onClick={() => { setDateFrom(""); setDateTo(""); }}>
+                Clear
+              </Button>
+            )}
+          </div>
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Printer className="size-4" />
+            Print
+          </Button>
+        </div>
+        {(dateFrom || dateTo) && (
+          <p className="text-xs text-muted-foreground -mt-2 print-only">
+            Showing purchase orders, draws and returns dated {dateFrom || "the earliest record"} through{" "}
+            {dateTo || "the latest record"}.
+          </p>
+        )}
+
         {/* Purchase Orders */}
         <div>
           <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
             <SectionHeading>Purchase Orders ({filteredPOs.length})</SectionHeading>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-1 no-print">
               {poStatusFilters.map((f) => (
                 <button
                   key={f.key}
@@ -95,7 +149,7 @@ export default function MaterialControl() {
 
         {/* Material Draws */}
         <div>
-          <SectionHeading>Material Draws ({materialDraws.length})</SectionHeading>
+          <SectionHeading>Material Draws ({filteredDraws.length})</SectionHeading>
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
@@ -109,7 +163,7 @@ export default function MaterialControl() {
                 </tr>
               </thead>
               <tbody className="font-mono-data text-xs">
-                {materialDraws.map((d) => (
+                {filteredDraws.map((d) => (
                   <tr key={d.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                     <td className="p-3 font-bold">{d.id}</td>
                     <td className="p-3 text-muted-foreground">{d.date}</td>
@@ -126,7 +180,7 @@ export default function MaterialControl() {
 
         {/* Returns */}
         <div>
-          <SectionHeading>Return Material Report ({materialReturns.length})</SectionHeading>
+          <SectionHeading>Return Material Report ({filteredReturns.length})</SectionHeading>
           <Panel className="overflow-x-auto">
             <table className="w-full text-left min-w-[600px]">
               <thead>
@@ -140,7 +194,7 @@ export default function MaterialControl() {
                 </tr>
               </thead>
               <tbody className="font-mono-data text-xs">
-                {materialReturns.map((r) => (
+                {filteredReturns.map((r) => (
                   <tr key={r.id} className="border-b border-border last:border-b-0 hover:bg-panel-elevated transition-colors">
                     <td className="p-3 font-bold">{r.id}</td>
                     <td className="p-3 text-muted-foreground">{r.date}</td>
