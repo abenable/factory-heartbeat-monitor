@@ -62,33 +62,26 @@ function PMChecklistMarkup({
       {task.requiredTools && <Box label="Required Tools" value={task.requiredTools} />}
       {task.safetyInstructions && <Box label="Safety Instructions" value={task.safetyInstructions} />}
 
-      {sections.map((section) => (
-        <div key={section} className="wo-print-checklist-section">
-          <div className="wo-print-checklist-title">{section}</div>
-          <table className="wo-print-checklist">
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th className="wo-print-check-col">OK</th>
-                <th className="wo-print-check-col">Faulty</th>
-                <th className="wo-print-check-col">N/A</th>
-              </tr>
-            </thead>
-            <tbody>
-              {task.checklist
-                .filter((i) => i.section === section)
-                .map((item) => (
-                  <tr key={item.id}>
-                    <td>{item.description}</td>
-                    <td className="wo-print-check-col">{item.result === "ok" ? "✓" : ""}</td>
-                    <td className="wo-print-check-col">{item.result === "faulty" ? "✓" : ""}</td>
-                    <td className="wo-print-check-col">{item.result === "na" ? "✓" : ""}</td>
-                  </tr>
-                ))}
-            </tbody>
-          </table>
-        </div>
-      ))}
+      <div className="wo-print-checklist-legend">Mark one per item: OK · F = Faulty · N/A = Not Applicable</div>
+      <div className="wo-print-checklist-columns">
+        {sections.map((section) => (
+          <div key={section} className="wo-print-checklist-section">
+            <div className="wo-print-checklist-title">{section}</div>
+            {task.checklist
+              .filter((i) => i.section === section)
+              .map((item) => (
+                <div key={item.id} className="wo-print-check-row">
+                  <span className="wo-print-check-desc">{item.description}</span>
+                  <span className="wo-print-check-marks">
+                    <span className={`wo-print-mark ${item.result === "ok" ? "wo-print-mark-filled" : ""}`}>OK</span>
+                    <span className={`wo-print-mark ${item.result === "faulty" ? "wo-print-mark-filled" : ""}`}>F</span>
+                    <span className={`wo-print-mark ${item.result === "na" ? "wo-print-mark-filled" : ""}`}>N/A</span>
+                  </span>
+                </div>
+              ))}
+          </div>
+        ))}
+      </div>
 
       <div className="wo-print-signoff">
         <SignatureField label="Technician Signature" name={personName ?? task.personInCharge} />
@@ -182,22 +175,22 @@ export function printPMChecklist(task: PMTask) {
       name ? `<span class="wo-print-sig-name">Print name: ${esc(name)}</span>` : ""
     }</div>`;
 
+  const mark = (active: boolean, label: string) =>
+    `<span class="wo-print-mark${active ? " wo-print-mark-filled" : ""}">${label}</span>`;
+
   const sectionsHtml = sections
     .map((section) => {
       const rows = task.checklist
         .filter((i) => i.section === section)
         .map(
           (item) =>
-            `<tr><td>${esc(item.description)}</td><td class="wo-print-check-col">${item.result === "ok" ? "✓" : ""}</td><td class="wo-print-check-col">${item.result === "faulty" ? "✓" : ""}</td><td class="wo-print-check-col">${item.result === "na" ? "✓" : ""}</td></tr>`,
+            `<div class="wo-print-check-row"><span class="wo-print-check-desc">${esc(item.description)}</span><span class="wo-print-check-marks">${mark(item.result === "ok", "OK")}${mark(item.result === "faulty", "F")}${mark(item.result === "na", "N/A")}</span></div>`,
         )
         .join("");
       return `
         <div class="wo-print-checklist-section">
           <div class="wo-print-checklist-title">${esc(section)}</div>
-          <table class="wo-print-checklist">
-            <thead><tr><th>Item</th><th class="wo-print-check-col">OK</th><th class="wo-print-check-col">Faulty</th><th class="wo-print-check-col">N/A</th></tr></thead>
-            <tbody>${rows}</tbody>
-          </table>
+          ${rows}
         </div>`;
     })
     .join("");
@@ -228,7 +221,8 @@ export function printPMChecklist(task: PMTask) {
     ${box("Procedures / Checklist Notes", task.procedures)}
     ${box("Required Tools", task.requiredTools)}
     ${box("Safety Instructions", task.safetyInstructions)}
-    ${sectionsHtml}
+    <div class="wo-print-checklist-legend">Mark one per item: OK &middot; F = Faulty &middot; N/A = Not Applicable</div>
+    <div class="wo-print-checklist-columns">${sectionsHtml}</div>
     <div class="wo-print-signoff">
       ${signature("Technician Signature", personName)}
       ${signoff("Date &amp; Time", "")}

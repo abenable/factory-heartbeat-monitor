@@ -148,12 +148,18 @@ export default function MaintenanceRequestForm() {
   const isApprover = isSupervisorUser && canApprove;
   const canEditResponse = isApprover;
 
+  // Preview the job number this request will actually get, so the printed
+  // form shows a real reference number (not a "DRAFT" placeholder) even
+  // before submission. handleSubmit() below reuses this same value rather
+  // than recomputing, so what was printed always matches what gets saved.
+  const previewJobNumber = mode === "create" ? nextMaintenanceJobNumber() : existing?.jobNumber;
+
   // In create mode there's no saved MaintenanceRequest yet — build a draft
   // shaped the same way so the printable template (and its Print button)
   // work from the very first keystroke, not just after submission.
   const draftRequest: MaintenanceRequest = existing ?? {
-    id: "DRAFT",
-    jobNumber: "DRAFT",
+    id: previewJobNumber ?? "DRAFT",
+    jobNumber: previewJobNumber ?? "DRAFT",
     status: "submitted",
     submittedAt: new Date().toISOString(),
     submittedBy: username,
@@ -524,7 +530,7 @@ export default function MaintenanceRequestForm() {
     }
 
     const now = new Date().toISOString();
-    const jobNumber = nextMaintenanceJobNumber();
+    const jobNumber = previewJobNumber ?? nextMaintenanceJobNumber();
 
     const req: MaintenanceRequest = {
       id: jobNumber,

@@ -190,7 +190,7 @@
 }
 
 @media print {
-  @page { margin: 1.5cm; }
+  @page { margin: 1cm; }
   html, body { background: #fff !important; color: #000 !important; }
   .no-print, aside, header, .screen-only { display: none !important; }
   main { padding: 0 !important; overflow: visible !important; }
@@ -278,9 +278,32 @@
 .wo-print-signoff-field span { font-size: 9px; color: #444; margin-top: 2px; }
 .wo-print-sig-name { font-style: italic; }
 
-.wo-print-checklist-section { margin-top: 10px; }
-.wo-print-checklist-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 3px; }
-.wo-print-checklist { width: 100% !important; border-collapse: collapse; margin-bottom: 6px; }
-.wo-print-checklist th, .wo-print-checklist td { border: 1px solid #000 !important; padding: 2.5px 6px !important; font-size: 9.5px !important; }
-.wo-print-checklist th { background: #f0f0f0 !important; text-align: left; }
-.wo-print-checklist td.wo-print-check-col { text-align: center; width: 34px; }
+/* Compact 2-column checklist layout — a sectioned table-per-section design
+   badly overflows one page once there are 30+ items, so each item is a
+   single dense flex row (not a table) and the whole list flows into two
+   CSS columns to roughly halve the vertical space needed. */
+.wo-print-checklist-columns { column-count: 2; column-gap: 14px; margin-top: 6px; }
+.wo-print-checklist-section { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 5px; }
+.wo-print-checklist-title {
+  font-size: 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+  border-bottom: 1px solid #000;
+  padding-bottom: 1px;
+  margin-bottom: 1px;
+}
+.wo-print-check-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 4px;
+  padding: 0.5px 0;
+  font-size: 8px;
+  border-bottom: 1px dotted #ccc;
+}
+.wo-print-check-desc { flex: 1; }
+.wo-print-check-marks { display: flex; gap: 3px; flex-shrink: 0; font-size: 6.5px; }
+.wo-print-mark { border: 1px solid #000; padding: 0 2px; display: inline-block; min-width: 10px; text-align: center; }
+.wo-print-mark-filled { background: #000; color: #fff; }
+.wo-print-checklist-legend { font-size: 7px; color: #444; margin-top: 4px; }
