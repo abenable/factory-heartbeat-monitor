@@ -118,21 +118,41 @@ function PMChecklistMarkup({
           <div>
             <h1>Kiira Motors Corporation</h1>
             <h2>
-              Preventive Maintenance Checklist {data.isFinished ? "— Completed" : "— Blank / In Progress"}
+              Equipment Maintenance Checklist {data.isFinished ? "— Completed" : "— Blank / In Progress"}
             </h2>
           </div>
         </div>
         <div className="wo-print-cwo">
-          <span>PM</span>
+          <span>REF</span>
           <strong>{task.referenceNumber ?? task.id}</strong>
+        </div>
+      </div>
+
+      <div className="wo-print-pm-infobar">
+        <div className="wo-print-pm-org">
+          <div>Department of Production</div>
+          <div>Division of Production Management</div>
+          <div>Maintenance Unit ({fields.department})</div>
+        </div>
+        <Box
+          label="Safety Requirement"
+          value="Mandatory Safety, PPE & LOTO Verification: Ensure PPE are worn (gloves, shoes, etc). LOTO applied where maintenance is due. Warning tags and signage displayed. Panel isolated and tested dead (where applicable)."
+        />
+        <div className="wo-print-pm-details">
+          <div className="wo-print-box-label">Details</div>
+          <table>
+            <tbody>
+              <tr><th>Workshop</th><td>{fields.workshop}</td></tr>
+              <tr><th>Equipment Name</th><td>{machineName ?? task.machineId}</td></tr>
+              <tr><th>Equipment ID</th><td>{task.machineId}</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
       <table className="wo-print-grid">
         <tbody>
           <GridRow label="Task / Checklist" value={task.task} label2="Frequency" value2={freqLabel(task.frequency)} />
-          <GridRow label="Machine/Equipment Name" value={machineName} label2="Machine/Equipment ID" value2={task.machineId} />
-          <GridRow label="Workshop" value={fields.workshop} label2="Department" value2={fields.department} />
           <GridRow label="Person in Charge" value={personName ?? task.personInCharge} label2="Last Done" value2={task.lastDone} />
           <GridRow label="Next Due" value={task.nextDue} label2="Est. Duration" value2={fields.estDuration} />
         </tbody>
@@ -141,40 +161,51 @@ function PMChecklistMarkup({
       <div className="wo-print-boxes-row">
         <Box label="Procedures / Checklist Notes" value={fields.procedures} />
         <Box label="Required Tools" value={fields.requiredTools} />
-        <Box label="Safety Instructions" value={fields.safetyInstructions} />
       </div>
 
       {data.isFinished && data.remarks && <Box label="Technician Remarks" value={data.remarks} />}
 
-      <div className="wo-print-checklist-legend">Mark one per item: OK · F = Faulty · N/A = Not Applicable</div>
-      <div className="wo-print-checklist-columns">
-        {sections.map((section) => (
-          <div key={section} className="wo-print-checklist-section">
-            <div className="wo-print-checklist-title">{section}</div>
-            {data.items
-              .filter((i) => i.section === section)
-              .map((item) => (
-                <div key={item.id} className="wo-print-check-row">
-                  <span className="wo-print-check-desc">{item.description}</span>
-                  <span className="wo-print-check-marks">
-                    <span className="wo-print-checkbox">
-                      <span className={`wo-print-checkbox-box ${item.result === "ok" ? "checked" : ""}`} />
-                      OK
-                    </span>
-                    <span className="wo-print-checkbox">
-                      <span className={`wo-print-checkbox-box ${item.result === "faulty" ? "checked" : ""}`} />
-                      F
-                    </span>
-                    <span className="wo-print-checkbox">
-                      <span className={`wo-print-checkbox-box ${item.result === "na" ? "checked" : ""}`} />
-                      N/A
-                    </span>
-                  </span>
-                </div>
-              ))}
-          </div>
-        ))}
-      </div>
+      <table className="wo-print-checklist-table">
+        <thead>
+          <tr>
+            <th className="sn-col">SN</th>
+            <th className="section-col">Check Item</th>
+            <th>Test Performed</th>
+            <th className="tick-col">OK</th>
+            <th className="tick-col">Faulty</th>
+            <th className="tick-col">N/A</th>
+          </tr>
+        </thead>
+        <tbody>
+          {sections.map((section, si) => {
+            const items = data.items.filter((i) => i.section === section);
+            return items.map((item, ii) => (
+              <tr key={item.id}>
+                {ii === 0 && (
+                  <td className="sn-col" rowSpan={items.length}>
+                    {si + 1}
+                  </td>
+                )}
+                {ii === 0 && (
+                  <td className="section-col" rowSpan={items.length}>
+                    {section}
+                  </td>
+                )}
+                <td>{item.description}</td>
+                <td className="tick-col">
+                  <span className={`wo-print-checkbox-box ${item.result === "ok" ? "checked" : ""}`} />
+                </td>
+                <td className="tick-col">
+                  <span className={`wo-print-checkbox-box ${item.result === "faulty" ? "checked" : ""}`} />
+                </td>
+                <td className="tick-col">
+                  <span className={`wo-print-checkbox-box ${item.result === "na" ? "checked" : ""}`} />
+                </td>
+              </tr>
+            ));
+          })}
+        </tbody>
+      </table>
 
       <div className="wo-print-signoff">
         <SignatureField
@@ -274,23 +305,25 @@ export function printPMChecklist(task: PMTask) {
       name ? `<span class="wo-print-sig-name">Print name: ${esc(name)}</span>` : ""
     }</div>`;
 
-  const mark = (active: boolean, label: string) =>
-    `<span class="wo-print-checkbox"><span class="wo-print-checkbox-box${active ? " checked" : ""}"></span>${label}</span>`;
+  const tickCell = (active: boolean) =>
+    `<td class="tick-col"><span class="wo-print-checkbox-box${active ? " checked" : ""}"></span></td>`;
 
-  const sectionsHtml = sections
-    .map((section) => {
-      const rows = data.items
-        .filter((i) => i.section === section)
+  const checklistRowsHtml = sections
+    .map((section, si) => {
+      const items = data.items.filter((i) => i.section === section);
+      return items
         .map(
-          (item) =>
-            `<div class="wo-print-check-row"><span class="wo-print-check-desc">${esc(item.description)}</span><span class="wo-print-check-marks">${mark(item.result === "ok", "OK")}${mark(item.result === "faulty", "F")}${mark(item.result === "na", "N/A")}</span></div>`,
+          (item, ii) => `
+        <tr>
+          ${ii === 0 ? `<td class="sn-col" rowspan="${items.length}">${si + 1}</td>` : ""}
+          ${ii === 0 ? `<td class="section-col" rowspan="${items.length}">${esc(section)}</td>` : ""}
+          <td>${esc(item.description)}</td>
+          ${tickCell(item.result === "ok")}
+          ${tickCell(item.result === "faulty")}
+          ${tickCell(item.result === "na")}
+        </tr>`,
         )
         .join("");
-      return `
-        <div class="wo-print-checklist-section">
-          <div class="wo-print-checklist-title">${esc(section)}</div>
-          ${rows}
-        </div>`;
     })
     .join("");
 
@@ -300,19 +333,38 @@ export function printPMChecklist(task: PMTask) {
         <img src="${logoRed}" alt="KMC" class="wo-print-logo" />
         <div>
           <h1>Kiira Motors Corporation</h1>
-          <h2>Preventive Maintenance Checklist ${data.isFinished ? "&mdash; Completed" : "&mdash; Blank / In Progress"}</h2>
+          <h2>Equipment Maintenance Checklist ${data.isFinished ? "&mdash; Completed" : "&mdash; Blank / In Progress"}</h2>
         </div>
       </div>
       <div class="wo-print-cwo">
-        <span>PM</span>
+        <span>REF</span>
         <strong>${esc(task.referenceNumber ?? task.id)}</strong>
+      </div>
+    </div>
+    <div class="wo-print-pm-infobar">
+      <div class="wo-print-pm-org">
+        <div>Department of Production</div>
+        <div>Division of Production Management</div>
+        <div>Maintenance Unit (${esc(fields.department)})</div>
+      </div>
+      ${box(
+        "Safety Requirement",
+        "Mandatory Safety, PPE & LOTO Verification: Ensure PPE are worn (gloves, shoes, etc). LOTO applied where maintenance is due. Warning tags and signage displayed. Panel isolated and tested dead (where applicable).",
+      )}
+      <div class="wo-print-pm-details">
+        <div class="wo-print-box-label">Details</div>
+        <table>
+          <tbody>
+            <tr><th>Workshop</th><td>${esc(fields.workshop)}</td></tr>
+            <tr><th>Equipment Name</th><td>${esc(machine?.name ?? task.machineId)}</td></tr>
+            <tr><th>Equipment ID</th><td>${esc(task.machineId)}</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
     <table class="wo-print-grid">
       <tbody>
         ${gridRow("Task / Checklist", task.task, "Frequency", freqLabel(task.frequency))}
-        ${gridRow("Machine/Equipment Name", machine?.name, "Machine/Equipment ID", task.machineId)}
-        ${gridRow("Workshop", fields.workshop, "Department", fields.department)}
         ${gridRow("Person in Charge", personName, "Last Done", task.lastDone)}
         ${gridRow("Next Due", task.nextDue, "Est. Duration", fields.estDuration)}
       </tbody>
@@ -320,11 +372,21 @@ export function printPMChecklist(task: PMTask) {
     <div class="wo-print-boxes-row">
       ${box("Procedures / Checklist Notes", fields.procedures)}
       ${box("Required Tools", fields.requiredTools)}
-      ${box("Safety Instructions", fields.safetyInstructions)}
     </div>
     ${data.isFinished && data.remarks ? box("Technician Remarks", data.remarks) : ""}
-    <div class="wo-print-checklist-legend">Mark one per item: OK &middot; F = Faulty &middot; N/A = Not Applicable</div>
-    <div class="wo-print-checklist-columns">${sectionsHtml}</div>
+    <table class="wo-print-checklist-table">
+      <thead>
+        <tr>
+          <th class="sn-col">SN</th>
+          <th class="section-col">Check Item</th>
+          <th>Test Performed</th>
+          <th class="tick-col">OK</th>
+          <th class="tick-col">Faulty</th>
+          <th class="tick-col">N/A</th>
+        </tr>
+      </thead>
+      <tbody>${checklistRowsHtml}</tbody>
+    </table>
     <div class="wo-print-signoff">
       ${signature("Technician Signature", data.isFinished ? data.technicianName : undefined)}
       ${signoff("Date &amp; Time Completed", data.isFinished ? fmtDateTime(data.completedAt) : "")}

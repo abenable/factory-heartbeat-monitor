@@ -23,14 +23,14 @@ describe("print templates render without throwing", () => {
     }
   });
 
-  it("PrintablePMChecklist for every seed PM task (checks the compacted 2-column layout renders all items)", () => {
+  it("PrintablePMChecklist for every seed PM task (checks the checklist table renders one row per item)", () => {
     for (const task of pmTasks) {
       const { container } = render(
         <ThemeProvider>
           <PrintablePMChecklist task={task} />
         </ThemeProvider>,
       );
-      const rows = container.querySelectorAll(".wo-print-check-row");
+      const rows = container.querySelectorAll(".wo-print-checklist-table tbody tr");
       expect(rows.length).toBe(task.checklist.length);
     }
   });
