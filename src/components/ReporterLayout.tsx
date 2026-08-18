@@ -24,8 +24,8 @@ export function ReporterLayout({ children, pageTitle }: ReporterLayoutProps) {
   };
 
   const nav = [
-    { to: "/report/maintenance/new", label: "Maintenance Request", icon: FileText },
-    { to: "/report", label: "Quick Request", icon: ClipboardList },
+    { to: "/report", label: "New Request", icon: FileText, match: (p: string) => p === "/report" || p.startsWith("/report/maintenance") },
+    { to: "/report/requests", label: "My Requests", icon: ClipboardList, match: (p: string) => p.startsWith("/report/requests") },
   ];
 
   return (
@@ -53,9 +53,7 @@ export function ReporterLayout({ children, pageTitle }: ReporterLayoutProps) {
           <div className="flex items-center gap-4">
             <nav className="hidden sm:flex items-center gap-1">
               {nav.map((item) => {
-                const active =
-                  location.pathname === item.to ||
-                  (item.to !== "/report" && location.pathname.startsWith(item.to));
+                const active = item.match(location.pathname);
                 return (
                   <Link
                     key={item.to}

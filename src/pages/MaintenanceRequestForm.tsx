@@ -155,8 +155,8 @@ export default function MaintenanceRequestForm() {
     <div className="flex flex-col gap-6 max-w-5xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
         <Button asChild variant="outline" size="sm" className="self-start">
-          <Link to={isReporterUser ? "/report" : "/job-requests"}>
-            <ArrowLeft className="size-4 mr-1" /> {isReporterUser ? "Back to console" : "All job requests"}
+          <Link to={isReporterUser ? "/report/requests" : "/job-requests"}>
+            <ArrowLeft className="size-4 mr-1" /> {isReporterUser ? "My Requests" : "All job requests"}
           </Link>
         </Button>
 
