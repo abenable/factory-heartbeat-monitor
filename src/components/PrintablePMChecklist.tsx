@@ -9,6 +9,8 @@ interface PrintData {
   isFinished: boolean;
   technicianName?: string;
   completedAt?: string;
+  startTime?: string;
+  endTime?: string;
   remarks?: string;
   approvedByName?: string;
   approvedAt?: string;
@@ -29,6 +31,8 @@ function resolvePrintData(task: PMTask): PrintData {
       isFinished: true,
       technicianName: getWorker(latest.completedBy)?.name ?? latest.completedBy,
       completedAt: latest.completedAt,
+      startTime: latest.startTime,
+      endTime: latest.endTime,
       remarks: latest.remarks,
       approvedByName: latest.approvedByName,
       approvedAt: latest.approvedAt,
@@ -78,6 +82,12 @@ function fmtDateTime(iso?: string): string {
   return Number.isNaN(d.getTime())
     ? ""
     : d.toLocaleString(undefined, { month: "short", day: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+function fmtTime(iso?: string): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" });
 }
 
 /**
@@ -155,6 +165,16 @@ function PMChecklistMarkup({
           <GridRow label="Task / Checklist" value={task.task} label2="Frequency" value2={freqLabel(task.frequency)} />
           <GridRow label="Person in Charge" value={personName ?? task.personInCharge} label2="Last Done" value2={task.lastDone} />
           <GridRow label="Next Due" value={task.nextDue} label2="Est. Duration" value2={fields.estDuration} />
+          <GridRow
+            label="Visit Date"
+            value={data.isFinished ? fmtDate(data.completedAt) : ""}
+            label2="Start Time / End Time"
+            value2={
+              data.isFinished && (data.startTime || data.endTime)
+                ? `${fmtTime(data.startTime)} – ${fmtTime(data.endTime)}`
+                : ""
+            }
+          />
         </tbody>
       </table>
 
@@ -370,6 +390,12 @@ export function printPMChecklist(task: PMTask) {
         ${gridRow("Task / Checklist", task.task, "Frequency", freqLabel(task.frequency))}
         ${gridRow("Person in Charge", personName, "Last Done", task.lastDone)}
         ${gridRow("Next Due", task.nextDue, "Est. Duration", fields.estDuration)}
+        ${gridRow(
+          "Visit Date",
+          data.isFinished ? fmtDate(data.completedAt) : "",
+          "Start Time / End Time",
+          data.isFinished && (data.startTime || data.endTime) ? `${fmtTime(data.startTime)} – ${fmtTime(data.endTime)}` : "",
+        )}
       </tbody>
     </table>
     <div class="wo-print-boxes-row">
