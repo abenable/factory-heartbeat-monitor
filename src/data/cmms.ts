@@ -219,6 +219,11 @@ export interface PMCompletionLog {
   /** Snapshot of the checklist results recorded during this visit. */
   items: PMChecklistItem[];
   remarks?: string;
+
+  // ── Supervisor approval of this completed visit ──
+  /** Typed name used as the supervisor's soft-copy approval signature. */
+  approvedByName?: string;
+  approvedAt?: string;
 }
 
 export interface PMTask {
@@ -245,11 +250,23 @@ export interface PMTask {
   /** Past completed visits — the source of "who completed it and how long it took". */
   history: PMCompletionLog[];
 
-  // ── Current visit workflow — reset by completePMVisit() once logged ──
+  // ── Current visit workflow ──
+  /**
+   * Status of the CURRENT visit cycle — same 4 states as a work order, so
+   * technician-facing filters/badges behave identically for both. Set to
+   * "in_progress" the moment the technician confirms receipt (acknowledging
+   * and starting both live in that one bucket), "blocked" if they report a
+   * blocker, and "done" once completePMVisit() logs the visit — it then
+   * stays "done" (along with who/when acknowledged it) until the technician
+   * acknowledges the *next* cycle, which overwrites it back to "in_progress".
+   */
+  visitStatus: WorkOrderStatus;
   visitAcknowledgedAt?: string;
   /** Typed name used as the technician's receipt confirmation for the current visit. */
   visitAcknowledgedByName?: string;
   visitStartedAt?: string;
+  /** Reason the technician gave when marking the current visit blocked. */
+  visitBlockedReason?: string;
 }
 
 /**
@@ -426,10 +443,60 @@ export function completePMVisit(
     nextDue: next.toISOString().slice(0, 10),
     history: [{ id: `pmlog-${task.id}-${task.history.length + 1}`, ...entry }, ...task.history],
     checklist: buildPMChecklist(),
-    visitAcknowledgedAt: undefined,
-    visitAcknowledgedByName: undefined,
-    visitStartedAt: undefined,
+    visitStatus: "done",
+    visitBlockedReason: undefined,
   });
+}
+
+/** Technician confirms they've received the current PM visit — moves it straight into "in_progress". */
+export function acknowledgePMVisit(taskId: string, byName: string): void {
+  updatePMTask(taskId, {
+    visitAcknowledgedAt: new Date().toISOString(),
+    visitAcknowledgedByName: byName,
+    visitStartedAt: undefined,
+    visitBlockedReason: undefined,
+    visitStatus: "in_progress",
+  });
+}
+
+/** Records the actual start time without disturbing an already-set one. */
+export function startPMVisit(taskId: string): void {
+  const task = getPMTask(taskId);
+  if (!task) return;
+  updatePMTask(taskId, {
+    visitStartedAt: task.visitStartedAt ?? new Date().toISOString(),
+    visitStatus: "in_progress",
+  });
+}
+
+/** Technician reports they can't proceed (missing parts, access, etc). */
+export function blockPMVisit(taskId: string, reason?: string): void {
+  updatePMTask(taskId, { visitStatus: "blocked", visitBlockedReason: reason });
+}
+
+/** Resumes a blocked visit back into progress. */
+export function resumePMVisit(taskId: string): void {
+  updatePMTask(taskId, { visitStatus: "in_progress", visitBlockedReason: undefined });
+}
+
+/**
+ * Supervisor approves the most recently completed visit (the "finished
+ * copy" the technician submitted). Supervisors never fill in the checklist
+ * themselves — this only records their soft-copy approval signature on
+ * top of what the technician already logged via completePMVisit().
+ */
+export function approvePMVisit(taskId: string, byName: string): void {
+  const task = getPMTask(taskId);
+  if (!task || task.history.length === 0) return;
+  const [latest, ...rest] = task.history;
+  updatePMTask(taskId, {
+    history: [{ ...latest, approvedByName: byName, approvedAt: new Date().toISOString() }, ...rest],
+  });
+}
+
+/** True once the most recently completed visit has been approved by a supervisor. */
+export function isLatestPMVisitApproved(task: PMTask): boolean {
+  return Boolean(task.history[0]?.approvedByName);
 }
 
 export const machines: Machine[] = [
@@ -1435,15 +1502,15 @@ function pmLog(
 
 /** The 9 originally curated PM tasks — rich narrative content, kept as-is and extended with checklist/history. */
 const curatedPMTasks: PMTask[] = [
-  { id: "PM-01", referenceNumber: "KMC/DPD/2026/CL201", machineId: "MS-TUBE-01", task: "Lens and nozzle inspection", intervalDays: 30, lastDone: "2026-08-02", nextDue: "2026-09-01", frequency: "monthly", procedures: "Inspect lens for burn marks. Check nozzle concentricity. Replace if kerf > 0.1 mm.", requiredTools: "Lens wipes, nozzle gauge", safetyInstructions: "Disable laser source. Wait 5 min after shutdown.", personInCharge: "Wagoli", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-01", "Wagoli", 45, 2.5, 19, 1, "Nozzle showed early wear, replaced.")] },
-  { id: "PM-02", referenceNumber: "KMC/DPD/2026/CL202", machineId: "MS-LATHE-01", task: "Spindle lubrication", intervalDays: 14, lastDone: "2026-08-06", nextDue: "2026-08-20", frequency: "weekly", procedures: "Apply grease to spindle bearings (2 pumps). Check oil mist level.", requiredTools: "Grease gun, lint-free cloth", safetyInstructions: "Spindle must be at rest. Lockout before access.", personInCharge: "Mukisa", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-02", "Mukisa", 60, 1.2, 20, 0), pmLog("PM-02", "Mukisa", 74, 1.4, 20, 0)] },
-  { id: "PM-03", referenceNumber: "KMC/DPD/2026/CL203", machineId: "MS-MILL-01", task: "Coolant flush", intervalDays: 60, lastDone: "2026-06-17", nextDue: "2026-08-16", frequency: "monthly", procedures: "Drain old coolant. Flush tank with clean water. Refill with 5% concentrate mix.", requiredTools: "Drain pan, pH test kit", safetyInstructions: "Wear chemical-resistant gloves and goggles.", personInCharge: "Suubi", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-03", "Suubi", 90, 2.8, 18, 2, "Tank had heavier sediment than usual.")] },
-  { id: "PM-04", referenceNumber: "KMC/DPD/2026/CL204", machineId: "WL-WELD-01", task: "Torch tip and liner check", intervalDays: 21, lastDone: "2026-08-06", nextDue: "2026-08-27", frequency: "weekly", procedures: "Remove worn tip. Clean threads. Install new tip. Verify gas flow.", requiredTools: "Tip wrench, wire brush", safetyInstructions: "Purge gas lines before disassembly.", personInCharge: "Tabalaata", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-04", "Tabalaata", 28, 1.6, 20, 0)] },
-  { id: "PM-05", referenceNumber: "KMC/DPD/2026/CL205", machineId: "PS-SPRAY-01", task: "Paint pattern verification", intervalDays: 14, lastDone: "2026-08-06", nextDue: "2026-08-20", frequency: "weekly", procedures: "Run pattern test card. Check atomization. Record fan width.", requiredTools: "Pattern test card, calipers", safetyInstructions: "Use booth ventilation. Ground applicator.", personInCharge: "Wagoli", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-05", "Wagoli", 21, 1.1, 20, 0)] },
-  { id: "PM-06", referenceNumber: "KMC/DPD/2026/CL206", machineId: "PS-COMP-01", task: "Filter and oil check", intervalDays: 30, lastDone: "2026-08-07", nextDue: "2026-09-06", frequency: "monthly", procedures: "Replace oil filter. Check air filter. Sample oil for analysis.", requiredTools: "Filter wrench, sample bottle", safetyInstructions: "Depressurize receiver. Wear ear protection.", personInCharge: "Oumo", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-06", "Oumo", 38, 2.2, 20, 0), pmLog("PM-06", "Oumo", 68, 2.0, 19, 1)] },
-  { id: "PM-07", referenceNumber: "KMC/DPD/2026/CL207", machineId: "CL2-SLING-01", task: "Hoist brake and chain inspection", intervalDays: 30, lastDone: "2026-07-23", nextDue: "2026-08-22", frequency: "monthly", procedures: "Test brake slip. Measure chain wear. Record load test.", requiredTools: "Chain gauge, load cell", safetyInstructions: "Tag out before entry. Use fall protection if elevated.", personInCharge: "Odeke", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-07", "Odeke", 53, 3.1, 20, 0)] },
-  { id: "PM-08", referenceNumber: "KMC/DPD/2026/CL208", machineId: "QIT-TEST-01", task: "Analyzer drift check", intervalDays: 14, lastDone: "2026-08-06", nextDue: "2026-08-20", frequency: "weekly", procedures: "Run calibration gas. Verify zero and span. Replace filter if differential > limit.", requiredTools: "Calibration gas, filter wrench", safetyInstructions: "Rollers locked. Chock vehicle.", personInCharge: "Oumo", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-08", "Oumo", 21, 0.9, 20, 0)] },
-  { id: "PM-09", referenceNumber: "KMC/DPD/2026/CL209", machineId: "CL1-VIN-01", task: "Stylus and vision calibration", intervalDays: 60, lastDone: "2026-07-13", nextDue: "2026-09-11", frequency: "monthly", procedures: "Replace worn stylus. Verify engraving depth. Calibrate vision camera.", requiredTools: "Stylus kit, depth gauge, calibration plaque", safetyInstructions: "Lock marking head. Wear eye protection.", personInCharge: "Mukisa", scheduledBy: "Nakimbugwe", checklist: buildPMChecklist(), history: [pmLog("PM-09", "Mukisa", 66, 2.4, 20, 0)] },
+  { id: "PM-01", referenceNumber: "KMC/DPD/2026/CL201", machineId: "MS-TUBE-01", task: "Lens and nozzle inspection", intervalDays: 30, lastDone: "2026-08-02", nextDue: "2026-09-01", frequency: "monthly", procedures: "Inspect lens for burn marks. Check nozzle concentricity. Replace if kerf > 0.1 mm.", requiredTools: "Lens wipes, nozzle gauge", safetyInstructions: "Disable laser source. Wait 5 min after shutdown.", personInCharge: "Wagoli", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-01", "Wagoli", 45, 2.5, 19, 1, "Nozzle showed early wear, replaced.")] },
+  { id: "PM-02", referenceNumber: "KMC/DPD/2026/CL202", machineId: "MS-LATHE-01", task: "Spindle lubrication", intervalDays: 14, lastDone: "2026-08-06", nextDue: "2026-08-20", frequency: "weekly", procedures: "Apply grease to spindle bearings (2 pumps). Check oil mist level.", requiredTools: "Grease gun, lint-free cloth", safetyInstructions: "Spindle must be at rest. Lockout before access.", personInCharge: "Mukisa", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-02", "Mukisa", 60, 1.2, 20, 0), pmLog("PM-02", "Mukisa", 74, 1.4, 20, 0)] },
+  { id: "PM-03", referenceNumber: "KMC/DPD/2026/CL203", machineId: "MS-MILL-01", task: "Coolant flush", intervalDays: 60, lastDone: "2026-06-17", nextDue: "2026-08-16", frequency: "monthly", procedures: "Drain old coolant. Flush tank with clean water. Refill with 5% concentrate mix.", requiredTools: "Drain pan, pH test kit", safetyInstructions: "Wear chemical-resistant gloves and goggles.", personInCharge: "Suubi", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-03", "Suubi", 90, 2.8, 18, 2, "Tank had heavier sediment than usual.")] },
+  { id: "PM-04", referenceNumber: "KMC/DPD/2026/CL204", machineId: "WL-WELD-01", task: "Torch tip and liner check", intervalDays: 21, lastDone: "2026-08-06", nextDue: "2026-08-27", frequency: "weekly", procedures: "Remove worn tip. Clean threads. Install new tip. Verify gas flow.", requiredTools: "Tip wrench, wire brush", safetyInstructions: "Purge gas lines before disassembly.", personInCharge: "Tabalaata", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-04", "Tabalaata", 28, 1.6, 20, 0)] },
+  { id: "PM-05", referenceNumber: "KMC/DPD/2026/CL205", machineId: "PS-SPRAY-01", task: "Paint pattern verification", intervalDays: 14, lastDone: "2026-08-06", nextDue: "2026-08-20", frequency: "weekly", procedures: "Run pattern test card. Check atomization. Record fan width.", requiredTools: "Pattern test card, calipers", safetyInstructions: "Use booth ventilation. Ground applicator.", personInCharge: "Wagoli", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-05", "Wagoli", 21, 1.1, 20, 0)] },
+  { id: "PM-06", referenceNumber: "KMC/DPD/2026/CL206", machineId: "PS-COMP-01", task: "Filter and oil check", intervalDays: 30, lastDone: "2026-08-07", nextDue: "2026-09-06", frequency: "monthly", procedures: "Replace oil filter. Check air filter. Sample oil for analysis.", requiredTools: "Filter wrench, sample bottle", safetyInstructions: "Depressurize receiver. Wear ear protection.", personInCharge: "Oumo", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-06", "Oumo", 38, 2.2, 20, 0), pmLog("PM-06", "Oumo", 68, 2.0, 19, 1)] },
+  { id: "PM-07", referenceNumber: "KMC/DPD/2026/CL207", machineId: "CL2-SLING-01", task: "Hoist brake and chain inspection", intervalDays: 30, lastDone: "2026-07-23", nextDue: "2026-08-22", frequency: "monthly", procedures: "Test brake slip. Measure chain wear. Record load test.", requiredTools: "Chain gauge, load cell", safetyInstructions: "Tag out before entry. Use fall protection if elevated.", personInCharge: "Odeke", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-07", "Odeke", 53, 3.1, 20, 0)] },
+  { id: "PM-08", referenceNumber: "KMC/DPD/2026/CL208", machineId: "QIT-TEST-01", task: "Analyzer drift check", intervalDays: 14, lastDone: "2026-08-06", nextDue: "2026-08-20", frequency: "weekly", procedures: "Run calibration gas. Verify zero and span. Replace filter if differential > limit.", requiredTools: "Calibration gas, filter wrench", safetyInstructions: "Rollers locked. Chock vehicle.", personInCharge: "Oumo", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-08", "Oumo", 21, 0.9, 20, 0)] },
+  { id: "PM-09", referenceNumber: "KMC/DPD/2026/CL209", machineId: "CL1-VIN-01", task: "Stylus and vision calibration", intervalDays: 60, lastDone: "2026-07-13", nextDue: "2026-09-11", frequency: "monthly", procedures: "Replace worn stylus. Verify engraving depth. Calibrate vision camera.", requiredTools: "Stylus kit, depth gauge, calibration plaque", safetyInstructions: "Lock marking head. Wear eye protection.", personInCharge: "Mukisa", scheduledBy: "Nakimbugwe", visitStatus: "open", checklist: buildPMChecklist(), history: [pmLog("PM-09", "Mukisa", 66, 2.4, 20, 0)] },
 ];
 
 /** Remaining fleet machines that had no PM coverage — generated from the standard checklist template. */
@@ -1471,6 +1538,7 @@ const generatedPMTasks: PMTask[] = [
   lastDone: daysAgo(intervalDays - daysDue),
   personInCharge,
   scheduledBy: "Nakimbugwe",
+  visitStatus: "open" as WorkOrderStatus,
   checklist: buildPMChecklist(),
   history: hist.map(([who, daysBefore, hours, ok, faulty]) =>
     pmLog(id, who as string, daysBefore as number, hours as number, ok as number, faulty as number),

@@ -379,6 +379,7 @@ function NewPMDialog({
       workshop: workshop.trim() || machine?.sector,
       department: department.trim() || undefined,
       scheduledBy: getUser() ?? undefined,
+      visitStatus: "open",
       checklist: buildPMChecklist(),
       history: [],
     });

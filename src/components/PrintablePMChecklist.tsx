@@ -15,7 +15,7 @@ export function PrintablePMChecklist({ task }: { task: PMTask }) {
   const person = task.personInCharge ? getWorker(task.personInCharge) : null;
 
   return (
-    <div className="print-only print-block wo-print" data-print-pm={task.id}>
+    <div className="print-only print-block wo-print wo-print-pm-landscape" data-print-pm={task.id}>
       <PMChecklistMarkup task={task} machineName={machine?.name} personName={person?.name} />
     </div>
   );
@@ -58,9 +58,11 @@ function PMChecklistMarkup({
         </tbody>
       </table>
 
-      {task.procedures && <Box label="Procedures / Checklist Notes" value={task.procedures} />}
-      {task.requiredTools && <Box label="Required Tools" value={task.requiredTools} />}
-      {task.safetyInstructions && <Box label="Safety Instructions" value={task.safetyInstructions} />}
+      <div className="wo-print-boxes-row">
+        {task.procedures && <Box label="Procedures / Checklist Notes" value={task.procedures} />}
+        {task.requiredTools && <Box label="Required Tools" value={task.requiredTools} />}
+        {task.safetyInstructions && <Box label="Safety Instructions" value={task.safetyInstructions} />}
+      </div>
 
       <div className="wo-print-checklist-legend">Mark one per item: OK · F = Faulty · N/A = Not Applicable</div>
       <div className="wo-print-checklist-columns">
@@ -153,7 +155,7 @@ function esc(s: string) {
  */
 export function printPMChecklist(task: PMTask) {
   const container = document.createElement("div");
-  container.className = "print-only print-only-single print-block wo-print";
+  container.className = "print-only print-only-single print-block wo-print wo-print-pm-landscape";
   const machine = getMachine(task.machineId);
   const person = task.personInCharge ? getWorker(task.personInCharge) : null;
   const personName = person?.name ?? task.personInCharge;
@@ -218,9 +220,11 @@ export function printPMChecklist(task: PMTask) {
         ${gridRow("Next Due", task.nextDue, "Est. Duration", task.estimatedHours ? `${task.estimatedHours}h` : undefined)}
       </tbody>
     </table>
-    ${box("Procedures / Checklist Notes", task.procedures)}
-    ${box("Required Tools", task.requiredTools)}
-    ${box("Safety Instructions", task.safetyInstructions)}
+    <div class="wo-print-boxes-row">
+      ${box("Procedures / Checklist Notes", task.procedures)}
+      ${box("Required Tools", task.requiredTools)}
+      ${box("Safety Instructions", task.safetyInstructions)}
+    </div>
     <div class="wo-print-checklist-legend">Mark one per item: OK &middot; F = Faulty &middot; N/A = Not Applicable</div>
     <div class="wo-print-checklist-columns">${sectionsHtml}</div>
     <div class="wo-print-signoff">

@@ -191,6 +191,11 @@
 
 @media print {
   @page { margin: 1cm; }
+  /* Named landscape page, used only by the PM checklist (see .wo-print-pm-landscape
+     below) — everything else (work order, MRF, RCA, reports) stays on the default
+     portrait page. */
+  @page pm-landscape { size: landscape; margin: 1cm; }
+  .wo-print-pm-landscape { page: pm-landscape; }
   html, body { background: #fff !important; color: #000 !important; }
   .no-print, aside, header, .screen-only { display: none !important; }
   main { padding: 0 !important; overflow: visible !important; }
@@ -278,11 +283,16 @@
 .wo-print-signoff-field span { font-size: 9px; color: #444; margin-top: 2px; }
 .wo-print-sig-name { font-style: italic; }
 
-/* Compact 2-column checklist layout — a sectioned table-per-section design
-   badly overflows one page once there are 30+ items, so each item is a
-   single dense flex row (not a table) and the whole list flows into two
-   CSS columns to roughly halve the vertical space needed. */
+/* Compact multi-column checklist layout — a sectioned table-per-section
+   design badly overflows one page once there are 30+ items, so each item is
+   a single dense flex row (not a table) and the whole list flows through
+   CSS columns to cut the vertical space needed. The PM checklist prints
+   landscape (see .wo-print-pm-landscape) specifically so this can spread
+   into 3 columns and use the extra width instead of stacking tall. */
 .wo-print-checklist-columns { column-count: 2; column-gap: 14px; margin-top: 6px; }
+.wo-print-pm-landscape .wo-print-checklist-columns { column-count: 3; column-gap: 16px; }
+.wo-print-pm-landscape .wo-print-boxes-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.wo-print-pm-landscape .wo-print-boxes-row .wo-print-box { margin-bottom: 0; }
 .wo-print-checklist-section { break-inside: avoid; -webkit-column-break-inside: avoid; margin-bottom: 5px; }
 .wo-print-checklist-title {
   font-size: 8px;
