@@ -1,4 +1,4 @@
-import { PMTask, PMChecklistItem, getMachine } from "@/data/cmms";
+import { PMTask, PMChecklistItem, getMachine, estimatedPMHours } from "@/data/cmms";
 import { getWorker } from "@/data/workers";
 import logoRed from "@/assets/kmc-logo-red.svg";
 
@@ -35,6 +35,35 @@ function resolvePrintData(task: PMTask): PrintData {
     };
   }
   return { items: task.checklist, isFinished: false };
+}
+
+interface HeaderFields {
+  workshop: string;
+  department: string;
+  estDuration: string;
+  procedures: string;
+  requiredTools: string;
+  safetyInstructions: string;
+}
+
+/**
+ * Fills in fallbacks so the printed page never shows blank header cells or
+ * missing boxes just because a task's seed/created record left an optional
+ * field unset — the physical form should always look complete for both the
+ * technician (blank/in-progress copy) and the supervisor (preview/approval
+ * copy), since both print through this same resolver.
+ */
+function resolveHeaderFields(task: PMTask): HeaderFields {
+  const machine = getMachine(task.machineId);
+  const est = estimatedPMHours(task);
+  return {
+    workshop: task.workshop || machine?.sector || "—",
+    department: task.department || "Maintenance Department",
+    estDuration: `${est.hours.toFixed(1)}h`,
+    procedures: task.procedures || "—",
+    requiredTools: task.requiredTools || "—",
+    safetyInstructions: task.safetyInstructions || "—",
+  };
 }
 
 function fmtDate(iso?: string): string {
@@ -78,6 +107,7 @@ function PMChecklistMarkup({
   personName?: string;
 }) {
   const data = resolvePrintData(task);
+  const fields = resolveHeaderFields(task);
   const sections = Array.from(new Set(data.items.map((i) => i.section)));
 
   return (
@@ -102,16 +132,16 @@ function PMChecklistMarkup({
         <tbody>
           <GridRow label="Task / Checklist" value={task.task} label2="Frequency" value2={freqLabel(task.frequency)} />
           <GridRow label="Machine/Equipment Name" value={machineName} label2="Machine/Equipment ID" value2={task.machineId} />
-          <GridRow label="Workshop" value={task.workshop} label2="Department" value2={task.department} />
+          <GridRow label="Workshop" value={fields.workshop} label2="Department" value2={fields.department} />
           <GridRow label="Person in Charge" value={personName ?? task.personInCharge} label2="Last Done" value2={task.lastDone} />
-          <GridRow label="Next Due" value={task.nextDue} label2="Est. Duration" value2={`${task.estimatedHours ?? "—"}`} />
+          <GridRow label="Next Due" value={task.nextDue} label2="Est. Duration" value2={fields.estDuration} />
         </tbody>
       </table>
 
       <div className="wo-print-boxes-row">
-        {task.procedures && <Box label="Procedures / Checklist Notes" value={task.procedures} />}
-        {task.requiredTools && <Box label="Required Tools" value={task.requiredTools} />}
-        {task.safetyInstructions && <Box label="Safety Instructions" value={task.safetyInstructions} />}
+        <Box label="Procedures / Checklist Notes" value={fields.procedures} />
+        <Box label="Required Tools" value={fields.requiredTools} />
+        <Box label="Safety Instructions" value={fields.safetyInstructions} />
       </div>
 
       {data.isFinished && data.remarks && <Box label="Technician Remarks" value={data.remarks} />}
@@ -218,15 +248,14 @@ export function printPMChecklist(task: PMTask) {
   const person = task.personInCharge ? getWorker(task.personInCharge) : null;
   const personName = person?.name ?? task.personInCharge;
   const data = resolvePrintData(task);
+  const fields = resolveHeaderFields(task);
   const sections = Array.from(new Set(data.items.map((i) => i.section)));
 
   const gridRow = (label: string, value: string | undefined, label2: string, value2: string | undefined) =>
     `<tr><th>${esc(label)}</th><td>${esc(value || " ")}</td><th>${esc(label2)}</th><td>${esc(value2 || " ")}</td></tr>`;
 
-  const box = (label: string, value: string | undefined) =>
-    value
-      ? `<div class="wo-print-box"><div class="wo-print-box-label">${esc(label)}</div><div class="wo-print-box-body">${esc(value)}</div></div>`
-      : "";
+  const box = (label: string, value: string) =>
+    `<div class="wo-print-box"><div class="wo-print-box-label">${esc(label)}</div><div class="wo-print-box-body">${esc(value)}</div></div>`;
 
   const signoff = (label: string, value: string) =>
     `<div class="wo-print-signoff-field"><div class="wo-print-sig-line">${esc(value)}</div><span>${label}</span></div>`;
@@ -274,17 +303,17 @@ export function printPMChecklist(task: PMTask) {
       <tbody>
         ${gridRow("Task / Checklist", task.task, "Frequency", freqLabel(task.frequency))}
         ${gridRow("Machine/Equipment Name", machine?.name, "Machine/Equipment ID", task.machineId)}
-        ${gridRow("Workshop", task.workshop, "Department", task.department)}
+        ${gridRow("Workshop", fields.workshop, "Department", fields.department)}
         ${gridRow("Person in Charge", personName, "Last Done", task.lastDone)}
-        ${gridRow("Next Due", task.nextDue, "Est. Duration", task.estimatedHours ? `${task.estimatedHours}h` : undefined)}
+        ${gridRow("Next Due", task.nextDue, "Est. Duration", fields.estDuration)}
       </tbody>
     </table>
     <div class="wo-print-boxes-row">
-      ${box("Procedures / Checklist Notes", task.procedures)}
-      ${box("Required Tools", task.requiredTools)}
-      ${box("Safety Instructions", task.safetyInstructions)}
+      ${box("Procedures / Checklist Notes", fields.procedures)}
+      ${box("Required Tools", fields.requiredTools)}
+      ${box("Safety Instructions", fields.safetyInstructions)}
     </div>
-    ${data.isFinished ? box("Technician Remarks", data.remarks) : ""}
+    ${data.isFinished && data.remarks ? box("Technician Remarks", data.remarks) : ""}
     <div class="wo-print-checklist-legend">Mark one per item: OK &middot; F = Faulty &middot; N/A = Not Applicable</div>
     <div class="wo-print-checklist-columns">${sectionsHtml}</div>
     <div class="wo-print-signoff">

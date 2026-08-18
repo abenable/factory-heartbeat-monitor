@@ -54,6 +54,7 @@ import { printPMChecklist } from "@/components/PrintablePMChecklist";
 
 type FreqFilter = "all" | PMFrequency;
 type DueFilter = "all" | "overdue" | "due-soon";
+type StatusFilter = "all" | "open" | "in_progress" | "blocked" | "waiting_approval" | "approved";
 
 const FREQ_DAYS: Record<PMFrequency, number> = { daily: 1, weekly: 7, monthly: 30, quarterly: 90 };
 
@@ -71,6 +72,30 @@ const freqFilters: { key: FreqFilter; label: string }[] = [
   { key: "quarterly", label: "Quarterly" },
 ];
 
+const statusFilters: { key: StatusFilter; label: string }[] = [
+  { key: "all", label: "All" },
+  { key: "open", label: "Awaiting Technician" },
+  { key: "in_progress", label: "In Progress" },
+  { key: "blocked", label: "Blocked" },
+  { key: "waiting_approval", label: "Waiting Approval" },
+  { key: "approved", label: "Completed" },
+];
+
+function matchesStatusFilter(p: PMTask, filter: StatusFilter): boolean {
+  switch (filter) {
+    case "all":
+      return true;
+    case "open":
+    case "in_progress":
+    case "blocked":
+      return p.visitStatus === filter;
+    case "waiting_approval":
+      return p.visitStatus === "done" && !isLatestPMVisitApproved(p);
+    case "approved":
+      return p.visitStatus === "done" && isLatestPMVisitApproved(p);
+  }
+}
+
 const freqLabel = (f?: string) => (f ? f.charAt(0).toUpperCase() + f.slice(1) : "—");
 
 /** Only technicians who are currently available (not on leave) can be assigned a PM task. */
@@ -81,6 +106,7 @@ const technicians = Object.values(WORKERS).filter(
 export default function PMSchedule() {
   const [freqFilter, setFreqFilter] = useState<FreqFilter>("all");
   const [dueFilter, setDueFilter] = useState<DueFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
   const [scheduleTarget, setScheduleTarget] = useState<PMTask | null>(null);
@@ -94,12 +120,34 @@ export default function PMSchedule() {
     if (freqFilter !== "all") base = base.filter((p) => p.frequency === freqFilter);
     if (dueFilter === "overdue") base = base.filter((p) => isPMOverdue(p));
     if (dueFilter === "due-soon") base = base.filter((p) => isPMDueSoon(p));
+    base = base.filter((p) => matchesStatusFilter(p, statusFilter));
     return base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [freqFilter, dueFilter, tick]);
+  }, [freqFilter, dueFilter, statusFilter, tick]);
 
   const overdue = pmTasks.filter((p) => isPMOverdue(p)).length;
   const dueSoon = pmTasks.filter((p) => isPMDueSoon(p)).length;
+  const statusCounts = useMemo(() => {
+    const counts: Record<StatusFilter, number> = {
+      all: pmTasks.length,
+      open: 0,
+      in_progress: 0,
+      blocked: 0,
+      waiting_approval: 0,
+      approved: 0,
+    };
+    for (const p of pmTasks) {
+      if (p.visitStatus === "open") counts.open++;
+      else if (p.visitStatus === "in_progress") counts.in_progress++;
+      else if (p.visitStatus === "blocked") counts.blocked++;
+      else if (p.visitStatus === "done") {
+        if (isLatestPMVisitApproved(p)) counts.approved++;
+        else counts.waiting_approval++;
+      }
+    }
+    return counts;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tick]);
 
   const toggleExpand = (id: string) =>
     setExpanded((prev) => (prev === id ? null : id));
@@ -135,6 +183,23 @@ export default function PMSchedule() {
             </span>
           </div>
         )}
+
+        <div className="flex flex-wrap gap-1.5">
+          {statusFilters.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setStatusFilter(f.key)}
+              className={`px-3 py-1.5 text-xs font-medium border rounded-full transition-colors ${
+                statusFilter === f.key
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border text-muted-foreground hover:border-primary hover:text-primary"
+              }`}
+            >
+              {f.label}
+              <span className="ml-1.5 font-mono-data text-[10px] opacity-70">{statusCounts[f.key]}</span>
+            </button>
+          ))}
+        </div>
 
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionHeading>Machine PM Checklists</SectionHeading>
