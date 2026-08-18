@@ -165,15 +165,18 @@ function PMChecklistMarkup({
 
       {data.isFinished && data.remarks && <Box label="Technician Remarks" value={data.remarks} />}
 
+      <div className="wo-print-checklist-legend">
+        Tick one box per item: <strong>✓</strong> passed inspection · <strong>✗</strong> requires attention · <strong>–</strong> not applicable
+      </div>
       <table className="wo-print-checklist-table">
         <thead>
           <tr>
             <th className="sn-col">SN</th>
             <th className="section-col">Check Item</th>
             <th>Test Performed</th>
-            <th className="tick-col">OK</th>
-            <th className="tick-col">Faulty</th>
-            <th className="tick-col">N/A</th>
+            <th className="tick-col">✓</th>
+            <th className="tick-col">✗</th>
+            <th className="tick-col">–</th>
           </tr>
         </thead>
         <tbody>
@@ -374,15 +377,18 @@ export function printPMChecklist(task: PMTask) {
       ${box("Required Tools", fields.requiredTools)}
     </div>
     ${data.isFinished && data.remarks ? box("Technician Remarks", data.remarks) : ""}
+    <div class="wo-print-checklist-legend">
+      Tick one box per item: <strong>&#10003;</strong> passed inspection &middot; <strong>&#10007;</strong> requires attention &middot; <strong>&ndash;</strong> not applicable
+    </div>
     <table class="wo-print-checklist-table">
       <thead>
         <tr>
           <th class="sn-col">SN</th>
           <th class="section-col">Check Item</th>
           <th>Test Performed</th>
-          <th class="tick-col">OK</th>
-          <th class="tick-col">Faulty</th>
-          <th class="tick-col">N/A</th>
+          <th class="tick-col">&#10003;</th>
+          <th class="tick-col">&#10007;</th>
+          <th class="tick-col">&ndash;</th>
         </tr>
       </thead>
       <tbody>${checklistRowsHtml}</tbody>
