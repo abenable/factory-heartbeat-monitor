@@ -1,5 +1,6 @@
 import { WORKERS } from "@/data/workers";
 import type { WorkerProfile } from "@/data/workers";
+import { hydrateFromStorage, persistToStorage } from "@/lib/persistedStore";
 
 export type MaintenanceUrgency = "critical" | "high" | "medium" | "low";
 export type MaintenanceRequestStatus = "submitted" | "approved" | "rejected" | "converted";
@@ -109,6 +110,7 @@ export const maintenanceRequests: MaintenanceRequest[] = [
     },
   },
 ];
+hydrateFromStorage("maintenanceRequests", maintenanceRequests);
 
 export function getMaintenanceRequest(id: string): MaintenanceRequest | undefined {
   return maintenanceRequests.find((r) => r.id === id);
@@ -116,12 +118,14 @@ export function getMaintenanceRequest(id: string): MaintenanceRequest | undefine
 
 export function addMaintenanceRequest(req: MaintenanceRequest) {
   maintenanceRequests.unshift(req);
+  persistToStorage("maintenanceRequests", maintenanceRequests);
 }
 
 export function updateMaintenanceRequest(id: string, updates: Partial<MaintenanceRequest>) {
   const idx = maintenanceRequests.findIndex((r) => r.id === id);
   if (idx !== -1) {
     maintenanceRequests[idx] = { ...maintenanceRequests[idx], ...updates };
+    persistToStorage("maintenanceRequests", maintenanceRequests);
   }
 }
 

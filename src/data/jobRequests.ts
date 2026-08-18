@@ -1,3 +1,5 @@
+import { hydrateFromStorage, persistToStorage } from "@/lib/persistedStore";
+
 export type JobRequestStatus = "new" | "assigned" | "in_progress" | "converted";
 
 export interface JobRequest {
@@ -71,14 +73,17 @@ export const jobRequests: JobRequest[] = [
     plant: "Jinja North",
   },
 ];
+hydrateFromStorage("jobRequests", jobRequests);
 
 export function addJobRequest(jr: JobRequest) {
   jobRequests.unshift(jr);
+  persistToStorage("jobRequests", jobRequests);
 }
 
 export function updateJobRequest(id: string, updates: Partial<JobRequest>) {
   const idx = jobRequests.findIndex((j) => j.id === id);
   if (idx !== -1) {
     jobRequests[idx] = { ...jobRequests[idx], ...updates };
+    persistToStorage("jobRequests", jobRequests);
   }
 }

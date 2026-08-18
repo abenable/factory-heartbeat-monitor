@@ -1,5 +1,7 @@
 // Shared mock data for the CMMS. Replace with real telemetry source later.
 
+import { hydrateFromStorage, persistToStorage } from "@/lib/persistedStore";
+
 export type MachineStatus = "running" | "idle" | "down" | "maintenance";
 
 export const SECTORS = [
@@ -174,6 +176,7 @@ export interface WorkOrder {
 
 export function addWorkOrder(wo: WorkOrder) {
   workOrders.unshift(wo);
+  persistToStorage("workOrders", workOrders);
 }
 
 /**
@@ -196,6 +199,7 @@ export function updateWorkOrder(id: string, updates: Partial<WorkOrder>) {
   const idx = workOrders.findIndex((w) => w.id === id);
   if (idx !== -1) {
     workOrders[idx] = { ...workOrders[idx], ...updates };
+    persistToStorage("workOrders", workOrders);
   }
 }
 
@@ -417,12 +421,14 @@ export function nextPMTaskId(): string {
 
 export function addPMTask(task: PMTask) {
   pmTasks.push(task);
+  persistToStorage("pmTasks", pmTasks);
 }
 
 export function updatePMTask(id: string, updates: Partial<PMTask>) {
   const idx = pmTasks.findIndex((p) => p.id === id);
   if (idx !== -1) {
     pmTasks[idx] = { ...pmTasks[idx], ...updates };
+    persistToStorage("pmTasks", pmTasks);
   }
 }
 
@@ -1187,6 +1193,7 @@ export const machines: Machine[] = [
     assignedTechnicians: ["Mukisa", "Oumo"],
   },
 ];
+hydrateFromStorage("machines", machines);
 
 export const alerts: AlertEvent[] = [
   {
@@ -1473,6 +1480,7 @@ export const workOrders: WorkOrder[] = [
     },
   },
 ];
+hydrateFromStorage("workOrders", workOrders);
 
 function daysFromNow(n: number): string {
   return new Date(Date.now() + n * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
@@ -1563,6 +1571,7 @@ function nextRefFor(id: string): string {
 }
 
 export const pmTasks: PMTask[] = [...curatedPMTasks, ...generatedPMTasks];
+hydrateFromStorage("pmTasks", pmTasks);
 
 export function getMachine(id: string) {
   return machines.find((m) => m.id === id);
@@ -1629,11 +1638,13 @@ export function getBacklog(machineId?: string, now: Date = new Date()): WorkOrde
 
 export function addMachine(machine: Machine) {
   machines.unshift(machine);
+  persistToStorage("machines", machines);
 }
 
 export function updateMachine(id: string, updates: Partial<Machine>) {
   const idx = machines.findIndex((m) => m.id === id);
   if (idx !== -1) {
     machines[idx] = { ...machines[idx], ...updates };
+    persistToStorage("machines", machines);
   }
 }

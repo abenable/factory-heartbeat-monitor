@@ -471,6 +471,21 @@ const pmStatusMeta: Record<WorkOrderStatus, { label: string; color: string }> = 
   done: { label: "Done", color: "text-led-ok" },
 };
 
+/** Card CTA text — must never read like a status ("Open checklist" on a
+ *  finished task looked like the checklist was still open), so it's phrased
+ *  differently per visitStatus instead of reusing one generic label. */
+function pmCardCta(task: PMTask): string {
+  if (!task.visitAcknowledgedAt) return "Confirm receipt";
+  switch (task.visitStatus) {
+    case "done":
+      return "View completed checklist";
+    case "blocked":
+      return "Resume checklist";
+    default:
+      return "Continue checklist";
+  }
+}
+
 function PMCard({ task, onClick }: { task: PMTask; onClick: () => void }) {
   const machine = getMachine(task.machineId);
   const days = pmDaysUntil(task.nextDue);
@@ -512,7 +527,7 @@ function PMCard({ task, onClick }: { task: PMTask; onClick: () => void }) {
           </span>
         </div>
         <div className="flex items-center text-xs text-primary font-medium">
-          {task.visitAcknowledgedAt ? "Open checklist" : "Confirm receipt"} <ChevronRight className="size-3.5 ml-1" />
+          {pmCardCta(task)} <ChevronRight className="size-3.5 ml-1" />
         </div>
       </CardContent>
     </Card>
