@@ -6,6 +6,7 @@ import { StatusDot } from "@/components/StatusDot";
 import { Button } from "@/components/ui/button";
 import {
   alerts,
+  comparePMByReference,
   getMachine,
   pmTasks,
   statusColor,
@@ -44,7 +45,7 @@ const MachineDetail = () => {
   const tone = statusColor(machine.status);
   const machineAlerts = alerts.filter((a) => a.machineId === machine.id);
   const machineWO = workOrders.filter((w) => w.machineId === machine.id);
-  const machinePM = pmTasks.filter((p) => p.machineId === machine.id);
+  const machinePM = pmTasks.filter((p) => p.machineId === machine.id).sort(comparePMByReference);
   const machineBacklog = getBacklog(machine.id);
 
   return (

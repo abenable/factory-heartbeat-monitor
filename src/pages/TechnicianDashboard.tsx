@@ -12,9 +12,11 @@ import {
   Loader2,
   MessageSquare,
   PauseCircle,
+  Search,
   Timer,
   TrendingUp,
   Wrench,
+  X as XIcon,
 } from "lucide-react";
 import {
   Bar,
@@ -49,6 +51,7 @@ import {
   blockPMVisit,
   resumePMVisit,
   completePMVisit,
+  comparePMByReference,
   estimatedPMHours,
   pmDaysUntil,
   isPMOverdue,
@@ -356,9 +359,20 @@ const pmFilters: { key: WorkOrderStatus | "all" | "active"; label: string }[] = 
   { key: "all", label: "All" },
 ];
 
+/** Free-text search across reference number, task id/name and machine — lets a
+ *  technician with a long list quickly jump to a specific checklist. */
+function pmMatchesSearch(p: PMTask, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const machine = getMachine(p.machineId);
+  const haystack = [p.id, p.referenceNumber, p.task, p.machineId, machine?.name].filter(Boolean).join(" ").toLowerCase();
+  return haystack.includes(q);
+}
+
 function MyPMSection({ username, worker }: { username: string; worker: WorkerProfile | null }) {
   const [tick, setTick] = useState(0);
   const [pmFilter, setPmFilter] = useState<WorkOrderStatus | "all" | "active">("active");
+  const [search, setSearch] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const myPM = useMemo(
@@ -367,12 +381,13 @@ function MyPMSection({ username, worker }: { username: string; worker: WorkerPro
     [username, tick],
   );
 
-  const filtered =
+  const filtered = (
     pmFilter === "all"
       ? myPM
       : pmFilter === "active"
       ? myPM.filter((p) => p.visitStatus !== "done")
-      : myPM.filter((p) => p.visitStatus === pmFilter);
+      : myPM.filter((p) => p.visitStatus === pmFilter)
+  ).filter((p) => pmMatchesSearch(p, search));
 
   // Always look the selected task up fresh from pmTasks so the open dialog
   // reflects the latest state after any update, instead of a stale prop.
@@ -390,7 +405,25 @@ function MyPMSection({ username, worker }: { username: string; worker: WorkerPro
         </span>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap items-center gap-2 mb-4">
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+          <Input
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search reference #, task, machine..."
+            className="h-8 w-56 pl-8 pr-7 text-xs"
+          />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            >
+              <XIcon className="size-3.5" />
+            </button>
+          )}
+        </div>
         {pmFilters.map((f) => (
           <button
             key={f.key}
@@ -413,7 +446,7 @@ function MyPMSection({ username, worker }: { username: string; worker: WorkerPro
           </Card>
         )}
         {filtered
-          .sort((a, b) => new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime())
+          .sort(comparePMByReference)
           .map((task) => (
             <PMCard key={task.id} task={task} onClick={() => setSelectedId(task.id)} />
           ))}

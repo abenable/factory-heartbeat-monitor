@@ -398,6 +398,15 @@ export function getPMTask(id: string): PMTask | undefined {
   return pmTasks.find((p) => p.id === id);
 }
 
+/** Sorts PM tasks by their paper-form reference number (falls back to id), so
+ *  listings match the order technicians/supervisors expect from the physical
+ *  checklist binder rather than by due date. */
+export function comparePMByReference(a: PMTask, b: PMTask): number {
+  const ka = a.referenceNumber ?? a.id;
+  const kb = b.referenceNumber ?? b.id;
+  return ka.localeCompare(kb, undefined, { numeric: true, sensitivity: "base" });
+}
+
 export function nextPMTaskId(): string {
   const seqs = pmTasks
     .map((p) => Number(p.id.replace(/^PM-/, "")))

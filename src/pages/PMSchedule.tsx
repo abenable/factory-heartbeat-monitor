@@ -10,8 +10,10 @@ import {
   PauseCircle,
   Plus,
   Printer,
+  Search,
   Timer,
   UserCog,
+  X,
 } from "lucide-react";
 import { AppLayout } from "@/components/AppLayout";
 import { Panel, SectionHeading } from "@/components/Panel";
@@ -36,6 +38,7 @@ import {
   updatePMTask,
   approvePMVisit,
   isLatestPMVisitApproved,
+  comparePMByReference,
   estimatedPMHours,
   pmDaysUntil,
   isPMOverdue,
@@ -98,6 +101,19 @@ function matchesStatusFilter(p: PMTask, filter: StatusFilter): boolean {
 
 const freqLabel = (f?: string) => (f ? f.charAt(0).toUpperCase() + f.slice(1) : "—");
 
+/** Free-text search across reference number, task id/name, machine, workshop/department and assigned technician. */
+function pmMatchesSearch(p: PMTask, query: string): boolean {
+  const q = query.trim().toLowerCase();
+  if (!q) return true;
+  const machine = getMachine(p.machineId);
+  const person = p.personInCharge ? getWorker(p.personInCharge) : undefined;
+  const haystack = [p.id, p.referenceNumber, p.task, p.machineId, machine?.name, p.personInCharge, person?.name, p.workshop, p.department]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  return haystack.includes(q);
+}
+
 /** Only technicians who are currently available (not on leave) can be assigned a PM task. */
 const technicians = Object.values(WORKERS).filter(
   (w) => w.role !== "supervisor" && w.role !== "viewer" && w.role !== "reporter" && !onLeaveUsernames.includes(w.username),
@@ -107,6 +123,7 @@ export default function PMSchedule() {
   const [freqFilter, setFreqFilter] = useState<FreqFilter>("all");
   const [dueFilter, setDueFilter] = useState<DueFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [search, setSearch] = useState("");
   const [expanded, setExpanded] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
   const [scheduleTarget, setScheduleTarget] = useState<PMTask | null>(null);
@@ -114,19 +131,19 @@ export default function PMSchedule() {
   const [newOpen, setNewOpen] = useState(false);
 
   const sorted = useMemo(() => {
-    let base = [...pmTasks].sort(
-      (a, b) => new Date(a.nextDue).getTime() - new Date(b.nextDue).getTime(),
-    );
+    let base = [...pmTasks].sort(comparePMByReference);
     if (freqFilter !== "all") base = base.filter((p) => p.frequency === freqFilter);
     if (dueFilter === "overdue") base = base.filter((p) => isPMOverdue(p));
     if (dueFilter === "due-soon") base = base.filter((p) => isPMDueSoon(p));
     base = base.filter((p) => matchesStatusFilter(p, statusFilter));
+    base = base.filter((p) => pmMatchesSearch(p, search));
     return base;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [freqFilter, dueFilter, statusFilter, tick]);
+  }, [freqFilter, dueFilter, statusFilter, search, tick]);
 
   const overdue = pmTasks.filter((p) => isPMOverdue(p)).length;
   const dueSoon = pmTasks.filter((p) => isPMDueSoon(p)).length;
+  const assignedUnacknowledged = pmTasks.filter((p) => p.personInCharge && p.visitStatus === "open").length;
   const statusCounts = useMemo(() => {
     const counts: Record<StatusFilter, number> = {
       all: pmTasks.length,
@@ -157,7 +174,7 @@ export default function PMSchedule() {
   return (
     <AppLayout pageTitle="Preventive Maintenance Schedule" breadcrumb="PM PLANNING">
       <div className="flex flex-col gap-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
           <Stat
             label="Overdue"
             value={overdue}
@@ -171,6 +188,13 @@ export default function PMSchedule() {
             tone="warn"
             active={dueFilter === "due-soon"}
             onClick={() => setDueFilter((f) => (f === "due-soon" ? "all" : "due-soon"))}
+          />
+          <Stat
+            label="Assigned, Awaiting Technician"
+            value={assignedUnacknowledged}
+            tone="warn"
+            active={statusFilter === "open"}
+            onClick={() => setStatusFilter((f) => (f === "open" ? "all" : "open"))}
           />
           <Stat label="Total Tracked" value={pmTasks.length} />
         </div>
@@ -204,6 +228,24 @@ export default function PMSchedule() {
         <div className="flex flex-wrap items-center justify-between gap-3">
           <SectionHeading>Machine PM Checklists</SectionHeading>
           <div className="flex flex-wrap items-center gap-3">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search reference #, task, machine, technician..."
+                className="h-9 w-64 pl-8 pr-8 text-sm"
+              />
+              {search && (
+                <button
+                  type="button"
+                  onClick={() => setSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                >
+                  <X className="size-3.5" />
+                </button>
+              )}
+            </div>
             <div className="flex flex-wrap gap-1">
               {freqFilters.map((f) => (
                 <button
