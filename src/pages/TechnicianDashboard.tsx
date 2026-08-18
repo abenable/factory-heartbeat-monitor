@@ -549,7 +549,12 @@ function PMTaskDetailDialog({
   const signatureName = currentUser?.name ?? task.personInCharge ?? "";
   const [remarks, setRemarks] = useState("");
   const [blockedReason, setBlockedReason] = useState(task.visitBlockedReason ?? "");
-  const sections = Array.from(new Set(task.checklist.map((i) => i.section)));
+  const isDone = task.visitStatus === "done";
+  // Once a visit completes, task.checklist resets to blank for the next
+  // cycle — the actual filled-in results live in task.history[0].items, so
+  // a completed task must read from there instead (matches the print logic).
+  const displayItems = isDone && task.history[0] ? task.history[0].items : task.checklist;
+  const sections = Array.from(new Set(displayItems.map((i) => i.section)));
 
   const acknowledge = () => {
     acknowledgePMVisit(task.id, signatureName);
@@ -595,8 +600,6 @@ function PMTaskDetailDialog({
     onUpdated();
     onClose();
   };
-
-  const isDone = task.visitStatus === "done";
 
   return (
     <Dialog open onOpenChange={(open) => !open && onClose()}>
@@ -704,7 +707,7 @@ function PMTaskDetailDialog({
               <div key={section} className="space-y-1.5">
                 <span className="text-xs font-medium text-muted-foreground">{section}</span>
                 <div className="space-y-1.5">
-                  {task.checklist
+                  {displayItems
                     .filter((i) => i.section === section)
                     .map((item) => (
                       <div

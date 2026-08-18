@@ -157,9 +157,18 @@ function PMChecklistMarkup({
                 <div key={item.id} className="wo-print-check-row">
                   <span className="wo-print-check-desc">{item.description}</span>
                   <span className="wo-print-check-marks">
-                    <span className={`wo-print-mark ${item.result === "ok" ? "wo-print-mark-filled" : ""}`}>OK</span>
-                    <span className={`wo-print-mark ${item.result === "faulty" ? "wo-print-mark-filled" : ""}`}>F</span>
-                    <span className={`wo-print-mark ${item.result === "na" ? "wo-print-mark-filled" : ""}`}>N/A</span>
+                    <span className="wo-print-checkbox">
+                      <span className={`wo-print-checkbox-box ${item.result === "ok" ? "checked" : ""}`} />
+                      OK
+                    </span>
+                    <span className="wo-print-checkbox">
+                      <span className={`wo-print-checkbox-box ${item.result === "faulty" ? "checked" : ""}`} />
+                      F
+                    </span>
+                    <span className="wo-print-checkbox">
+                      <span className={`wo-print-checkbox-box ${item.result === "na" ? "checked" : ""}`} />
+                      N/A
+                    </span>
                   </span>
                 </div>
               ))}
@@ -266,7 +275,7 @@ export function printPMChecklist(task: PMTask) {
     }</div>`;
 
   const mark = (active: boolean, label: string) =>
-    `<span class="wo-print-mark${active ? " wo-print-mark-filled" : ""}">${label}</span>`;
+    `<span class="wo-print-checkbox"><span class="wo-print-checkbox-box${active ? " checked" : ""}"></span>${label}</span>`;
 
   const sectionsHtml = sections
     .map((section) => {

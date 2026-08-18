@@ -306,14 +306,26 @@
 .wo-print-check-row {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
   gap: 4px;
-  padding: 0.5px 0;
+  padding: 1px 0;
   font-size: 8px;
   border-bottom: 1px dotted #ccc;
 }
 .wo-print-check-desc { flex: 1; }
-.wo-print-check-marks { display: flex; gap: 3px; flex-shrink: 0; font-size: 6.5px; }
-.wo-print-mark { border: 1px solid #000; padding: 0 2px; display: inline-block; min-width: 10px; text-align: center; }
-.wo-print-mark-filled { background: #000; color: #fff; }
+.wo-print-check-marks { display: flex; gap: 5px; flex-shrink: 0; align-items: center; }
+.wo-print-checkbox { display: inline-flex; align-items: center; gap: 2px; font-size: 6.5px; white-space: nowrap; }
+.wo-print-checkbox-box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 8px;
+  height: 8px;
+  border: 1px solid #000;
+  font-size: 7px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.wo-print-checkbox-box.checked { font-weight: 700; }
+.wo-print-checkbox-box.checked::after { content: "\2713"; }
 .wo-print-checklist-legend { font-size: 7px; color: #444; margin-top: 4px; }
