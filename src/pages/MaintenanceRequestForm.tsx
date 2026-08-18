@@ -148,6 +148,34 @@ export default function MaintenanceRequestForm() {
   const isApprover = isSupervisorUser && canApprove;
   const canEditResponse = isApprover;
 
+  // In create mode there's no saved MaintenanceRequest yet — build a draft
+  // shaped the same way so the printable template (and its Print button)
+  // work from the very first keystroke, not just after submission.
+  const draftRequest: MaintenanceRequest = existing ?? {
+    id: "DRAFT",
+    jobNumber: "DRAFT",
+    status: "submitted",
+    submittedAt: new Date().toISOString(),
+    submittedBy: username,
+    requesterName,
+    requesterEmail,
+    requesterDepartment,
+    requesterDesignation,
+    requestDateTime: requestDateTime ? new Date(requestDateTime).toISOString() : new Date().toISOString(),
+    requesterSignatureName,
+    requesterSignedAt: undefined,
+    equipmentName,
+    equipmentId,
+    workshop,
+    station,
+    operatorCustodianName,
+    operatorCustodianDesignation,
+    problemDescription,
+    urgency,
+    routedSupervisorUsername: "",
+    response: { receivedAt: "" },
+  };
+
   const pageTitle = mode === "create" ? "New Maintenance Request" : existing?.jobNumber ?? "Maintenance Request";
   const breadcrumb = mode === "create" ? "JOB REQUEST · MRF" : "JOB REQUEST · MRF";
 
@@ -161,11 +189,9 @@ export default function MaintenanceRequestForm() {
         </Button>
 
         <div className="flex items-center gap-2 no-print">
-          {mode === "view" && existing && (
-            <Button variant="outline" size="sm" onClick={() => window.print()}>
-              <Printer className="size-4 mr-2" /> Print / Download PDF
-            </Button>
-          )}
+          <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <Printer className="size-4 mr-2" /> Print / Download PDF
+          </Button>
         </div>
       </div>
 
@@ -467,7 +493,7 @@ export default function MaintenanceRequestForm() {
   return (
     <>
       <div className="screen-only">{wrapped}</div>
-      {existing && <PrintableMaintenanceRequest request={existing} />}
+      <PrintableMaintenanceRequest request={draftRequest} />
     </>
   );
 
